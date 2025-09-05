@@ -59,6 +59,7 @@ namespace TechZone.Api
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

@@ -10,16 +10,12 @@ using TechZone.Core.models;
 
 namespace TechZone.Api.Services.Implementations
 {
-    public class AuthService : IAuthService
+    public class AuthService(UserManager<ApplicationUser> userManager, IOptions<helper.JWT> jwt) : IAuthService
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly helper.JWT _jwt;
-        public AuthService(UserManager<ApplicationUser> userManager, IOptions<helper.JWT> jwt)
-        {
-            _userManager = userManager;
-            _jwt = jwt.Value;
-        }
+        private readonly helper.JWT _jwt = jwt.Value;
+
         public async Task<AuthDto> RegisterAsync(RegisterDto dto)
         {
             if (await _userManager.FindByEmailAsync(dto.Email) is not null)
