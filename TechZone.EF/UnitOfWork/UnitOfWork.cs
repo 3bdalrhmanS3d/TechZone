@@ -1,28 +1,49 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TechZone.Core.Interfaces;
 using TechZone.EF.Application;
+using TechZone.EF.Repositories;
 
 namespace TechZone.EF.UnitOfWork
 {
-    internal class UnitOfWork(ApplicationDbContext context) : IUnitOfWork
+    public class UnitOfWork : IUnitOfWork
     {
+        private readonly ApplicationDbContext _context;
 
+        // Repository instances
+        public ILaptopRepository Laptops { get; }
+        public IOrderRepository Orders { get; }
+        public IOrderItemRepository OrderItems { get; }
 
-        // Transaction Methods
-        public Task<IDbContextTransaction> BeginTransactionAsync() => context.Database.BeginTransactionAsync();
+        public UnitOfWork(ApplicationDbContext context)
+        {
+            _context = context;
 
-        public int Complete() => context.SaveChanges();
+            // Initialize repositories
+            Laptops = new LaptopRepository(_context);
+            Orders = new OrderRepository(_context);
+            OrderItems = new OrderItemRepository(_context);
+        }
 
-        public Task<int> CompleteAsync() => context.SaveChangesAsync();
+        // Transaction methods
+        public Task<IDbContextTransaction> BeginTransactionAsync()
+            => _context.Database.BeginTransactionAsync();
 
-        public void Dispose() => context.Dispose();
+        public int Complete() => _context.SaveChanges();
 
-        public Task<int> SaveAsync() => context.SaveChangesAsync();
-        public Task<int> SaveChangesAsync() => context.SaveChangesAsync();
+        public Task<int> CompleteAsync() => _context.SaveChangesAsync();
+
+        public void Dispose() => _context.Dispose();
+
+        public Task<int> SaveAsync()
+        {
+            return _context.SaveChangesAsync();
+        }
+
+        public Task<int> SaveChangesAsync()
+        {
+            return _context.SaveChangesAsync();
+        }
     }
 }

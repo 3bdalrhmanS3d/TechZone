@@ -4,8 +4,10 @@ using System.Reflection;
 using TechZone.Api.Data;
 using TechZone.Api.Services.Implementations;
 using TechZone.Api.Services.Interfaces;
+using TechZone.Core.Interfaces;
 using TechZone.Core.models;
 using TechZone.EF.Application;
+using TechZone.EF.UnitOfWork;
 
 namespace TechZone.Api
 {
@@ -18,6 +20,8 @@ namespace TechZone.Api
             // Add services to the container.
             builder.Services.Configure<helper.JWT>(builder.Configuration.GetSection("JWT"));
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<ILaptopService, LaptopService>();
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
