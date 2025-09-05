@@ -17,12 +17,12 @@ namespace TechZone.Api.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterAsync([FromBody] RegisterDto model)
+        public async Task<IActionResult> RegisterAsync([FromBody] RegisterDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _authService.RegisterAsync(model);
+            var result = await _authService.RegisterAsync(dto);
 
             if (!result.IsAuthenticated)
                 return BadRequest(result.Message);
@@ -30,32 +30,33 @@ namespace TechZone.Api.Controllers
             return Ok(result);
         }
 
-        [HttpPost("token")]
-        public async Task<IActionResult> GetTokenAsync([FromBody] TokenRequestDto model)
+        [HttpPost("login")]
+        public async Task<IActionResult> LoginAsync([FromBody] TokenRequestDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _authService.GetTokenAsync(model);
+            var result = await _authService.GetTokenAsync(dto);
 
             if (!result.IsAuthenticated)
                 return BadRequest(result.Message);
 
             return Ok(result);
         }
+
 
         [HttpPost("addrole")]
-        public async Task<IActionResult> AddRoleAsync([FromBody] AddRoleDto model)
+        public async Task<IActionResult> AddRoleAsync([FromBody] AddRoleDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _authService.AddRoleAsync(model);
+            var result = await _authService.AddRoleAsync(dto);
 
             if (!string.IsNullOrEmpty(result))
                 return BadRequest(result);
 
-            return Ok(model);
+            return Ok(dto);
         }
     }
 }
