@@ -41,6 +41,10 @@ namespace TechZone.Api.Controllers
             if (!result.IsAuthenticated)
                 return BadRequest(result.Message);
 
+            if (!string.IsNullOrEmpty(result.RefreshToken))
+                SetRefreshTokenInCookie(result.RefreshToken, result.RefreshTokenExpiration);
+
+
             return Ok(result);
         }
 
@@ -57,6 +61,19 @@ namespace TechZone.Api.Controllers
                 return BadRequest(result);
 
             return Ok(dto);
+        }
+        private void SetRefreshTokenInCookie(string refreshToken, DateTime expires)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = expires.ToLocalTime(),
+                Secure = true,
+                IsEssential = true,
+                SameSite = SameSiteMode.None
+            };
+
+            Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
     }
 }

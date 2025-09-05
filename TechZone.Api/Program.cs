@@ -45,7 +45,8 @@ namespace TechZone.Api
                     ValidAudience = builder.Configuration["JWT:Audience"],
                     ValidIssuer = builder.Configuration["JWT:Issuer"],
                     IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
-                        System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]))
+                        System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"])),
+                    ClockSkew = TimeSpan.Zero
                 };
             });
 
