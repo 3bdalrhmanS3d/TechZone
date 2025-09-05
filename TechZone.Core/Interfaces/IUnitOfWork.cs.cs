@@ -9,6 +9,10 @@ namespace TechZone.Core.Interfaces
 {
     public interface IUnitOfWork:IDisposable
     {
+        // Repository Properties
+        ILaptopRepository Laptops { get; }
+        IOrderRepository Orders { get; }
+        IOrderItemRepository OrderItems { get; }
         // Transaction Methods
         Task<int> CompleteAsync();
         int Complete();

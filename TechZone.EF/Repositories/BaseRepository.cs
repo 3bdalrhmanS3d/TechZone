@@ -9,7 +9,7 @@ using TechZone.EF.Application;
 
 namespace TechZone.EF.Repositories
 {
-    internal class BaseRepository<T> where T : class
+    public class BaseRepository<T> where T : class
     {
         protected readonly ApplicationDbContext _context;
         protected readonly DbSet<T> _dbSet;
