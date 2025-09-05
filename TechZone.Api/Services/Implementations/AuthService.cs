@@ -169,7 +169,5 @@ namespace TechZone.Api.Services.Implementations
                 CreatedOn = DateTime.UtcNow
             };
         }
-
     }
-
 }
