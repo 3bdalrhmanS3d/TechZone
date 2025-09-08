@@ -1,26 +1,26 @@
 ﻿using TechZone.Api.DTOs.Auth;
 using TechZone.Core.ServiceResponse;
 
-public interface IAuthService
+namespace TechZone.Core.Service.Interfaces
 {
-    
-    Task<ServiceResponse<AuthDto>> RegisterAsync(RegisterDto model);
+    public interface IAuthService
+    {
+        // User Registration and Email Confirmation
+        Task<ServiceResponse<bool>> RegisterAsync(RegisterDto dto);
+        Task<ServiceResponse<bool>> ConfirmEmailAsync(ConfirmEmailWithCodeDto dto);
+        Task<ServiceResponse<bool>> ResendVerificationCodeAsync(ResendVerificationCodeDto dto);
 
-    Task<ServiceResponse<AuthDto>> GetTokenAsync(TokenRequestDto model);
+        // Authentication
+        Task<ServiceResponse<AuthDto>> GetTokenAsync(TokenRequestDto dto);
+        Task<ServiceResponse<AuthDto>> RefreshTokenAsync(RefreshTokenDto dto);
+        Task<ServiceResponse<bool>> RevokeTokenAsync(string userId, RevokeTokenDto dto);
 
-    Task<ServiceResponse<bool>> ConfirmEmailAsync(ConfirmEmailDto model);
+        // Password Management
+        Task<ServiceResponse<bool>> ForgotPasswordAsync(ForgotPasswordDto dto);
+        Task<ServiceResponse<bool>> ResetPasswordAsync(ResetPasswordWithCodeDto dto);
+        Task<ServiceResponse<bool>> ChangePasswordAsync(string userId, ChangePasswordDto dto);
 
-    Task<ServiceResponse<bool>> ResendEmailConfirmationAsync(ResendConfirmationEmailDto model);
-
-    Task<ServiceResponse<bool>> ForgotPasswordAsync(ForgotPasswordDto model);
-
-    Task<ServiceResponse<bool>> ResetPasswordAsync(ResetPasswordDto model);
-
-    Task<ServiceResponse<bool>> ChangePasswordAsync(string userId, ChangePasswordDto model);
-
-    Task<ServiceResponse<AuthDto>> RefreshTokenAsync(RefreshTokenDto model);
-
-    Task<ServiceResponse<bool>> RevokeTokenAsync(string userId, RevokeTokenDto model);
-
-    
+        // Role Management
+        Task<ServiceResponse<bool>> AddRoleAsync(AddRoleDto dto);
+    }
 }

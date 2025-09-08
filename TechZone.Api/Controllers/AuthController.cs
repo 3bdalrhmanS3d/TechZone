@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TechZone.Api.DTOs.Auth;
 using TechZone.Api.Extensions;
+using TechZone.Core.Service.Interfaces;
 using TechZone.Core.ServiceResponse;
 
 namespace TechZone.Api.Controllers
@@ -24,30 +25,23 @@ namespace TechZone.Api.Controllers
         /// Register a new user
         /// </summary>
         /// <param name="dto">Registration details</param>
-        /// <returns>Authentication result with JWT token</returns>
+        /// <returns>Registration result - email verification code will be sent</returns>
         [HttpPost("register")]
-        [ProducesResponseType(typeof(ServiceResponse<AuthDto>), 200)]
-        [ProducesResponseType(typeof(ServiceResponse<AuthDto>), 400)]
-        [ProducesResponseType(typeof(ServiceResponse<AuthDto>), 409)]
-        [ProducesResponseType(typeof(ServiceResponse<AuthDto>), 500)]
-        public async Task<ActionResult<ServiceResponse<AuthDto>>> Register([FromBody] RegisterDto dto)
+        [ProducesResponseType(typeof(ServiceResponse<bool>), 200)]
+        [ProducesResponseType(typeof(ServiceResponse<bool>), 400)]
+        [ProducesResponseType(typeof(ServiceResponse<bool>), 409)]
+        [ProducesResponseType(typeof(ServiceResponse<bool>), 500)]
+        public async Task<ActionResult<ServiceResponse<bool>>> Register([FromBody] RegisterDto dto)
         {
             _logger.LogInformation("POST /api/auth/register - Registration attempt for email: {Email}", dto.Email);
 
             if (!ModelState.IsValid)
             {
-                var validationResponse = ModelState.ToValidationErrorResponse<AuthDto>();
+                var validationResponse = ModelState.ToValidationErrorResponse<bool>();
                 return validationResponse.ToActionResult();
             }
 
             var response = await _authService.RegisterAsync(dto);
-
-            // Set refresh token in cookie if successful
-            if (response.IsSuccess && !string.IsNullOrEmpty(response.Data?.RefreshToken))
-            {
-                SetRefreshTokenInCookie(response.Data.RefreshToken, response.Data.RefreshTokenExpiration);
-            }
-
             return response.ToActionResult();
         }
 
@@ -84,18 +78,18 @@ namespace TechZone.Api.Controllers
         }
 
         /// <summary>
-        /// Confirm user email
+        /// Confirm user email with verification code
         /// </summary>
-        /// <param name="dto">Email confirmation details</param>
+        /// <param name="dto">Email confirmation details with code</param>
         /// <returns>Confirmation result</returns>
         [HttpPost("confirm-email")]
         [ProducesResponseType(typeof(ServiceResponse<bool>), 200)]
         [ProducesResponseType(typeof(ServiceResponse<bool>), 400)]
         [ProducesResponseType(typeof(ServiceResponse<bool>), 404)]
         [ProducesResponseType(typeof(ServiceResponse<bool>), 500)]
-        public async Task<ActionResult<ServiceResponse<bool>>> ConfirmEmail([FromBody] ConfirmEmailDto dto)
+        public async Task<ActionResult<ServiceResponse<bool>>> ConfirmEmail([FromBody] ConfirmEmailWithCodeDto dto)
         {
-            _logger.LogInformation("POST /api/auth/confirm-email - Email confirmation for user: {UserId}", dto.UserId);
+            _logger.LogInformation("POST /api/auth/confirm-email - Email confirmation for user: {Email}", dto.Email);
 
             if (!ModelState.IsValid)
             {
@@ -108,45 +102,18 @@ namespace TechZone.Api.Controllers
         }
 
         /// <summary>
-        /// Confirm email via GET (for email links)
+        /// Resend verification code
         /// </summary>
-        /// <param name="userId">User ID</param>
-        /// <param name="token">Confirmation token</param>
-        /// <returns>Confirmation result</returns>
-        [HttpGet("confirm-email")]
-        [ProducesResponseType(typeof(ServiceResponse<bool>), 200)]
-        [ProducesResponseType(typeof(ServiceResponse<bool>), 400)]
-        [ProducesResponseType(typeof(ServiceResponse<bool>), 404)]
-        [ProducesResponseType(typeof(ServiceResponse<bool>), 500)]
-        public async Task<ActionResult<ServiceResponse<bool>>> ConfirmEmailViaGet([FromQuery] string userId, [FromQuery] string token)
-        {
-            _logger.LogInformation("GET /api/auth/confirm-email - Email confirmation for user: {UserId}", userId);
-
-            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
-            {
-                var errorResponse = ServiceResponse<bool>.ErrorResponse("User ID and token are required",
-                    "البريد الإلكتروني للمستلم مطلوب",
-                    400);
-                return errorResponse.ToActionResult();
-            }
-
-            var dto = new ConfirmEmailDto { UserId = userId, Token = token };
-            var response = await _authService.ConfirmEmailAsync(dto);
-            return response.ToActionResult();
-        }
-
-        /// <summary>
-        /// Resend email confirmation
-        /// </summary>
-        /// <param name="dto">Email for resending confirmation</param>
+        /// <param name="dto">Resend verification code details</param>
         /// <returns>Resend result</returns>
-        [HttpPost("resend-email-confirmation")]
+        [HttpPost("resend-verification-code")]
         [ProducesResponseType(typeof(ServiceResponse<bool>), 200)]
         [ProducesResponseType(typeof(ServiceResponse<bool>), 400)]
         [ProducesResponseType(typeof(ServiceResponse<bool>), 500)]
-        public async Task<ActionResult<ServiceResponse<bool>>> ResendEmailConfirmation([FromBody] ResendConfirmationEmailDto dto)
+        public async Task<ActionResult<ServiceResponse<bool>>> ResendVerificationCode([FromBody] ResendVerificationCodeDto dto)
         {
-            _logger.LogInformation("POST /api/auth/resend-email-confirmation - Resending confirmation to: {Email}", dto.Email);
+            _logger.LogInformation("POST /api/auth/resend-verification-code - Resending {Type} code to: {Email}",
+                dto.VerificationType, dto.Email);
 
             if (!ModelState.IsValid)
             {
@@ -154,12 +121,12 @@ namespace TechZone.Api.Controllers
                 return validationResponse.ToActionResult();
             }
 
-            var response = await _authService.ResendEmailConfirmationAsync(dto);
+            var response = await _authService.ResendVerificationCodeAsync(dto);
             return response.ToActionResult();
         }
 
         /// <summary>
-        /// Send forgot password email
+        /// Send forgot password email with reset code
         /// </summary>
         /// <param name="dto">Forgot password details</param>
         /// <returns>Send result</returns>
@@ -182,16 +149,16 @@ namespace TechZone.Api.Controllers
         }
 
         /// <summary>
-        /// Reset user password
+        /// Reset user password with verification code
         /// </summary>
-        /// <param name="dto">Password reset details</param>
+        /// <param name="dto">Password reset details with code</param>
         /// <returns>Reset result</returns>
         [HttpPost("reset-password")]
         [ProducesResponseType(typeof(ServiceResponse<bool>), 200)]
         [ProducesResponseType(typeof(ServiceResponse<bool>), 400)]
         [ProducesResponseType(typeof(ServiceResponse<bool>), 404)]
         [ProducesResponseType(typeof(ServiceResponse<bool>), 500)]
-        public async Task<ActionResult<ServiceResponse<bool>>> ResetPassword([FromBody] ResetPasswordDto dto)
+        public async Task<ActionResult<ServiceResponse<bool>>> ResetPassword([FromBody] ResetPasswordWithCodeDto dto)
         {
             _logger.LogInformation("POST /api/auth/reset-password - Password reset for: {Email}", dto.Email);
 
@@ -308,7 +275,8 @@ namespace TechZone.Api.Controllers
 
             if (string.IsNullOrEmpty(dto.RefreshToken))
             {
-                var errorResponse = ServiceResponse<bool>.ErrorResponse("Refresh token is required", "البريد الإلكتروني للمستلم مطلوب", 400);
+                var errorResponse = ServiceResponse<bool>.ErrorResponse("Refresh token is required",
+                    "رمز التحديث مطلوب", 400);
                 return errorResponse.ToActionResult();
             }
 
@@ -336,9 +304,6 @@ namespace TechZone.Api.Controllers
 
             try
             {
-                // Clear refresh token cookie
-                Response.Cookies.Delete("refreshToken");
-
                 // If user is authenticated, optionally revoke their refresh token
                 var userId = User.FindFirst("uid")?.Value;
                 if (!string.IsNullOrEmpty(userId))
@@ -350,6 +315,9 @@ namespace TechZone.Api.Controllers
                         await _authService.RevokeTokenAsync(userId, revokeDto);
                     }
                 }
+
+                // Clear refresh token cookie
+                Response.Cookies.Delete("refreshToken");
 
                 var response = ServiceResponse<bool>.SuccessResponse(true, "Logout successful");
                 return response.ToActionResult();
@@ -396,6 +364,8 @@ namespace TechZone.Api.Controllers
             }
         }
 
+        #region Helper Methods
+
         private void SetRefreshTokenInCookie(string refreshToken, DateTime expires)
         {
             var cookieOptions = new CookieOptions
@@ -409,5 +379,7 @@ namespace TechZone.Api.Controllers
 
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
+
+        #endregion
     }
 }

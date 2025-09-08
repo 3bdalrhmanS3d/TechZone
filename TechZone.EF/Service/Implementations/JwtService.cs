@@ -8,20 +8,20 @@ using System.Security.Cryptography;
 using System.Text;
 using TechZone.Api.Services.Interfaces;
 using TechZone.Core.Entities;
-using TechZone.Core.models;
+using TechZone.Core.Service.Interfaces;
 using TechZone.Core.ServiceResponse;
 
-namespace TechZone.Api.Services.Implementations
+namespace TechZone.EF.Service.Implementations
 {
     public class JwtService : IJwtService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly helper.JWT _jwtSettings;
+        private readonly Api.helper.JWT _jwtSettings;
         private readonly ILogger<JwtService> _logger;
 
         public JwtService(
             UserManager<ApplicationUser> userManager,
-            IOptions<helper.JWT> jwtSettings,
+            IOptions<Api.helper.JWT> jwtSettings,
             ILogger<JwtService> logger)
         {
             _userManager = userManager;

@@ -11,11 +11,14 @@ namespace TechZone.Api.DTOs.Auth
         public string Token { get; set; } = string.Empty;
     }
 
-    public class EmailConfirmationResultDto
+    public class ConfirmEmailWithCodeDto
     {
-        public bool IsConfirmed { get; set; }
-        public string Message { get; set; } = string.Empty;
-        public DateTime ConfirmationTime { get; set; } = DateTime.UtcNow;
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email format")]
         public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Verification code is required")]
+        [StringLength(10, MinimumLength = 4, ErrorMessage = "Verification code must be between 4 and 10 characters")]
+        public string Code { get; set; } = string.Empty;
     }
 }

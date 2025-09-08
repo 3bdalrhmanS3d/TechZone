@@ -1,14 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 using TechZone.Api.DTOs.Auth;
 using TechZone.Api.Services.Interfaces;
+using TechZone.core.Service.Interfaces;
 using TechZone.Core.Entities;
-using TechZone.Core.models;
+using TechZone.Core.Service.Interfaces;
 using TechZone.Core.ServiceResponse;
 
 namespace TechZone.EF.Service.Implementations
@@ -19,40 +17,40 @@ namespace TechZone.EF.Service.Implementations
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IJwtService _jwtService;
         private readonly IEmailService _emailService;
+        private readonly IVerificationService _verificationService;
         private readonly ILogger<AuthService> _logger;
-        private readonly IConfiguration _configuration;
 
         public AuthService(
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager,
             IJwtService jwtService,
             IEmailService emailService,
-            ILogger<AuthService> logger,
-            IConfiguration configuration)
+            IVerificationService verificationService,
+            ILogger<AuthService> logger)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _jwtService = jwtService;
             _emailService = emailService;
+            _verificationService = verificationService;
             _logger = logger;
-            _configuration = configuration;
         }
 
-        public async Task<ServiceResponse<AuthDto>> RegisterAsync(RegisterDto dto)
+        public async Task<ServiceResponse<bool>> RegisterAsync(RegisterDto dto)
         {
             try
             {
                 // Check if email is already registered
                 if (await _userManager.FindByEmailAsync(dto.Email) is not null)
                 {
-                    return ServiceResponse<AuthDto>.ConflictResponse(
+                    return ServiceResponse<bool>.ConflictResponse(
                         "Email is already registered");
                 }
 
                 // Check if username is already registered
                 if (await _userManager.FindByNameAsync(dto.UserName) is not null)
                 {
-                    return ServiceResponse<AuthDto>.ConflictResponse(
+                    return ServiceResponse<bool>.ConflictResponse(
                         "Username is already registered");
                 }
 
@@ -61,14 +59,14 @@ namespace TechZone.EF.Service.Implementations
                     UserName = dto.UserName,
                     Email = dto.Email,
                     FullName = dto.FullName,
-                    EmailConfirmed = false // Require email confirmation
+                    EmailConfirmed = false
                 };
 
                 var result = await _userManager.CreateAsync(user, dto.Password);
                 if (!result.Succeeded)
                 {
                     var errors = result.Errors.Select(e => e.Description).ToList();
-                    return ServiceResponse<AuthDto>.ValidationErrorResponse(
+                    return ServiceResponse<bool>.ValidationErrorResponse(
                         new Dictionary<string, List<string>> { { "Password", errors } },
                         "Registration failed");
                 }
@@ -76,49 +74,256 @@ namespace TechZone.EF.Service.Implementations
                 // Add user to default role
                 await _userManager.AddToRoleAsync(user, "User");
 
-                // Generate email confirmation token
-                var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var confirmationLink = GenerateEmailConfirmationLink(user.Id, emailConfirmationToken);
+                // Get the user ID for verification code
+                var userId =  (user.Id);
 
-                // Send confirmation email
-                var emailResult = await _emailService.SendEmailConfirmationAsync(user.Email, confirmationLink);
+                // Create verification code
+                var codeResult = await _verificationService.CreateVerificationCodeAsync(
+                    userId,
+                    VerificationCodeType.EmailVerification,
+                    DestinationStatus.Email);
+
+                if (!codeResult.IsSuccess)
+                {
+                    _logger.LogError("Failed to create verification code for user {UserId}", userId);
+                    return ServiceResponse<bool>.InternalServerErrorResponse(
+                        "Failed to create verification code");
+                }
+
+                // Send confirmation email with the generated code
+                var emailResult = await _emailService.SendEmailConfirmationAsync(user.Email, codeResult.Data.Code);
                 if (!emailResult.IsSuccess)
                 {
                     _logger.LogWarning("Failed to send confirmation email to {Email}", user.Email);
                     // Don't fail registration if email fails, just log it
                 }
 
-                // Generate JWT token (user can use the app but some features may be limited until email is confirmed)
-                var jwtSecurityToken = await _jwtService.CreateJwtTokenAsync(user);
-                var refreshToken = _jwtService.GenerateRefreshToken();
-
-                // Add refresh token to user
-                if (user.RefreshTokens == null)
-                    user.RefreshTokens = new List<RefreshToken>();
-
-                user.RefreshTokens.Add(refreshToken);
-                await _userManager.UpdateAsync(user);
-
-                var authDto = new AuthDto
-                {
-                    Email = user.Email,
-                    IsAuthenticated = true,
-                    Roles = new List<string> { "User" },
-                    Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-                    Username = user.UserName,
-                    RefreshToken = refreshToken.Token,
-                    RefreshTokenExpiration = refreshToken.ExpiresOn,
-                    EmailConfirmed = user.EmailConfirmed
-                };
-
                 _logger.LogInformation("User {Email} registered successfully", user.Email);
-                return ServiceResponse<AuthDto>.SuccessResponse(authDto, "Registration completed successfully. Please check your email to confirm your account.");
+                return ServiceResponse<bool>.SuccessResponse(true,
+                    "Registration completed successfully. Please check your email for verification code.",
+                    "تمت العملية بنجاح تأكد من بريدك لكود التفعيل");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during user registration for email {Email}", dto.Email);
-                return ServiceResponse<AuthDto>.InternalServerErrorResponse(
+                return ServiceResponse<bool>.InternalServerErrorResponse(
                     "An error occurred during registration");
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> ConfirmEmailAsync(ConfirmEmailWithCodeDto dto)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(dto.Email);
+                if (user is null)
+                {
+                    return ServiceResponse<bool>.NotFoundResponse("User not found");
+                }
+
+                if (user.EmailConfirmed)
+                {
+                    return ServiceResponse<bool>.SuccessResponse(true, "Email is already confirmed");
+                }
+
+                var userId =  (user.Id);
+
+                // Verify the code using VerificationService
+                var verificationResult = await _verificationService.VerifyCodeAsync(
+                    userId, dto.Code, VerificationCodeType.EmailVerification);
+
+                if (!verificationResult.IsSuccess)
+                {
+                    return verificationResult;
+                }
+
+                // Mark email as confirmed
+                user.EmailConfirmed = true;
+                await _userManager.UpdateAsync(user);
+
+                // Send welcome email
+                var welcomeEmailResult = await _emailService.SendWelcomeEmailAsync(user.Email, user.FullName);
+                if (!welcomeEmailResult.IsSuccess)
+                {
+                    _logger.LogWarning("Failed to send welcome email to {Email}", user.Email);
+                }
+
+                _logger.LogInformation("Email confirmed for user {UserId}", user.Id);
+                return ServiceResponse<bool>.SuccessResponse(true,
+                    "Email confirmed successfully",
+                    "تم تأكيد البريد الإلكتروني بنجاح");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error confirming email for user {Email}", dto.Email);
+                return ServiceResponse<bool>.InternalServerErrorResponse(
+                    "An error occurred while confirming email");
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> ResendVerificationCodeAsync(ResendVerificationCodeDto dto)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(dto.Email);
+                if (user is null)
+                {
+                    // Don't reveal if email exists or not for security
+                    return ServiceResponse<bool>.SuccessResponse(true,
+                        "If the email exists, a verification code has been sent");
+                }
+
+                var userId =  (user.Id);
+                var verificationType = (dto.VerificationType);
+
+                // Check if email is already confirmed for email verification
+                if (verificationType == VerificationCodeType.EmailVerification && user.EmailConfirmed)
+                {
+                    return ServiceResponse<bool>.SuccessResponse(true, "Email is already confirmed");
+                }
+
+                // Create new verification code
+                var codeResult = await _verificationService.CreateVerificationCodeAsync(
+                    userId, verificationType, DestinationStatus.Email);
+
+                if (!codeResult.IsSuccess)
+                {
+                    return ServiceResponse<bool>.InternalServerErrorResponse(
+                        "Failed to create verification code");
+                }
+
+                // Send appropriate email based on verification type
+                ServiceResponse<bool> emailResult;
+                if (verificationType == VerificationCodeType.EmailVerification)
+                {
+                    emailResult = await _emailService.SendEmailConfirmationAsync(user.Email, codeResult.Data.Code);
+                }
+                else if (verificationType == VerificationCodeType.PasswordReset)
+                {
+                    emailResult = await _emailService.SendPasswordResetAsync(user.Email, codeResult.Data.Code);
+                }
+                else
+                {
+                    return ServiceResponse<bool>.ErrorResponse("Invalid verification type", "", 400);
+                }
+
+                if (!emailResult.IsSuccess)
+                {
+                    return ServiceResponse<bool>.InternalServerErrorResponse(
+                        "Failed to send verification email");
+                }
+
+                _logger.LogInformation("Verification code resent to {Email} for type {Type}", dto.Email, verificationType);
+                return ServiceResponse<bool>.SuccessResponse(true, "Verification code sent successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error resending verification code to {Email}", dto.Email);
+                return ServiceResponse<bool>.InternalServerErrorResponse(
+                    "An error occurred while resending verification code");
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> ForgotPasswordAsync(ForgotPasswordDto dto)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(dto.Email);
+                if (user is null)
+                {
+                    // Don't reveal if email exists or not for security
+                    return ServiceResponse<bool>.SuccessResponse(true,
+                        "If the email exists, a password reset code has been sent");
+                }
+
+                var userId =  (user.Id);
+
+                // Create password reset verification code
+                var codeResult = await _verificationService.CreateVerificationCodeAsync(
+                    userId,
+                    VerificationCodeType.PasswordReset,
+                    DestinationStatus.Email);
+
+                if (!codeResult.IsSuccess)
+                {
+                    return ServiceResponse<bool>.InternalServerErrorResponse(
+                        "Failed to create reset code");
+                }
+
+                // Send password reset email with the generated code
+                var emailResult = await _emailService.SendPasswordResetAsync(user.Email, codeResult.Data.Code);
+                if (!emailResult.IsSuccess)
+                {
+                    return ServiceResponse<bool>.InternalServerErrorResponse(
+                        "Failed to send password reset email");
+                }
+
+                _logger.LogInformation("Password reset code sent to {Email}", dto.Email);
+                return ServiceResponse<bool>.SuccessResponse(true,
+                    "Password reset code sent successfully",
+                    "تم إرسال كود إعادة تعيين كلمة المرور بنجاح");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error sending password reset email to {Email}", dto.Email);
+                return ServiceResponse<bool>.InternalServerErrorResponse(
+                    "An error occurred while sending password reset email");
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> ResetPasswordAsync(ResetPasswordWithCodeDto dto)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(dto.Email);
+                if (user is null)
+                {
+                    return ServiceResponse<bool>.NotFoundResponse("User not found");
+                }
+
+                var userId =  (user.Id);
+
+                // Verify the reset code
+                var verificationResult = await _verificationService.VerifyCodeAsync(
+                    userId, dto.Code, VerificationCodeType.PasswordReset);
+
+                if (!verificationResult.IsSuccess)
+                {
+                    return verificationResult;
+                }
+
+                // Reset password using UserManager token
+                var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var result = await _userManager.ResetPasswordAsync(user, resetToken, dto.NewPassword);
+
+                if (!result.Succeeded)
+                {
+                    var errors = result.Errors.Select(e => e.Description).ToList();
+                    return ServiceResponse<bool>.ValidationErrorResponse(
+                        new Dictionary<string, List<string>> { { "Password", errors } },
+                        "Password reset failed");
+                }
+
+                // Revoke all refresh tokens for security
+                if (user.RefreshTokens?.Any() == true)
+                {
+                    foreach (var token in user.RefreshTokens.Where(t => t.IsActive))
+                    {
+                        token.RevokedOn = DateTime.UtcNow;
+                    }
+                    await _userManager.UpdateAsync(user);
+                }
+
+                _logger.LogInformation("Password reset successfully for user {Email}", dto.Email);
+                return ServiceResponse<bool>.SuccessResponse(true,
+                    "Password reset successfully",
+                    "تم إعادة تعيين كلمة المرور بنجاح");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error resetting password for email {Email}", dto.Email);
+                return ServiceResponse<bool>.InternalServerErrorResponse(
+                    "An error occurred while resetting password");
             }
         }
 
@@ -222,163 +427,6 @@ namespace TechZone.EF.Service.Implementations
             }
         }
 
-        public async Task<ServiceResponse<bool>> ConfirmEmailAsync(ConfirmEmailDto dto)
-        {
-            try
-            {
-                var user = await _userManager.FindByIdAsync(dto.UserId);
-                if (user is null)
-                {
-                    return ServiceResponse<bool>.NotFoundResponse("User not found");
-                }
-
-                if (user.EmailConfirmed)
-                {
-                    return ServiceResponse<bool>.SuccessResponse(true, "Email is already confirmed");
-                }
-
-                var decodedToken = WebEncoders.Base64UrlDecode(dto.Token);
-                var normalToken = Encoding.UTF8.GetString(decodedToken);
-
-                var result = await _userManager.ConfirmEmailAsync(user, normalToken);
-                if (!result.Succeeded)
-                {
-                    return ServiceResponse<bool>.ErrorResponse(
-                        "Invalid or expired confirmation token",
-                        "رمز التأكيد غير صالح أو منتهي الصلاحية",
-                        400);
-                }
-
-                // Send welcome email
-                var welcomeEmailResult = await _emailService.SendWelcomeEmailAsync(user.Email, user.FullName);
-                if (!welcomeEmailResult.IsSuccess)
-                {
-                    _logger.LogWarning("Failed to send welcome email to {Email}", user.Email);
-                }
-
-                _logger.LogInformation("Email confirmed for user {UserId}", dto.UserId);
-                return ServiceResponse<bool>.SuccessResponse(true, "Email confirmed successfully");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error confirming email for user {UserId}", dto.UserId);
-                return ServiceResponse<bool>.InternalServerErrorResponse(
-                    "An error occurred while confirming email");
-            }
-        }
-
-        public async Task<ServiceResponse<bool>> ResendEmailConfirmationAsync(ResendConfirmationEmailDto dto)
-        {
-            try
-            {
-                var user = await _userManager.FindByEmailAsync(dto.Email);
-                if (user is null)
-                {
-                    // Don't reveal if email exists or not for security
-                    return ServiceResponse<bool>.SuccessResponse(true, "If the email exists, a confirmation link has been sent");
-                }
-
-                if (user.EmailConfirmed)
-                {
-                    return ServiceResponse<bool>.SuccessResponse(true, "Email is already confirmed");
-                }
-
-                var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var confirmationLink = GenerateEmailConfirmationLink(user.Id, emailConfirmationToken);
-
-                var emailResult = await _emailService.SendEmailConfirmationAsync(user.Email, confirmationLink);
-                if (!emailResult.IsSuccess)
-                {
-                    return ServiceResponse<bool>.InternalServerErrorResponse(
-                        "Failed to send confirmation email");
-                }
-
-                _logger.LogInformation("Email confirmation resent to {Email}", dto.Email);
-                return ServiceResponse<bool>.SuccessResponse(true, "Confirmation email sent successfully");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error resending email confirmation to {Email}", dto.Email);
-                return ServiceResponse<bool>.InternalServerErrorResponse(
-                    "An error occurred while resending confirmation email");
-            }
-        }
-
-        public async Task<ServiceResponse<bool>> ForgotPasswordAsync(ForgotPasswordDto dto)
-        {
-            try
-            {
-                var user = await _userManager.FindByEmailAsync(dto.Email);
-                if (user is null)
-                {
-                    // Don't reveal if email exists or not for security
-                    return ServiceResponse<bool>.SuccessResponse(true, "If the email exists, a password reset link has been sent");
-                }
-
-                var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var resetLink = GeneratePasswordResetLink(user.Email, resetToken);
-
-                var emailResult = await _emailService.SendPasswordResetAsync(user.Email, resetLink);
-                if (!emailResult.IsSuccess)
-                {
-                    return ServiceResponse<bool>.InternalServerErrorResponse(
-                        "Failed to send password reset email");
-                }
-
-                _logger.LogInformation("Password reset email sent to {Email}", dto.Email);
-                return ServiceResponse<bool>.SuccessResponse(true, "Password reset email sent successfully");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error sending password reset email to {Email}", dto.Email);
-                return ServiceResponse<bool>.InternalServerErrorResponse(
-                    "An error occurred while sending password reset email");
-            }
-        }
-
-        public async Task<ServiceResponse<bool>> ResetPasswordAsync(ResetPasswordDto dto)
-        {
-            try
-            {
-                var user = await _userManager.FindByEmailAsync(dto.Email);
-                if (user is null)
-                {
-                    return ServiceResponse<bool>.NotFoundResponse("User not found");
-                }
-
-                var decodedToken = WebEncoders.Base64UrlDecode(dto.Token);
-                var normalToken = Encoding.UTF8.GetString(decodedToken);
-
-                var result = await _userManager.ResetPasswordAsync(user, normalToken, dto.NewPassword);
-                if (!result.Succeeded)
-                {
-                    var errors = result.Errors.Select(e => e.Description).ToList();
-                    return ServiceResponse<bool>.ValidationErrorResponse(
-                        new Dictionary<string, List<string>> { { "Password", errors } },
-                        "Password reset failed");
-                }
-
-                // Revoke all refresh tokens for security
-                if (user.RefreshTokens?.Any() == true)
-                {
-                    foreach (var token in user.RefreshTokens.Where(t => t.IsActive))
-                    {
-                        token.RevokedOn = DateTime.UtcNow;
-                    }
-                    await _userManager.UpdateAsync(user);
-                }
-
-                _logger.LogInformation("Password reset successfully for user {Email}", dto.Email);
-                return ServiceResponse<bool>.SuccessResponse(true, "Password reset successfully");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error resetting password for email {Email}", dto.Email);
-                return ServiceResponse<bool>.InternalServerErrorResponse(
-                    "An error occurred while resetting password");
-            }
-        }
-
         public async Task<ServiceResponse<bool>> ChangePasswordAsync(string userId, ChangePasswordDto dto)
         {
             try
@@ -478,23 +526,5 @@ namespace TechZone.EF.Service.Implementations
                     "An error occurred while revoking token");
             }
         }
-
-        #region Private Helper Methods
-
-        private string GenerateEmailConfirmationLink(string userId, string token)
-        {
-            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-            var baseUrl = _configuration["AppSettings:ClientUrl"] ?? "https://localhost:7124";
-            return $"{baseUrl}/api/auth/confirm-email?userId={userId}&token={encodedToken}";
-        }
-
-        private string GeneratePasswordResetLink(string email, string token)
-        {
-            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-            var baseUrl = _configuration["AppSettings:ClientUrl"] ?? "https://localhost:7124";
-            return $"{baseUrl}/api/auth/reset-password?email={email}&token={encodedToken}";
-        }
-
-        #endregion
     }
 }

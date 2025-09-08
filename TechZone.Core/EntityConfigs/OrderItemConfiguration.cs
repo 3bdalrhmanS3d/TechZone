@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Reflection.Emit;
-using TechZone.Core.models;
+using TechZone.Core.Entities;
 
 namespace TechZone.Core.EntityConfigs
 {

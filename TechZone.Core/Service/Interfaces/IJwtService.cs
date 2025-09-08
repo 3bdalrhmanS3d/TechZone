@@ -1,10 +1,9 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using TechZone.Core.Entities;
-using TechZone.Core.models;
 using TechZone.Core.ServiceResponse;
 
-namespace TechZone.Api.Services.Interfaces
+namespace TechZone.Core.Service.Interfaces
 {
     public interface IJwtService
     {

@@ -5,8 +5,8 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using TechZone.Core.Consts;
+using TechZone.Core.Entities;
 using TechZone.Core.Interfaces;
-using TechZone.Core.models;
 
 namespace TechZone.EF.Repositories
 {

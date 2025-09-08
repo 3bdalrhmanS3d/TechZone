@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TechZone.Core.models
+namespace TechZone.Core.Entities
 {
     public class Order
     {

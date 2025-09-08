@@ -1,5 +1,5 @@
 ﻿using TechZone.Api.DTOs.Laptop;
-using TechZone.Core.models;
+using TechZone.Core.Entities;
 using TechZone.Core.ServiceResponse;
 
 namespace TechZone.Api.Services.Interfaces

@@ -5,8 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TechZone.Core.models;
 using TechZone.Core.EntityConfigs;
+using TechZone.Core.Entities;
+
 namespace TechZone.EF.Application
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
@@ -18,7 +19,8 @@ namespace TechZone.EF.Application
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<LaptopVariant> LaptopVariants { get; set; }
         public DbSet<Laptop> Laptops { get; set; }
-
+        public DbSet<EmailQueue> EmailQueues { get; set; }
+        public DbSet<VerificationCode> VerificationCodes { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -27,6 +29,8 @@ namespace TechZone.EF.Application
             modelBuilder.ApplyConfiguration(new LaptopVariantConfiguration());
             modelBuilder.ApplyConfiguration(new OrderConfiguration());
             modelBuilder.ApplyConfiguration(new OrderItemConfiguration());
+            modelBuilder.ApplyConfiguration(new EmailQueueConfiguration());
+            modelBuilder.ApplyConfiguration(new VerificationCodeConfiguration());
 
             // Optionally keep this to apply any additional configurations
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);

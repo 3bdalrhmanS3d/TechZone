@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using TechZone.Api.DTOs.Laptop;
 using TechZone.Api.Services.Interfaces;
+using TechZone.Core.Entities;
 using TechZone.Core.Interfaces;
-using TechZone.Core.models;
 using TechZone.Core.ServiceResponse;
 
-namespace TechZone.Api.Services.Implementations
+namespace TechZone.EF.Service.Implementations
 {
     public class LaptopService : ILaptopService
     {
