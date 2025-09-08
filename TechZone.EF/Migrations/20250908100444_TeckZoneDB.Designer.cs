@@ -12,8 +12,8 @@ using TechZone.EF.Application;
 namespace TechZone.EF.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250905120749_initial-migration000")]
-    partial class initialmigration000
+    [Migration("20250908100444_TeckZoneDB")]
+    partial class TeckZoneDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -158,7 +158,7 @@ namespace TechZone.EF.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("TechZone.Core.models.ApplicationUser", b =>
+            modelBuilder.Entity("TechZone.Core.Entities.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -228,7 +228,97 @@ namespace TechZone.EF.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("TechZone.Core.models.Laptop", b =>
+            modelBuilder.Entity("TechZone.Core.Entities.EmailQueue", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmailType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsHtml")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MaxRetries")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("NextRetryAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RetryCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ScheduledAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TemplateData")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ToEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ToName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt")
+                        .HasDatabaseName("IX_EmailQueues_CreatedAt");
+
+                    b.HasIndex("EmailType")
+                        .HasDatabaseName("IX_EmailQueues_EmailType");
+
+                    b.HasIndex("NextRetryAt")
+                        .HasDatabaseName("IX_EmailQueues_NextRetryAt");
+
+                    b.HasIndex("Priority")
+                        .HasDatabaseName("IX_EmailQueues_Priority");
+
+                    b.HasIndex("ScheduledAt")
+                        .HasDatabaseName("IX_EmailQueues_ScheduledAt");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_EmailQueues_Status");
+
+                    b.HasIndex("Status", "NextRetryAt")
+                        .HasDatabaseName("IX_EmailQueues_Status_NextRetryAt");
+
+                    b.HasIndex("Status", "Priority", "CreatedAt")
+                        .HasDatabaseName("IX_EmailQueues_Status_Priority_CreatedAt");
+
+                    b.ToTable("EmailQueues", (string)null);
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.Laptop", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -270,7 +360,7 @@ namespace TechZone.EF.Migrations
                     b.ToTable("Laptops");
                 });
 
-            modelBuilder.Entity("TechZone.Core.models.LaptopVariant", b =>
+            modelBuilder.Entity("TechZone.Core.Entities.LaptopVariant", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -300,7 +390,7 @@ namespace TechZone.EF.Migrations
                     b.ToTable("LaptopVariants", (string)null);
                 });
 
-            modelBuilder.Entity("TechZone.Core.models.Order", b =>
+            modelBuilder.Entity("TechZone.Core.Entities.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -337,7 +427,7 @@ namespace TechZone.EF.Migrations
                     b.ToTable("Orders", (string)null);
                 });
 
-            modelBuilder.Entity("TechZone.Core.models.OrderItem", b =>
+            modelBuilder.Entity("TechZone.Core.Entities.OrderItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -366,6 +456,88 @@ namespace TechZone.EF.Migrations
                     b.ToTable("OrderItems", (string)null);
                 });
 
+            modelBuilder.Entity("TechZone.Core.Entities.VerificationCode", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+
+                    b.Property<int>("AttemptCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("Destination")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("DATEADD(MINUTE, 60, GETUTCDATE())");
+
+                    b.Property<bool>("IsUsed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("MaxAttempts")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(3);
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .HasDatabaseName("IX_VerificationCodes_Code");
+
+                    b.HasIndex("ExpiryDate")
+                        .HasDatabaseName("IX_VerificationCodes_ExpiryDate");
+
+                    b.HasIndex("Type")
+                        .HasDatabaseName("IX_VerificationCodes_Type");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_VerificationCodes_UserId");
+
+                    b.HasIndex("UserId", "Type", "IsUsed")
+                        .HasDatabaseName("IX_VerificationCodes_UserId_Type_IsUsed");
+
+                    b.HasIndex("Code", "Type", "IsUsed", "ExpiryDate")
+                        .HasDatabaseName("IX_VerificationCodes_Verification_Query");
+
+                    b.ToTable("VerificationCodes", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_VerificationCodes_Attempt_NonNegative", "[AttemptCount] >= 0");
+
+                            t.HasCheckConstraint("CK_VerificationCodes_Expiry_After_Created", "[ExpiryDate] > [CreatedAt]");
+
+                            t.HasCheckConstraint("CK_VerificationCodes_MaxAttempts_Positive", "[MaxAttempts] > 0");
+                        });
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -377,7 +549,7 @@ namespace TechZone.EF.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("TechZone.Core.models.ApplicationUser", null)
+                    b.HasOne("TechZone.Core.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -386,7 +558,7 @@ namespace TechZone.EF.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("TechZone.Core.models.ApplicationUser", null)
+                    b.HasOne("TechZone.Core.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -401,7 +573,7 @@ namespace TechZone.EF.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TechZone.Core.models.ApplicationUser", null)
+                    b.HasOne("TechZone.Core.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -410,16 +582,53 @@ namespace TechZone.EF.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("TechZone.Core.models.ApplicationUser", null)
+                    b.HasOne("TechZone.Core.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TechZone.Core.models.LaptopVariant", b =>
+            modelBuilder.Entity("TechZone.Core.Entities.ApplicationUser", b =>
                 {
-                    b.HasOne("TechZone.Core.models.Laptop", "Laptop")
+                    b.OwnsMany("TechZone.Core.Entities.RefreshToken", "RefreshTokens", b1 =>
+                        {
+                            b1.Property<string>("ApplicationUserId")
+                                .HasColumnType("nvarchar(450)");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<DateTime>("CreatedOn")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<DateTime>("ExpiresOn")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<DateTime?>("RevokedOn")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("Token")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("ApplicationUserId", "Id");
+
+                            b1.ToTable("RefreshToken");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ApplicationUserId");
+                        });
+
+                    b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.LaptopVariant", b =>
+                {
+                    b.HasOne("TechZone.Core.Entities.Laptop", "Laptop")
                         .WithMany("Variants")
                         .HasForeignKey("LaptopId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -428,13 +637,13 @@ namespace TechZone.EF.Migrations
                     b.Navigation("Laptop");
                 });
 
-            modelBuilder.Entity("TechZone.Core.models.Order", b =>
+            modelBuilder.Entity("TechZone.Core.Entities.Order", b =>
                 {
-                    b.HasOne("TechZone.Core.models.ApplicationUser", null)
+                    b.HasOne("TechZone.Core.Entities.ApplicationUser", null)
                         .WithMany("Orders")
                         .HasForeignKey("ApplicationUserId");
 
-                    b.HasOne("TechZone.Core.models.ApplicationUser", "User")
+                    b.HasOne("TechZone.Core.Entities.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -443,15 +652,15 @@ namespace TechZone.EF.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TechZone.Core.models.OrderItem", b =>
+            modelBuilder.Entity("TechZone.Core.Entities.OrderItem", b =>
                 {
-                    b.HasOne("TechZone.Core.models.LaptopVariant", "LaptopVariant")
+                    b.HasOne("TechZone.Core.Entities.LaptopVariant", "LaptopVariant")
                         .WithMany()
                         .HasForeignKey("LaptopVariantId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TechZone.Core.models.Order", "Order")
+                    b.HasOne("TechZone.Core.Entities.Order", "Order")
                         .WithMany("Items")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -462,17 +671,30 @@ namespace TechZone.EF.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("TechZone.Core.models.ApplicationUser", b =>
+            modelBuilder.Entity("TechZone.Core.Entities.VerificationCode", b =>
                 {
-                    b.Navigation("Orders");
+                    b.HasOne("TechZone.Core.Entities.ApplicationUser", "User")
+                        .WithMany("VerificationCodes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TechZone.Core.models.Laptop", b =>
+            modelBuilder.Entity("TechZone.Core.Entities.ApplicationUser", b =>
+                {
+                    b.Navigation("Orders");
+
+                    b.Navigation("VerificationCodes");
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.Laptop", b =>
                 {
                     b.Navigation("Variants");
                 });
 
-            modelBuilder.Entity("TechZone.Core.models.Order", b =>
+            modelBuilder.Entity("TechZone.Core.Entities.Order", b =>
                 {
                     b.Navigation("Items");
                 });

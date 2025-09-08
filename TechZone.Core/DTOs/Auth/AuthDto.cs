@@ -15,6 +15,8 @@ namespace TechZone.Api.DTOs.Auth
         [JsonIgnore]
         public string? RefreshToken { get; set; }
 
+        public bool EmailConfirmed { get; set; }
+
         public DateTime RefreshTokenExpiration { get; set; }
     }
 }
