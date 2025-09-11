@@ -5,6 +5,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Filters;
 using System.Reflection;
+using TechZone.Api.Authorization;
 using TechZone.Api.Data;
 using TechZone.Api.Services.Interfaces;
 using TechZone.core.Service.Interfaces;
@@ -65,6 +66,8 @@ namespace TechZone.Api
                 builder.Services.AddScoped<IEmailService, EmailService>();
                 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
                 builder.Services.AddScoped<ILaptopService, LaptopService>();
+                builder.Services.AddScoped<IUserPermissionService, UserPermissionService>();
+
 
                 // Background Services
                 builder.Services.AddHostedService<EmailBackgroundService>();
@@ -165,7 +168,10 @@ namespace TechZone.Api
                 });
 
                 // Controllers
-                builder.Services.AddControllers()
+                builder.Services.AddControllers(options =>
+                {
+                    options.Filters.Add<PermissionBasedAuthorizationFilter>();
+                })
                     .ConfigureApiBehaviorOptions(options =>
                     {
                         options.SuppressModelStateInvalidFilter = false;

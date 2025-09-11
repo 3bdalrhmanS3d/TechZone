@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TechZone.Api.Authorization;
+using TechZone.Core.Data;
 using TechZone.Api.DTOs.Laptop;
 using TechZone.Api.Extensions;
 using TechZone.Api.Services.Interfaces;
 using TechZone.Core.Entities;
 using TechZone.Core.ServiceResponse;
-
 namespace TechZone.Api.Controllers
 {
     [Authorize]
@@ -29,6 +30,7 @@ namespace TechZone.Api.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(ServiceResponse<IEnumerable<Laptop>>), 200)]
         [ProducesResponseType(typeof(ServiceResponse<IEnumerable<Laptop>>), 500)]
+        [CheckPermission(Permission.ReadLaptops)]
         public async Task<ActionResult<ServiceResponse<IEnumerable<Laptop>>>> GetAll()
         {
             _logger.LogInformation("GET api/laptop - Retrieving all laptops");

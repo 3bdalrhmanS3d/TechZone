@@ -15,6 +15,7 @@ namespace TechZone.EF.Application
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
+        public DbSet<UserPermission> UserPermissions { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<LaptopVariant> LaptopVariants { get; set; }
@@ -31,6 +32,7 @@ namespace TechZone.EF.Application
             modelBuilder.ApplyConfiguration(new OrderItemConfiguration());
             modelBuilder.ApplyConfiguration(new EmailQueueConfiguration());
             modelBuilder.ApplyConfiguration(new VerificationCodeConfiguration());
+            modelBuilder.ApplyConfiguration(new UserPermissionConfiguration());
 
             // Optionally keep this to apply any additional configurations
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
