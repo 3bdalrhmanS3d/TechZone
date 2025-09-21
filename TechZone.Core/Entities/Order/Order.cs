@@ -25,13 +25,11 @@ namespace TechZone.Core.Entities
         [Required]
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
-        [ForeignKey(nameof(ApplicationUser))]  
-        public string ApplicationUserId { get; set; }
-
+        [ForeignKey(nameof(ApplicationUser))]
+        public string UserId { get; set; } 
 
         // Navigation property
-
-        public ApplicationUser ApplicationUser { get; set; }  
+        public ApplicationUser ApplicationUser { get; set; }
         public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
         public Shipping Shipping { get; set; }

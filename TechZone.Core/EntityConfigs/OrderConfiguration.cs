@@ -13,7 +13,7 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(o => o.OrderDate)
                    .IsRequired()
-                   .HasDefaultValueSql("GETUTCDATE()");  // غيّرت إلى UTC للتوافق
+                   .HasDefaultValueSql("GETUTCDATE()");
 
             builder.Property(o => o.TotalAmount)
                    .IsRequired()
@@ -22,12 +22,11 @@ namespace TechZone.Core.EntityConfigs
             builder.Property(o => o.Status)
                    .IsRequired()
                    .HasConversion<string>()
-                   .HasMaxLength(50);  // أضفت الحد للحفاظ على الطول السابق وتجنب max
+                   .HasMaxLength(50);
 
-            // استخدم PascalCase للـ navigation
             builder.HasOne(o => o.ApplicationUser)
                    .WithMany(u => u.Orders)
-                   .HasForeignKey(o => o.ApplicationUserId)
+                   .HasForeignKey(o => o.UserId) // غيّرت إلى UserId
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(o => o.Items)

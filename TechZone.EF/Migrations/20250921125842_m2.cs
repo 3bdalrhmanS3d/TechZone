@@ -15,16 +15,12 @@ namespace TechZone.EF.Migrations
                 name: "FK_Orders_AspNetUsers_ApplicationUserId",
                 table: "Orders");
 
-            migrationBuilder.DropForeignKey(
-                name: "FK_Orders_AspNetUsers_UserId",
-                table: "Orders");
-
             migrationBuilder.DropIndex(
-                name: "IX_Orders_UserId",
+                name: "IX_Orders_ApplicationUserId",
                 table: "Orders");
 
             migrationBuilder.DropColumn(
-                name: "UserId",
+                name: "ApplicationUserId",
                 table: "Orders");
 
             migrationBuilder.AlterColumn<DateTime>(
@@ -36,16 +32,6 @@ namespace TechZone.EF.Migrations
                 oldClrType: typeof(DateTime),
                 oldType: "datetime2",
                 oldDefaultValueSql: "GETDATE()");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "ApplicationUserId",
-                table: "Orders",
-                type: "nvarchar(450)",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "nvarchar(450)",
-                oldNullable: true);
 
             migrationBuilder.AddColumn<int>(
                 name: "DiscountId",
@@ -510,14 +496,6 @@ namespace TechZone.EF.Migrations
                 principalTable: "Discounts",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.SetNull);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Orders_AspNetUsers_ApplicationUserId",
-                table: "Orders",
-                column: "ApplicationUserId",
-                principalTable: "AspNetUsers",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />
@@ -534,10 +512,6 @@ namespace TechZone.EF.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_LaptopVariants_Discounts_DiscountId",
                 table: "LaptopVariants");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Orders_AspNetUsers_ApplicationUserId",
-                table: "Orders");
 
             migrationBuilder.DropTable(
                 name: "AuditLogs");
@@ -634,20 +608,11 @@ namespace TechZone.EF.Migrations
                 oldType: "datetime2",
                 oldDefaultValueSql: "GETUTCDATE()");
 
-            migrationBuilder.AlterColumn<string>(
+            migrationBuilder.AddColumn<string>(
                 name: "ApplicationUserId",
                 table: "Orders",
                 type: "nvarchar(450)",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(450)");
-
-            migrationBuilder.AddColumn<string>(
-                name: "UserId",
-                table: "Orders",
-                type: "nvarchar(450)",
-                nullable: false,
-                defaultValue: "");
+                nullable: true);
 
             migrationBuilder.AlterColumn<string>(
                 name: "ScreenSize",
@@ -695,9 +660,9 @@ namespace TechZone.EF.Migrations
                 oldMaxLength: 100);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_UserId",
+                name: "IX_Orders_ApplicationUserId",
                 table: "Orders",
-                column: "UserId");
+                column: "ApplicationUserId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Orders_AspNetUsers_ApplicationUserId",
@@ -705,14 +670,6 @@ namespace TechZone.EF.Migrations
                 column: "ApplicationUserId",
                 principalTable: "AspNetUsers",
                 principalColumn: "Id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Orders_AspNetUsers_UserId",
-                table: "Orders",
-                column: "UserId",
-                principalTable: "AspNetUsers",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
         }
     }
 }
