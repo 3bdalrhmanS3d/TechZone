@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TechZone.EF.Application;
 
@@ -11,9 +12,11 @@ using TechZone.EF.Application;
 namespace TechZone.EF.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250921125842_m2")]
+    partial class m2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -468,8 +471,8 @@ namespace TechZone.EF.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -490,8 +493,6 @@ namespace TechZone.EF.Migrations
 
                     b.HasIndex("Status")
                         .HasDatabaseName("IX_EmailQueues_Status");
-
-                    b.HasIndex("UserId");
 
                     b.HasIndex("Status", "NextRetryAt")
                         .HasDatabaseName("IX_EmailQueues_Status_NextRetryAt");
@@ -1097,16 +1098,6 @@ namespace TechZone.EF.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TechZone.Core.Entities.EmailQueue", b =>
-                {
-                    b.HasOne("TechZone.Core.Entities.ApplicationUser", "User")
-                        .WithMany("EmailQueue")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("TechZone.Core.Entities.Laptop", b =>
                 {
                     b.HasOne("TechZone.Core.Entities.Brand", "Brand")
@@ -1268,8 +1259,6 @@ namespace TechZone.EF.Migrations
                     b.Navigation("AuditLogs");
 
                     b.Navigation("CartItems");
-
-                    b.Navigation("EmailQueue");
 
                     b.Navigation("Orders");
 

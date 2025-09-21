@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TechZone.Core.Entities;
 
 namespace TechZone.Core.EntityConfigs
@@ -13,13 +8,9 @@ namespace TechZone.Core.EntityConfigs
     {
         public void Configure(EntityTypeBuilder<Laptop> builder)
         {
-            // Table Name
             builder.ToTable("Laptops");
-
-            // Primary Key
             builder.HasKey(l => l.Id);
 
-            // Properties
             builder.Property(l => l.ModelName)
                    .IsRequired()
                    .HasMaxLength(200);
@@ -36,8 +27,15 @@ namespace TechZone.Core.EntityConfigs
             builder.Property(l => l.Ports)
                    .HasMaxLength(300);
 
+            builder.Property(l => l.Description)
+                   .HasColumnType("text");
 
-            // Boolean flags
+            builder.Property(l => l.Notes)
+                   .HasColumnType("text");
+
+            builder.Property(l => l.Warranty)
+                   .HasMaxLength(200);
+
             builder.Property(l => l.HasCamera)
                    .IsRequired();
 
@@ -52,6 +50,31 @@ namespace TechZone.Core.EntityConfigs
                    .WithOne(v => v.Laptop)
                    .HasForeignKey(v => v.LaptopId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(l => l.Images)
+                   .WithOne(i => i.Laptop)
+                   .HasForeignKey(i => i.LaptopId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(l => l.Ratings)
+                   .WithOne(r => r.Laptop)
+                   .HasForeignKey(r => r.LaptopId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(l => l.RepairRequests)
+                   .WithOne(r => r.Laptop)
+                   .HasForeignKey(r => r.LaptopId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(l => l.Brand)
+                   .WithMany(b => b.Laptops)
+                   .HasForeignKey(l => l.BrandId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(l => l.Category)
+                   .WithMany(c => c.Laptops)
+                   .HasForeignKey(l => l.CategoryId)
+                   .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
