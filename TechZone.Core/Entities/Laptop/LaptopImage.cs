@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace TechZone.Core.Entities.Laptop
+namespace TechZone.Core.Entities
 {
     public class LaptopImage
     {

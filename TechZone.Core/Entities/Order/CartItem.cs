@@ -1,14 +1,13 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using TechZone.Core.Entities.Laptop;
-using TechZone.Core.Entities.User;
+using TechZone.Core.Entities;
 
-namespace TechZone.Core.Entities.Order
+namespace TechZone.Core.Entities
 {
     public class CartItem
     {
         public int Id { get; set; }
-        public string UserId { get; set; }
+        public string ApplicationUserId { get; set; }
         public int LaptopVariantId { get; set; }
 
         [Range(1, int.MaxValue)]

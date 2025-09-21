@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using TechZone.Core.Entities.User;
+using TechZone.Core.Entities;
 
 namespace TechZone.Api.DTOs.Auth
 {

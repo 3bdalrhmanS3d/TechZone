@@ -1,8 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using TechZone.Core.Entities.Order;
 
-namespace TechZone.Core.Entities.Laptop
+namespace TechZone.Core.Entities
 {
     public class LaptopVariant
     {

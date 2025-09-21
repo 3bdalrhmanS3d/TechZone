@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TechZone.Core.Entities.Order;
+using TechZone.Core.Entities;
 
 namespace TechZone.Core.EntityConfigs
 {

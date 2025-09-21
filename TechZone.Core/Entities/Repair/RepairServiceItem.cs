@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace TechZone.Core.Entities.Repair
+namespace TechZone.Core.Entities
 {
     public enum RepairType
     {

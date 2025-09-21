@@ -1,12 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TechZone.Core.Entities;
-using TechZone.Core.Entities.Feedback;
-using TechZone.Core.Entities.Laptop;
-using TechZone.Core.Entities.Logging;
-using TechZone.Core.Entities.Order;
-using TechZone.Core.Entities.Repair;
-using TechZone.Core.Entities.User;
 using TechZone.Core.EntityConfigs;
 
 namespace TechZone.EF.Application

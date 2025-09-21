@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TechZone.Core.Entities.Order;
+using TechZone.Core.Entities;
 
 namespace TechZone.Core.EntityConfigs
 {
@@ -20,7 +20,7 @@ namespace TechZone.Core.EntityConfigs
 
             builder.HasOne(ci => ci.User)
                    .WithMany(u => u.CartItems)
-                   .HasForeignKey(ci => ci.UserId)
+                   .HasForeignKey(ci => ci.ApplicationUserId)
                    .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(ci => ci.LaptopVariant)

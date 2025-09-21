@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TechZone.Core.Entities.User
+namespace TechZone.Core.Entities
 {
     [Owned]
     public class RefreshToken

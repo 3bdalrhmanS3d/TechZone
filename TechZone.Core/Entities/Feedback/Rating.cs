@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using TechZone.Core.Entities.User;
+using TechZone.Core.Entities;
 
-namespace TechZone.Core.Entities.Feedback
+namespace TechZone.Core.Entities
 {
     public class Rating
     {

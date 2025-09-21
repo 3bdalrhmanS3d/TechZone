@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using TechZone.Core.Entities.User;
+using TechZone.Core.Entities;
 
-namespace TechZone.Core.Entities.Repair
+namespace TechZone.Core.Entities
 {
     public enum RepairRequestStatus
     {
@@ -15,7 +15,7 @@ namespace TechZone.Core.Entities.Repair
     public class RepairRequest
     {
         public int RequestId { get; set; }
-        public string UserId { get; set; }
+        public string ApplicationUserId { get; set; }
         public int ItemId { get; set; }
         public int? LaptopId { get; set; }
 

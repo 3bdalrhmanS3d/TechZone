@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TechZone.Core.Entities.Laptop;
+using TechZone.Core.Entities;
 
-namespace TechZone.Core.Entities.Order
+namespace TechZone.Core.Entities
 {
     public class OrderItem
     {

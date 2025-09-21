@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TechZone.Core.Entities.Order;
+using TechZone.Core.Entities;
 
 namespace TechZone.Core.EntityConfigs
 {
@@ -13,7 +13,7 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(o => o.OrderDate)
                    .IsRequired()
-                   .HasDefaultValueSql("GETUTCDATE()");
+                   .HasDefaultValueSql("GETUTCDATE()");  // غيّرت إلى UTC للتوافق
 
             builder.Property(o => o.TotalAmount)
                    .IsRequired()
@@ -21,11 +21,13 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(o => o.Status)
                    .IsRequired()
-                   .HasConversion<string>();
+                   .HasConversion<string>()
+                   .HasMaxLength(50);  // أضفت الحد للحفاظ على الطول السابق وتجنب max
 
-            builder.HasOne(o => o.User)
+            // استخدم PascalCase للـ navigation
+            builder.HasOne(o => o.ApplicationUser)
                    .WithMany(u => u.Orders)
-                   .HasForeignKey(o => o.UserId)
+                   .HasForeignKey(o => o.ApplicationUserId)
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(o => o.Items)

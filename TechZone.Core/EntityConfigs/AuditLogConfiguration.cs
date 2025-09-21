@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TechZone.Core.Entities.Logging;
+using TechZone.Core.Entities;
 
 namespace TechZone.Core.EntityConfigs
 {
@@ -31,7 +31,7 @@ namespace TechZone.Core.EntityConfigs
 
             builder.HasOne(a => a.User)
                    .WithMany(u => u.AuditLogs)
-                   .HasForeignKey(a => a.UserId)
+                   .HasForeignKey(a => a.ApplicationUserId)
                    .OnDelete(DeleteBehavior.Restrict);
         }
     }

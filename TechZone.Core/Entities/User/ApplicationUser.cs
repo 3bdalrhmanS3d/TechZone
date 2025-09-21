@@ -2,12 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using TechZone.Core.Entities.Feedback;
-using TechZone.Core.Entities.Logging;
-using TechZone.Core.Entities.Order;
-using TechZone.Core.Entities.Repair;
+using TechZone.Core.Entities;
 
-namespace TechZone.Core.Entities.User
+namespace TechZone.Core.Entities
 {
     public class ApplicationUser : IdentityUser
     {

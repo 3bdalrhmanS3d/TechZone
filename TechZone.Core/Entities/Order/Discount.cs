@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using TechZone.Core.Entities.Laptop;
+using TechZone.Core.Entities;
 
-namespace TechZone.Core.Entities.Order
+namespace TechZone.Core.Entities
 {
     public class Discount
     {

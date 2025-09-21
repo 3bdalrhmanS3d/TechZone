@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using TechZone.Core.Entities.User;
+using System.ComponentModel.DataAnnotations.Schema;
+using TechZone.Core.Entities;
 
-namespace TechZone.Core.Entities.Order
+namespace TechZone.Core.Entities
 {
     public enum OrderStatus
     {
@@ -24,10 +25,13 @@ namespace TechZone.Core.Entities.Order
         [Required]
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
-        public string UserId { get; set; }
+        [ForeignKey(nameof(ApplicationUser))]  
+        public string ApplicationUserId { get; set; }
 
-        // Navigation
-        public ApplicationUser User { get; set; }
+
+        // Navigation property
+
+        public ApplicationUser ApplicationUser { get; set; }  
         public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
         public Shipping Shipping { get; set; }

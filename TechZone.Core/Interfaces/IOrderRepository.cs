@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TechZone.Core.Entities.Order;
+using TechZone.Core.Entities;
 
 namespace TechZone.Core.Interfaces
 {

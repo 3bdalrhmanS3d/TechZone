@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using TechZone.Api.Services.Interfaces;
-using TechZone.Core.Entities.User;
+using TechZone.Core.Entities;
 using TechZone.Core.Service.Interfaces;
 using TechZone.Core.ServiceResponse;
 

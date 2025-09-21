@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using TechZone.Core.Entities.Feedback;
-using TechZone.Core.Entities.Repair;
 
-namespace TechZone.Core.Entities.Laptop
+namespace TechZone.Core.Entities
 {
     public class Laptop
     {

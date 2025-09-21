@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TechZone.Core.Entities.User;
+using TechZone.Core.Entities;
 
 namespace TechZone.Core.EntityConfigs
 {
@@ -26,7 +26,7 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(u => u.CreatedAt)
                    .IsRequired()
-                   .HasDefaultValueSql("GETUTCDATE()");
+                   .HasDefaultValueSql("GETDATE()");
         }
     }
 }

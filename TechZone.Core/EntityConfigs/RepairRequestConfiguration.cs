@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TechZone.Core.Entities.Repair;
+using TechZone.Core.Entities;
 
 namespace TechZone.Core.EntityConfigs
 {
@@ -25,7 +25,7 @@ namespace TechZone.Core.EntityConfigs
 
             builder.HasOne(rr => rr.User)
                    .WithMany(u => u.RepairRequests)
-                   .HasForeignKey(rr => rr.UserId)
+                   .HasForeignKey(rr => rr.ApplicationUserId)
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(rr => rr.RepairServiceItem)
