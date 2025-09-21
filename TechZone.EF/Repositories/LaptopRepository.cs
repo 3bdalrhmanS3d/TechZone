@@ -6,7 +6,9 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using TechZone.Core.Consts;
 using TechZone.Core.Entities;
+using TechZone.Core.ENUMS.Laptop;
 using TechZone.Core.Interfaces;
+using TechZone.Core.PagedResult;
 using TechZone.EF.Application;
 
 namespace TechZone.EF.Repositories
@@ -19,6 +21,63 @@ namespace TechZone.EF.Repositories
         {
             _context = context;
         }
+
+        public async Task<PagedResult<Laptop>> GetPagedAsync(PaginationParamsDto<LaptopSortBy> paginationParams)
+        {
+            var query = _context.Laptops
+                .Include(l => l.Variants)
+                .AsNoTracking()
+                .AsQueryable();
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(paginationParams.Search))
+            {
+                var searchTerm = paginationParams.Search.ToLower();
+                query = query.Where(l =>
+                    l.ModelName.ToLower().Contains(searchTerm) ||
+                    l.Processor.ToLower().Contains(searchTerm) ||
+                    l.GPU.ToLower().Contains(searchTerm) ||
+                    l.ScreenSize.ToLower().Contains(searchTerm) ||
+                    l.Ports.ToLower().Contains(searchTerm)
+                );
+            }
+
+            // Apply sorting
+            query = ApplySorting(query, paginationParams.SortBy, paginationParams.SortDirection);
+
+            var totalCount = await query.CountAsync();
+
+            // Apply pagination
+            var items = await query
+                .Skip((paginationParams.Page - 1) * paginationParams.PageSize)
+                .Take(paginationParams.PageSize)
+                .ToListAsync();
+
+            return new PagedResult<Laptop>(items, totalCount, paginationParams.Page, paginationParams.PageSize);
+        }
+
+        private IQueryable<Laptop> ApplySorting(IQueryable<Laptop> query, LaptopSortBy? sortBy, SortDirection sortDirection)
+        {
+            if (!sortBy.HasValue)
+                return query.OrderBy(l => l.Id); // Default sorting
+
+            return sortBy.Value switch
+            {
+                LaptopSortBy.Id => sortDirection == SortDirection.Asc
+                    ? query.OrderBy(l => l.Id)
+                    : query.OrderByDescending(l => l.Id),
+
+                
+
+                _ => query.OrderBy(l => l.Id)
+            };
+        }
+
+        public async Task<int> CountAsync()
+        {
+            return await _context.Laptops.CountAsync();
+        }
+
 
         public async Task AddRangeAsync(IEnumerable<Laptop> entities)
         {
