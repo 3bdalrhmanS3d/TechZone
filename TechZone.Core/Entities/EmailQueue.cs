@@ -66,7 +66,10 @@ namespace TechZone.Core.Entities
         public EmailPriority Priority { get; set; } = EmailPriority.Normal; // High, Normal, Low
 
         // Related User (optional)
-        public int? UserId { get; set; }
+        [ForeignKey(nameof(ApplicationUser))]
+        public string? UserId { get; set; }
         public string? TemplateData { get; set; }
+
+        public virtual ApplicationUser? User { get; set; }
     }
 }

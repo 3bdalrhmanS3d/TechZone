@@ -29,5 +29,6 @@ namespace TechZone.Core.Entities
         public ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
         public List<RefreshToken>? RefreshTokens { get; set; }
         public virtual ICollection<VerificationCode> VerificationCodes { get; set; } = new List<VerificationCode>();
+        public virtual ICollection<EmailQueue> EmailQueue { get; set; }
     }
 }
