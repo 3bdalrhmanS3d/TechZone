@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TechZone.Api.DTOs.Laptop;
 using TechZone.Api.Extensions;
 using TechZone.Api.Services.Interfaces;
 using TechZone.Core.Entities;
+using TechZone.Core.ENUMS.Laptop;
+using TechZone.Core.PagedResult;
 using TechZone.Core.ServiceResponse;
 
 namespace TechZone.Api.Controllers
@@ -23,17 +26,25 @@ namespace TechZone.Api.Controllers
         }
 
         /// <summary>
-        /// Get all laptops
+        /// Get paginated, filtered, and sorted laptops
         /// </summary>
-        /// <returns>List of all laptops with their variants</returns>
+        /// <param name="paginationParams">Pagination, filtering, and sorting parameters</param>
+        /// <returns>Paginated list of laptops with their variants</returns>
         [HttpGet]
-        [ProducesResponseType(typeof(ServiceResponse<IEnumerable<Laptop>>), 200)]
-        [ProducesResponseType(typeof(ServiceResponse<IEnumerable<Laptop>>), 500)]
-        public async Task<ActionResult<ServiceResponse<IEnumerable<Laptop>>>> GetAll()
+        [ProducesResponseType(typeof(ServiceResponse<PagedResult<Laptop>>), 200)]
+        [ProducesResponseType(typeof(ServiceResponse<PagedResult<Laptop>>), 400)]
+        [ProducesResponseType(typeof(ServiceResponse<PagedResult<Laptop>>), 500)]
+        public async Task<ActionResult<ServiceResponse<PagedResult<Laptop>>>> GetAll(
+            [FromQuery] PaginationParamsDto<LaptopSortBy> paginationParams)
         {
-            _logger.LogInformation("GET api/laptop - Retrieving all laptops");
+            _logger.LogInformation("GET api/laptop - Retrieving laptops with pagination parameters: {@PaginationParams}", paginationParams);
 
-            var response = await _laptopService.GetAllAsync();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var response = await _laptopService.GetAllAsync(paginationParams);
             return response.ToActionResult();
         }
 

@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 using TechZone.Api.DTOs.Laptop;
 using TechZone.Api.Services.Interfaces;
 using TechZone.Core.Entities;
+using TechZone.Core.ENUMS.Laptop;
 using TechZone.Core.Interfaces;
+using TechZone.Core.PagedResult;
 using TechZone.Core.ServiceResponse;
 
 namespace TechZone.EF.Service.Implementations
@@ -18,24 +21,23 @@ namespace TechZone.EF.Service.Implementations
             _logger = logger;
         }
 
-        public async Task<ServiceResponse<IEnumerable<Laptop>>> GetAllAsync()
+        public async Task<ServiceResponse<PagedResult<Laptop>>> GetAllAsync(PaginationParamsDto<LaptopSortBy> paginationParams)
         {
             try
             {
-                _logger.LogInformation("Retrieving all laptops");
+                _logger.LogInformation("Retrieving laptops with parameters: {@PaginationParams}", paginationParams);
+                var result = await _unitOfWork.Laptops.GetPagedAsync(paginationParams);
 
-                var laptops = await _unitOfWork.Laptops.GetAllAsync(l => l.Variants);
-
-                return ServiceResponse<IEnumerable<Laptop>>.SuccessResponse(
-                    laptops,
-                    "All laptops retrieved successfully",
-                    "تم استرجاع جميع أجهزة الكمبيوتر المحمولة بنجاح"
+                return ServiceResponse<PagedResult<Laptop>>.SuccessResponse(
+                    result,
+                    "Laptops retrieved successfully",
+                    "تم استرجاع أجهزة الكمبيوتر المحمولة بنجاح"
                 );
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while retrieving all laptops");
-                return ServiceResponse<IEnumerable<Laptop>>.InternalServerErrorResponse(
+                _logger.LogError(ex, "Error occurred while retrieving laptops");
+                return ServiceResponse<PagedResult<Laptop>>.InternalServerErrorResponse(
                     "An error occurred while retrieving laptops"
                 );
             }
