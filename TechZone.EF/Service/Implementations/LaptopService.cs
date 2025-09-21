@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using TechZone.Api.DTOs.Laptop;
 using TechZone.Api.Services.Interfaces;
-using TechZone.Core.Entities;
+using TechZone.Core.Entities.Laptop;
 using TechZone.Core.Interfaces;
 using TechZone.Core.ServiceResponse;
 

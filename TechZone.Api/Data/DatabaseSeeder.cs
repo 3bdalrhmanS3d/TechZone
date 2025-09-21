@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using TechZone.Core.Entities;
+using TechZone.Core.Entities.User;
 
 namespace TechZone.Api.Data
 {
