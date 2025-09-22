@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using TechZone.Api.DTOs.Laptop;
 using TechZone.Api.Services.Interfaces;
+using TechZone.Core.DTOs.Laptop;
 using TechZone.Core.Entities;
 using TechZone.Core.ENUMS.Laptop;
 using TechZone.Core.Interfaces;
@@ -21,14 +22,16 @@ namespace TechZone.EF.Service.Implementations
             _logger = logger;
         }
 
-        public async Task<ServiceResponse<PagedResult<Laptop>>> GetAllAsync(PaginationParamsDto<LaptopSortBy> paginationParams)
+        public async Task<ServiceResponse<PagedResult<LaptopResponseDTO>>> GetAllAsync(PaginationParamsDto<LaptopSortBy> paginationParams)
         {
             try
             {
                 _logger.LogInformation("Retrieving laptops with parameters: {@PaginationParams}", paginationParams);
                 var result = await _unitOfWork.Laptops.GetPagedAsync(paginationParams);
 
-                return ServiceResponse<PagedResult<Laptop>>.SuccessResponse(
+
+
+                return ServiceResponse<PagedResult<LaptopResponseDTO>>.SuccessResponse(
                     result,
                     "Laptops retrieved successfully",
                     "تم استرجاع أجهزة الكمبيوتر المحمولة بنجاح"
@@ -37,7 +40,7 @@ namespace TechZone.EF.Service.Implementations
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while retrieving laptops");
-                return ServiceResponse<PagedResult<Laptop>>.InternalServerErrorResponse(
+                return ServiceResponse<PagedResult<LaptopResponseDTO>>.InternalServerErrorResponse(
                     "An error occurred while retrieving laptops"
                 );
             }

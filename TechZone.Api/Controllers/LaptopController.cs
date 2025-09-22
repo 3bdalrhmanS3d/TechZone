@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TechZone.Api.DTOs.Laptop;
 using TechZone.Api.Extensions;
 using TechZone.Api.Services.Interfaces;
+using TechZone.Core.DTOs.Laptop;
 using TechZone.Core.Entities;
 using TechZone.Core.ENUMS.Laptop;
 using TechZone.Core.PagedResult;
@@ -31,13 +32,37 @@ namespace TechZone.Api.Controllers
         /// <param name="paginationParams">Pagination, filtering, and sorting parameters</param>
         /// <returns>Paginated list of laptops with their variants</returns>
         [HttpGet]
-        [ProducesResponseType(typeof(ServiceResponse<PagedResult<Laptop>>), 200)]
-        [ProducesResponseType(typeof(ServiceResponse<PagedResult<Laptop>>), 400)]
-        [ProducesResponseType(typeof(ServiceResponse<PagedResult<Laptop>>), 500)]
-        public async Task<ActionResult<ServiceResponse<PagedResult<Laptop>>>> GetAll(
+        [ProducesResponseType(typeof(ServiceResponse<PagedResult<LaptopResponseDTO>>), 200)]
+        [ProducesResponseType(typeof(ServiceResponse<PagedResult<LaptopResponseDTO>>), 400)]
+        [ProducesResponseType(typeof(ServiceResponse<PagedResult<LaptopResponseDTO>>), 500)]
+        public async Task<ActionResult<ServiceResponse<PagedResult<LaptopResponseDTO>>>> GetAll(
             [FromQuery] PaginationParamsDto<LaptopSortBy> paginationParams)
         {
             _logger.LogInformation("GET api/laptop - Retrieving laptops with pagination parameters: {@PaginationParams}", paginationParams);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var response = await _laptopService.GetAllAsync(paginationParams);
+            return response.ToActionResult();
+        }
+
+
+        /// <summary>
+        /// Get paginated, filtered, and sorted laptops
+        /// </summary>
+        /// <param name="paginationParams">Pagination, filtering, and sorting parameters</param>
+        /// <returns>Paginated list of laptops with their variants</returns>
+        [HttpGet("recommended")]
+        [ProducesResponseType(typeof(ServiceResponse<PagedResult<LaptopResponseDTO>>), 200)]
+        [ProducesResponseType(typeof(ServiceResponse<PagedResult<LaptopResponseDTO>>), 400)]
+        [ProducesResponseType(typeof(ServiceResponse<PagedResult<LaptopResponseDTO>>), 500)]
+        public async Task<ActionResult<ServiceResponse<PagedResult<LaptopResponseDTO>>>> GetRecommended(
+            [FromQuery] PaginationParamsDto<LaptopSortBy> paginationParams)
+        {
+            _logger.LogInformation("GET api/Recommended laptops - Retrieving laptops with pagination parameters: {@PaginationParams}", paginationParams);
 
             if (!ModelState.IsValid)
             {

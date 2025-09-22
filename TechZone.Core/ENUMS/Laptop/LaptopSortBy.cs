@@ -9,7 +9,8 @@ namespace TechZone.Core.ENUMS.Laptop
     public enum LaptopSortBy
     {
         Id,
-        //ModelName,
+        ModelName,
+        Price,
         //Processor,
         //GPU,
         //ScreenSize,

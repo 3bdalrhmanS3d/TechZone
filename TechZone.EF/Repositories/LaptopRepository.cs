@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using TechZone.Core.Consts;
+using TechZone.Core.DTOs.Laptop;
 using TechZone.Core.Entities;
 using TechZone.Core.ENUMS.Laptop;
 using TechZone.Core.Interfaces;
@@ -22,56 +23,119 @@ namespace TechZone.EF.Repositories
             _context = context;
         }
 
-        public async Task<PagedResult<Laptop>> GetPagedAsync(PaginationParamsDto<LaptopSortBy> paginationParams)
+        public async Task<PagedResult<LaptopResponseDTO>> GetPagedAsync(PaginationParamsDto<LaptopSortBy> paginationParams)
         {
-            var query = _context.Laptops
-                .Include(l => l.Variants)
-                .AsNoTracking()
-                .AsQueryable();
+            var query = _context.Laptops.AsNoTracking();
 
-            // Apply search filter
+            // Filter (null-safe)
             if (!string.IsNullOrWhiteSpace(paginationParams.Search))
             {
-                var searchTerm = paginationParams.Search.ToLower();
+                var s = paginationParams.Search.ToLower();
                 query = query.Where(l =>
-                    l.ModelName.ToLower().Contains(searchTerm) ||
-                    l.Processor.ToLower().Contains(searchTerm) ||
-                    l.GPU.ToLower().Contains(searchTerm) ||
-                    l.ScreenSize.ToLower().Contains(searchTerm) ||
-                    l.Ports.ToLower().Contains(searchTerm)
+                    ((l.ModelName ?? "").ToLower().Contains(s)) ||
+                    ((l.Processor ?? "").ToLower().Contains(s)) ||
+                    ((l.GPU ?? "").ToLower().Contains(s)) ||
+                    ((l.ScreenSize ?? "").ToLower().Contains(s)) ||
+                    ((l.Ports ?? "").ToLower().Contains(s))
                 );
             }
 
-            // Apply sorting
+            // ✅ ALWAYS order before paging
             query = ApplySorting(query, paginationParams.SortBy, paginationParams.SortDirection);
 
-            var totalCount = await query.CountAsync();
+            // Projection (كلها null-safe)
+            var projected = query.Select(l => new
+            {
+                l.Id,
+                Name = l.ModelName ?? "",
+                Category = l.Category != null ? l.Category.Name : "unknown",
 
-            // Apply pagination
-            var items = await query
-                .Skip((paginationParams.Page - 1) * paginationParams.PageSize)
-                .Take(paginationParams.PageSize)
+                // ✅ التصحيح هنا
+                MinPrice = 10000.0m, // Amr, fix this
+
+                Images = l.Images.Select(img => img.ImageUrl ?? ""),
+                // Brand و Processor في الموديل strings default ""، بس نخليها defensive برضه
+                ShortDescription = string.Concat(
+        (l.Brand != null ? l.Brand.Name : ""),
+        ", RAM 16 GB, ",
+        (l.Processor ?? ""),
+        " ."
+    )
+            });
+
+
+            var totalCount = await projected.CountAsync();
+
+            // Paging
+            var page = paginationParams.Page;
+            var size = paginationParams.PageSize;
+
+            var pageItems = await projected
+                .Skip((page - 1) * size)
+                .Take(size)
                 .ToListAsync();
 
-            return new PagedResult<Laptop>(items, totalCount, paginationParams.Page, paginationParams.PageSize);
-        }
-
-        private IQueryable<Laptop> ApplySorting(IQueryable<Laptop> query, LaptopSortBy? sortBy, SortDirection sortDirection)
-        {
-            if (!sortBy.HasValue)
-                return query.OrderBy(l => l.Id); // Default sorting
-
-            return sortBy.Value switch
+            // Post-processing (randoms خارج SQL)
+            var rnd = new Random();
+            var items = pageItems.Select(x => new LaptopResponseDTO
             {
-                LaptopSortBy.Id => sortDirection == SortDirection.Asc
-                    ? query.OrderBy(l => l.Id)
-                    : query.OrderByDescending(l => l.Id),
+                Id = x.Id,
+                Name = x.Name,
+                // خليه 0 لو لازم non-nullable، أو غيّر DTO لـ decimal?
+                Price = 10000.0m,
+                Category = x.Category,
+                Images = x.Images.Where(u => !string.IsNullOrWhiteSpace(u)).ToList(),
+                ReviewsCount = rnd.Next(0, 500),
+                IsDiscounted = false,
+                DiscountedPrice = null,
+                Rate = Math.Round(rnd.NextDouble() * 5, 1),
+                ShortDescription = x.ShortDescription
+            }).ToList();
 
-                
-
-                _ => query.OrderBy(l => l.Id)
-            };
+            return new PagedResult<LaptopResponseDTO>(items, totalCount, page, size);
         }
+
+        private static IQueryable<Laptop> ApplySorting(
+    IQueryable<Laptop> q,
+    LaptopSortBy? sortBy,
+    SortDirection dir)
+        {
+            IOrderedQueryable<Laptop> oq;
+
+            switch (sortBy)
+            {
+                case LaptopSortBy.Price:
+                    oq = (dir == SortDirection.Asc)
+                        ? q.OrderBy(l => l.Variants
+                                .Select(v => (decimal?)v.Price)
+                                .DefaultIfEmpty()
+                                .Min())
+                        : q.OrderByDescending(l => l.Variants
+                                .Select(v => (decimal?)v.Price)
+                                .DefaultIfEmpty()
+                                .Min());
+                    break;
+
+                case LaptopSortBy.ModelName:
+                    oq = (dir == SortDirection.Asc)
+                        ? q.OrderBy(l => l.ModelName)
+                        : q.OrderByDescending(l => l.ModelName);
+                    break;
+
+                default:
+                    // دايماً عندك ترتيب افتراضي ثابت
+                    oq = (dir == SortDirection.Asc)
+                        ? q.OrderBy(l => l.Id)
+                        : q.OrderByDescending(l => l.Id);
+                    break;
+            }
+
+            // تثبيت إضافي للنتائج
+            return (dir == SortDirection.Asc)
+                ? oq.ThenBy(l => l.Id)
+                : oq.ThenByDescending(l => l.Id);
+        }
+
 
         public async Task<int> CountAsync()
         {

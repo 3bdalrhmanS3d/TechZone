@@ -1,4 +1,5 @@
 ﻿using TechZone.Api.DTOs.Laptop;
+using TechZone.Core.DTOs.Laptop;
 using TechZone.Core.Entities;
 using TechZone.Core.ENUMS.Laptop;
 using TechZone.Core.PagedResult;
@@ -8,7 +9,7 @@ namespace TechZone.Api.Services.Interfaces
 {
     public interface ILaptopService
     {
-        Task<ServiceResponse<PagedResult<Laptop>>> GetAllAsync(PaginationParamsDto<LaptopSortBy> paginationParams);
+        Task<ServiceResponse<PagedResult<LaptopResponseDTO>>> GetAllAsync(PaginationParamsDto<LaptopSortBy> paginationParams);
         Task<ServiceResponse<Laptop>> GetByIdAsync(int id);
         Task<ServiceResponse<Laptop>> CreateAsync(CreateLaptopDto laptop);
         Task<ServiceResponse<Laptop>> UpdateAsync(int id, UpdateLaptopDto laptop);
