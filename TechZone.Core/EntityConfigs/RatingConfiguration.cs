@@ -19,7 +19,7 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(r => r.CreatedAt)
                    .IsRequired()
-                   .HasDefaultValueSql("GETUTCDATE()");
+                   .HasDefaultValueSql("now()");
 
             builder.HasOne(r => r.User)
                    .WithMany(u => u.Ratings)

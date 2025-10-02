@@ -16,7 +16,7 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(ci => ci.AddedAt)
                    .IsRequired()
-                   .HasDefaultValueSql("GETUTCDATE()");
+                   .HasDefaultValueSql("now()");
 
             builder.HasOne(ci => ci.User)
                    .WithMany(u => u.CartItems)

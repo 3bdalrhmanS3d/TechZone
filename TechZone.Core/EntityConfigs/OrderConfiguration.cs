@@ -13,7 +13,7 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(o => o.OrderDate)
                    .IsRequired()
-                   .HasDefaultValueSql("GETUTCDATE()");
+                   .HasDefaultValueSql("now()"); 
 
             builder.Property(o => o.TotalAmount)
                    .IsRequired()

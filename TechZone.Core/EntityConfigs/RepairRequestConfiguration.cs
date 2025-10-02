@@ -21,7 +21,7 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(rr => rr.RequestDate)
                    .IsRequired()
-                   .HasDefaultValueSql("GETUTCDATE()");
+                   .HasDefaultValueSql("now()");
 
             builder.HasOne(rr => rr.User)
                    .WithMany(u => u.RepairRequests)
