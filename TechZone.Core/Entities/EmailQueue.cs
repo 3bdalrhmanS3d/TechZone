@@ -37,10 +37,8 @@ namespace TechZone.Core.Entities
     public class EmailQueue
     {
         [Key]
-        [Column(TypeName = "uniqueidentifier")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id { get; set; }
-
+        public Guid Id { get; set; } = Guid.NewGuid();
         public string ToEmail { get; set; } = string.Empty;
 
         public string? ToName { get; set; }

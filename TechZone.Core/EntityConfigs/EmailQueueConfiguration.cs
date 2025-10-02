@@ -39,10 +39,11 @@ namespace TechZone.Core.EntityConfigs
                 .IsRequired();
 
             builder.Property(eq => eq.ErrorMessage);
-                
+
 
             builder.Property(eq => eq.TemplateData)
-                .HasColumnType("nvarchar(max)");
+        .HasColumnType("text"); // PostgreSQL equivalent
+
 
             // Performance Indexes
             builder.HasIndex(eq => eq.Status)
