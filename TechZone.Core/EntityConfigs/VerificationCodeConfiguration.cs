@@ -10,19 +10,21 @@ namespace TechZone.Core.EntityConfigs
         {
             builder.ToTable("VerificationCodes", t =>
             {
-                t.HasCheckConstraint("CK_VerificationCodes_Expiry_After_Created", "[ExpiryDate] > [CreatedAt]");
-                t.HasCheckConstraint("CK_VerificationCodes_Attempt_NonNegative", "[AttemptCount] >= 0");
-                t.HasCheckConstraint("CK_VerificationCodes_MaxAttempts_Positive", "[MaxAttempts] > 0");
+                t.HasCheckConstraint("CK_VerificationCodes_Expiry_After_Created", "ExpiryDate > CreatedAt");
+                t.HasCheckConstraint("CK_VerificationCodes_Attempt_NonNegative", "AttemptCount >= 0");
+                t.HasCheckConstraint("CK_VerificationCodes_MaxAttempts_Positive", "MaxAttempts > 0");
             });
+
 
             // PK
             builder.HasKey(vc => vc.Id);
 
             // Id (DB default)
             builder.Property(vc => vc.Id)
-                   .HasColumnType("uniqueidentifier")
-                   .HasDefaultValueSql("NEWSEQUENTIALID()")
-                   .IsRequired();
+                .HasColumnType("uuid")
+                .HasDefaultValueSql("gen_random_uuid()")
+                .IsRequired();
+
 
             // FK to AspNetUsers (nvarchar(450))
             builder.Property(vc => vc.UserId)
@@ -51,14 +53,15 @@ namespace TechZone.Core.EntityConfigs
                    .IsRequired();
 
             builder.Property(vc => vc.CreatedAt)
-                   .HasDefaultValueSql("GETUTCDATE()")
+                   .HasDefaultValueSql("now()")
                    .ValueGeneratedOnAdd()
                    .IsRequired();
 
             builder.Property(vc => vc.ExpiryDate)
-                   .HasDefaultValueSql("DATEADD(MINUTE, 60, GETUTCDATE())")
-                   .ValueGeneratedOnAdd()
-                   .IsRequired();
+                    .HasDefaultValueSql("now() + interval '60 minutes'")
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
+
 
             builder.Property(vc => vc.AttemptCount)
                    .HasDefaultValue(0)

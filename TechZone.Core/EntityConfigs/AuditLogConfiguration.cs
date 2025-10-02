@@ -24,7 +24,7 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(a => a.Timestamp)
                    .IsRequired()
-                   .HasDefaultValueSql("GETUTCDATE()");
+                   .HasDefaultValueSql("now()");
 
             builder.Property(a => a.Details)
                    .HasColumnType("text");

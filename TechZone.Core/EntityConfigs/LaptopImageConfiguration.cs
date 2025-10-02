@@ -21,7 +21,7 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(li => li.UploadedAt)
                    .IsRequired()
-                   .HasDefaultValueSql("GETUTCDATE()");
+                   .HasDefaultValueSql("now()");
 
             builder.HasOne(li => li.Laptop)
                    .WithMany(l => l.Images)
