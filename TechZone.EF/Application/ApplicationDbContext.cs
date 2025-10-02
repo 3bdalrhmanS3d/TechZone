@@ -31,6 +31,15 @@ namespace TechZone.EF.Application
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            {
+                entity.SetTableName(entity.GetTableName().ToLower());
+
+                foreach (var property in entity.GetProperties())
+                {
+                    property.SetColumnName(property.GetColumnName().ToLower());
+                }
+            }
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());

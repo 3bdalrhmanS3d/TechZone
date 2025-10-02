@@ -100,7 +100,7 @@ namespace TechZone.Api
                 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 {
                     // Try to read DATABASE_URL from Railway
-                    var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+                    var dbUrl = "postgresql://postgres:GRgpDWQqsyUjfpcfZCYCvcmGiHCUTbGt@switchyard.proxy.rlwy.net:46456/railway";
                     string connectionString;
 
                     if (!string.IsNullOrEmpty(dbUrl))
