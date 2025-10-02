@@ -26,7 +26,7 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(u => u.CreatedAt)
                    .IsRequired()
-                   .HasDefaultValueSql("GETDATE()");
+                   .HasDefaultValueSql("NOW()");
         }
     }
 }

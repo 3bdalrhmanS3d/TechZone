@@ -99,26 +99,44 @@ namespace TechZone.Api
                 // Database Configuration with reduced logging
                 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 {
-                    options.UseSqlServer(
-                        builder.Configuration.GetConnectionString("DefaultConnection"),
-                        sqlOptions =>
-                        {
-                            sqlOptions.EnableRetryOnFailure(
-                                maxRetryCount: 3,
-                                maxRetryDelay: TimeSpan.FromSeconds(5),
-                                errorNumbersToAdd: null
-                            );
-                            sqlOptions.CommandTimeout(30);
-                        });
+                    // Try to read DATABASE_URL from Railway
+                    var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+                    string connectionString;
 
-                    // Reduce EF Core logging
+                    if (!string.IsNullOrEmpty(dbUrl))
+                    {
+                        // Convert postgres://... into Npgsql connection string
+                        var uri = new Uri(dbUrl);
+                        var userInfo = uri.UserInfo.Split(':');
+
+                        connectionString =
+                            $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};" +
+                            $"Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+                    }
+                    else
+                    {
+                        // Local fallback (from appsettings.json)
+                        connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                    }
+
+                    options.UseNpgsql(connectionString, npgsqlOptions =>
+                    {
+                        npgsqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 3,
+                            maxRetryDelay: TimeSpan.FromSeconds(5),
+                            errorCodesToAdd: null
+                        );
+                        npgsqlOptions.CommandTimeout(30);
+                    });
+
                     options.EnableSensitiveDataLogging(false);
                     options.EnableServiceProviderCaching();
                     options.EnableDetailedErrors(builder.Environment.IsDevelopment());
 
-                    // Only log warnings and errors for EF
                     options.LogTo(message => Log.Debug("[EF] {Message}", message), LogLevel.Warning);
                 });
+
+
 
                 // Authentication Configuration
                 builder.Services.AddAuthentication(option =>
