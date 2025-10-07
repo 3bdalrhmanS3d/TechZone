@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -219,21 +221,45 @@ namespace TechZone.Api.Data
         // ====== 3) Laptop Images ======
         private static async Task SeedLaptopImagesAsync(ApplicationDbContext ctx)
         {
-            if (await ctx.LaptopImages.AnyAsync()) return;
 
             var laptopIds = await ctx.Laptops.Select(l => l.Id).ToListAsync();
             if (laptopIds.Count == 0) return;
 
-            var images = laptopIds.Select(id => new LaptopImage
+            var cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
+            cloudinary.Api.Secure = true;
+
+            string imageFolder = Path.Combine("wwwroot", "PICs", "LapTops");
+            var localImages = Directory.GetFiles(imageFolder, "*.webp").ToList();
+
+            var rng = new Random();
+            var images = new List<LaptopImage>();
+
+            foreach (var laptopId in laptopIds)
             {
-                LaptopId = id,
-                ImageUrl = $"F:TechZone\\TechZone.Api\\wwwroot\\PICs\\LapTops\\defaultLaptop.webp{id}.jpg",
-                IsMain = true
-            });
+                var imagePath = localImages[rng.Next(localImages.Count)];
+
+                var uploadParams = new ImageUploadParams
+                {
+                    File = new FileDescription(imagePath),
+                    Folder = "techzone/laptops"
+                };
+
+                var uploadResult = await cloudinary.UploadAsync(uploadParams);
+                var url = uploadResult.SecureUrl?.ToString() ?? "";
+
+                images.Add(new LaptopImage
+                {
+                    LaptopId = laptopId,
+                    ImageUrl = url,
+                    IsMain = true
+                });
+            }
 
             await ctx.LaptopImages.AddRangeAsync(images);
             await ctx.SaveChangesAsync();
         }
-        
+
+
+
     }
 }
