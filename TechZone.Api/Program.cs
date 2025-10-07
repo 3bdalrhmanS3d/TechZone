@@ -14,6 +14,9 @@ using TechZone.Core.Service.Interfaces;
 using TechZone.EF.Application;
 using TechZone.EF.Service.Implementations;
 using TechZone.EF.UnitOfWork;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using dotenv.net;
 
 namespace TechZone.Api
 {
@@ -43,6 +46,16 @@ namespace TechZone.Api
                 Log.Information("🚀 Starting TechZone API application");
 
                 var builder = WebApplication.CreateBuilder(args);
+                // Load environment variables from .env
+                DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
+
+                // Initialize Cloudinary
+                var cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
+                cloudinary.Api.Secure = true;
+
+                // Register Cloudinary as a service
+                builder.Services.AddSingleton(cloudinary);
+
 
                 // Replace default logging with Serilog
                 builder.Host.UseSerilog();
