@@ -221,6 +221,12 @@ namespace TechZone.Api.Data
         // ====== 3) Laptop Images ======
         private static async Task SeedLaptopImagesAsync(ApplicationDbContext ctx)
         {
+            // 🔥 Clear existing images first
+            if (await ctx.LaptopImages.AnyAsync())
+            {
+                ctx.LaptopImages.RemoveRange(ctx.LaptopImages);
+                await ctx.SaveChangesAsync();
+            }
 
             var laptopIds = await ctx.Laptops.Select(l => l.Id).ToListAsync();
             if (laptopIds.Count == 0) return;
