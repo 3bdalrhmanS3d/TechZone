@@ -68,8 +68,7 @@ namespace TechZone.Api.Data
                 {
                     UserName = "admin",
                     Email = adminEmail,
-                    FirstName = "TechZone",
-                    LastName = "Admin",
+                    FullName = "Admin TechZone",
                     PhoneNumber = "+201234567890",
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true

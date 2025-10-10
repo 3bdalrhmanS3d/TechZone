@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -12,6 +13,7 @@ using TechZone.Core.Entities;
 using TechZone.Core.Interfaces;
 using TechZone.Core.Service.Interfaces;
 using TechZone.EF.Application;
+using TechZone.EF.Features.Profile.Endpoints;
 using TechZone.EF.Service.Implementations;
 using TechZone.EF.UnitOfWork;
 
@@ -65,6 +67,12 @@ namespace TechZone.Api
                 builder.Services.AddScoped<IEmailService, EmailService>();
                 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
                 builder.Services.AddScoped<ILaptopService, LaptopService>();
+
+                // mediator services for CQRS
+                //builder.Services.AddMediatR(typeof(Program).Assembly);
+                builder.Services.AddMediatR(typeof(TechZone.EF.Features.Profile.Queries.GetProfileQueryHandler).Assembly);
+
+
 
                 // Background Services
                 builder.Services.AddHostedService<EmailBackgroundService>();
@@ -322,7 +330,7 @@ namespace TechZone.Api
                 app.UseAuthentication();
                 app.UseAuthorization();
                 app.MapControllers();
-
+                app.MapProfileEndpoint();
                 // Logging startup information
                 Log.Information("🌟 TechZone API started successfully");
                 Log.Information("🔧 Environment: {Environment}", app.Environment.EnvironmentName);

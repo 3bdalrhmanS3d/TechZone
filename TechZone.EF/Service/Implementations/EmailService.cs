@@ -46,9 +46,8 @@ namespace TechZone.EF.Service.Implementations
             {
                 // Get user details to get the name
                 var user = await _userManager.FindByEmailAsync(email);
-                string FirstName = user.FirstName ?? "";
-                string LastName = user.LastName ?? "";
-                string toName = FirstName + " " + LastName;
+
+                string toName = user.FullName??"";
 
                 var code = confirmationCode ?? GenerateVerificationCode();
                 var subject = "Confirm Your Email - TechZone";

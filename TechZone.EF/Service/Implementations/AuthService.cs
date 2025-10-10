@@ -58,8 +58,7 @@ namespace TechZone.EF.Service.Implementations
                 {
                     UserName = dto.UserName,
                     Email = dto.Email,
-                    FirstName = dto.FirstName, // Updated from FullName
-                    LastName = dto.LastName,   // Updated from FullName
+                    FullName = dto.FirstName, // Updated from FullName
                     EmailConfirmed = false
                 };
 
@@ -143,7 +142,7 @@ namespace TechZone.EF.Service.Implementations
                 await _userManager.UpdateAsync(user);
 
                 // Send welcome email
-                var fullName = $"{user.FirstName} {user.LastName}"; // Combine first and last name
+                var fullName = user.FullName; // Combine first and last name
                 var welcomeEmailResult = await _emailService.SendWelcomeEmailAsync(user.Email, fullName);
                 if (!welcomeEmailResult.IsSuccess)
                 {

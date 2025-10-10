@@ -8,11 +8,7 @@ namespace TechZone.Core.EntityConfigs
     {
         public void Configure(EntityTypeBuilder<ApplicationUser> builder)
         {
-            builder.Property(u => u.FirstName)
-                   .IsRequired()
-                   .HasMaxLength(100);
-
-            builder.Property(u => u.LastName)
+            builder.Property(u => u.FullName)
                    .IsRequired()
                    .HasMaxLength(100);
 

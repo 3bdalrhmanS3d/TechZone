@@ -40,7 +40,7 @@ namespace TechZone.EF.Service.Implementations
                 foreach (var role in roles)
                     roleClaims.Add(new Claim("roles", role));
 
-                var fullName = $"{user.FirstName} {user.LastName}"; // Combine first and last name
+                var fullName = user.FullName; // Combine first and last name
 
                 var claims = new[]
                 {
