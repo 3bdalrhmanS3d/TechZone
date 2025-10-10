@@ -1,4 +1,5 @@
 ﻿using TechZone.Core.Entities;
+using TechZone.Core.Entities.User;
 using TechZone.Core.ServiceResponse;
 
 namespace TechZone.Core.Service.Interfaces

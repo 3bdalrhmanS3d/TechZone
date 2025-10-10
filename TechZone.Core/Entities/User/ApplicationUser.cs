@@ -3,8 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using TechZone.Core.Entities;
+using TechZone.Core.Entities.Laptop;
+using TechZone.Core.Entities.Logging;
+using TechZone.Core.Entities.Order;
+using TechZone.Core.Entities.Repair;
 
-namespace TechZone.Core.Entities
+namespace TechZone.Core.Entities.User
 {
     public class ApplicationUser : IdentityUser
     {
@@ -22,7 +26,7 @@ namespace TechZone.Core.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation properties
-        public ICollection<Order> Orders { get; set; } = new List<Order>();
+        public ICollection<TechZone.Core.Entities.Order.Order> Orders { get; set; } = new List<TechZone.Core.Entities.Order.Order>();
         public ICollection<Rating> Ratings { get; set; } = new List<Rating>();
         public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
         public ICollection<RepairRequest> RepairRequests { get; set; } = new List<RepairRequest>();

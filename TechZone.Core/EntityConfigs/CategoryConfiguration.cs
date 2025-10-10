@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TechZone.Core.Entities;
+using TechZone.Core.Entities.Laptop;
 
 namespace TechZone.Core.EntityConfigs
 {
@@ -17,6 +18,8 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(c => c.Description)
                    .HasColumnType("text");
+
+            builder.Property(c => c.CategoryImageURL);
         }
     }
 }

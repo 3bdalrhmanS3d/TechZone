@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using TechZone.Core.Entities;
+using TechZone.Core.Entities.User;
 using TechZone.Core.ServiceResponse;
 
 namespace TechZone.Core.Service.Interfaces

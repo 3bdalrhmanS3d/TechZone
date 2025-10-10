@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace TechZone.Core.Entities
+namespace TechZone.Core.Entities.Laptop
 {
     public class Category
     {
@@ -12,6 +12,7 @@ namespace TechZone.Core.Entities
 
         public string Description { get; set; } = string.Empty;
 
+        public string? CategoryImageURL { get; set; } = string.Empty;
         // Navigation
         public ICollection<Laptop> Laptops { get; set; } = new List<Laptop>();
     }
