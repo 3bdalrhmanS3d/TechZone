@@ -35,6 +35,7 @@ namespace TechZone.Api.Controllers
         [ProducesResponseType(typeof(ServiceResponse<PagedResult<LaptopResponseDTO>>), 200)]
         [ProducesResponseType(typeof(ServiceResponse<PagedResult<LaptopResponseDTO>>), 400)]
         [ProducesResponseType(typeof(ServiceResponse<PagedResult<LaptopResponseDTO>>), 500)]
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResponse<PagedResult<LaptopResponseDTO>>>> GetAll(
             [FromQuery] PaginationParamsDto<LaptopSortBy> paginationParams)
         {
