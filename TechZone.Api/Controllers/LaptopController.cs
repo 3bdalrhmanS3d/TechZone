@@ -25,6 +25,22 @@ namespace TechZone.Api.Controllers
             _laptopService = laptopService;
             _logger = logger;
         }
+        /// <summary>
+        /// Get all laptops with all their details (no pagination)
+        /// </summary>
+        /// <returns>List of all laptops with full details</returns>
+        [HttpGet("all")]
+        [ProducesResponseType(typeof(ServiceResponse<IEnumerable<LaptopResponseDTO>>), 200)]
+        [ProducesResponseType(typeof(ServiceResponse<IEnumerable<LaptopResponseDTO>>), 400)]
+        [ProducesResponseType(typeof(ServiceResponse<IEnumerable<LaptopResponseDTO>>), 500)]
+        [AllowAnonymous]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<FullLaptopResponseDTO>>>> GetAllFull()
+        {
+            _logger.LogInformation("GET api/laptop/all - Retrieving all laptops with full details (no pagination)");
+
+            var response = await _laptopService.GetAllFullAsync();
+            return response.ToActionResult();
+        }
 
         /// <summary>
         /// Get paginated, filtered, and sorted laptops

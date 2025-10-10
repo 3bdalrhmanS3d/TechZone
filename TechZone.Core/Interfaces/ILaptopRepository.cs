@@ -14,8 +14,7 @@ namespace TechZone.Core.Interfaces
 {
     public interface ILaptopRepository : IBaseRepository<Laptop>
     {
-        // You can add Laptop-specific queries here later
-
+        Task<IEnumerable<FullLaptopResponseDTO>> GetAllFullAsync();
         Task<PagedResult<LaptopResponseDTO>> GetPagedAsync(PaginationParamsDto<LaptopSortBy> paginationParams);
         Task<int> CountAsync();
     }

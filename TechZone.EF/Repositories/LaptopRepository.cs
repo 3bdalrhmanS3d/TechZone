@@ -23,6 +23,58 @@ namespace TechZone.EF.Repositories
         {
             _context = context;
         }
+        public async Task<IEnumerable<FullLaptopResponseDTO>> GetAllFullAsync()
+        {
+            var laptops = await _context.Laptops
+                .Include(l => l.Brand)
+                .Include(l => l.Category)
+                .Include(l => l.Images)
+                .Include(l => l.Variants)
+                .AsNoTracking()
+                .ToListAsync();
+
+            return laptops.Select(l => new FullLaptopResponseDTO
+            {
+                Id = l.Id,
+                ModelName = l.ModelName,
+                Processor = l.Processor,
+                GPU = l.GPU,
+                ScreenSize = l.ScreenSize,
+                HasCamera = l.HasCamera,
+                HasKeyboard = l.HasKeyboard,
+                HasTouchScreen = l.HasTouchScreen,
+                Ports = l.Ports,
+                Description = l.Description,
+                Notes = l.Notes,
+                Warranty = l.Warranty,
+
+                Brand = new BrandDTO
+                {
+                    Id = l.Brand.Id,
+                    Name = l.Brand.Name
+                },
+                Category = new CategoryDTO
+                {
+                    Id = l.Category.Id,
+                    Name = l.Category.Name
+                },
+                Variants = l.Variants.Select(v => new LaptopVariantDTO
+                {
+                    Id = v.Id,
+                    Ram = v.RAM,
+                    Storage = v.Storage,
+                    Price = v.Price,
+                    StockQuantity = v.StockQuantity
+                }).ToList(),
+                Images = l.Images.Select(i => new LaptopImageDTO
+                {
+                    Id = i.Id,
+                    ImageUrl = i.ImageUrl,
+                    IsMain = i.IsMain
+                }).ToList()
+            }).ToList();
+        }
+
 
         public async Task<PagedResult<LaptopResponseDTO>> GetPagedAsync(PaginationParamsDto<LaptopSortBy> paginationParams)
         {
@@ -187,6 +239,7 @@ namespace TechZone.EF.Repositories
 
             return await query.ToListAsync();
         }
+
 
         public async Task<Laptop> GetByIdAsync(int id, params Expression<Func<Laptop, object>>[] includes)
         {

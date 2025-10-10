@@ -10,6 +10,7 @@ namespace TechZone.Api.Services.Interfaces
 {
     public interface ILaptopService
     {
+        Task<ServiceResponse<IEnumerable<FullLaptopResponseDTO>>> GetAllFullAsync();
         Task<ServiceResponse<PagedResult<LaptopResponseDTO>>> GetAllAsync(PaginationParamsDto<LaptopSortBy> paginationParams);
         Task<ServiceResponse<Laptop>> GetByIdAsync(int id);
         Task<ServiceResponse<Laptop>> CreateAsync(CreateLaptopDto laptop);

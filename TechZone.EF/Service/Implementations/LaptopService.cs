@@ -22,6 +22,87 @@ namespace TechZone.EF.Service.Implementations
             _unitOfWork = unitOfWork;
             _logger = logger;
         }
+        public async Task<ServiceResponse<IEnumerable<FullLaptopResponseDTO>>> GetAllFullAsync()
+        {
+            try
+            {
+                _logger.LogInformation("Retrieving all laptops with full details");
+
+                var laptops = await _unitOfWork.Laptops.GetAllAsync(
+                    l => l.Brand,
+                    l => l.Category,
+                    l => l.Images,
+                    l => l.Variants
+                );
+
+                if (laptops == null || !laptops.Any())
+                {
+                    _logger.LogWarning("No laptops found in the database");
+                    return ServiceResponse<IEnumerable<FullLaptopResponseDTO>>.NotFoundResponse(
+                        "No laptops found",
+                        "لم يتم العثور على أجهزة كمبيوتر محمولة"
+                    );
+                }
+
+                var laptopDtos = laptops.Select(l => new FullLaptopResponseDTO
+                {
+                    Id = l.Id,
+                    ModelName = l.ModelName,
+                    Processor = l.Processor,
+                    GPU = l.GPU,
+                    ScreenSize = l.ScreenSize,
+                    HasCamera = l.HasCamera,
+                    HasKeyboard = l.HasKeyboard,
+                    HasTouchScreen = l.HasTouchScreen,
+                    Ports = l.Ports,
+                    Description = l.Description,
+                    Notes = l.Notes,
+                    Warranty = l.Warranty,
+
+                    Brand = new BrandDTO
+                    {
+                        Id = l.Brand.Id,
+                        Name = l.Brand.Name
+                    },
+
+                    Category = new CategoryDTO
+                    {
+                        Id = l.Category.Id,
+                        Name = l.Category.Name
+                    },
+
+                    Variants = l.Variants.Select(v => new LaptopVariantDTO
+                    {
+                        Id = v.Id,
+                        Ram = v.RAM,
+                        Storage = v.Storage,
+                        Price = v.Price,
+                        StockQuantity = v.StockQuantity
+                    }).ToList(),
+
+                    Images = l.Images.Select(i => new LaptopImageDTO
+                    {
+                        Id = i.Id,
+                        ImageUrl = i.ImageUrl,
+                        IsMain = i.IsMain
+                    }).ToList()
+                }).ToList();
+
+                return ServiceResponse<IEnumerable<FullLaptopResponseDTO>>.SuccessResponse(
+                    laptopDtos,
+                    "All laptops retrieved successfully",
+                    "تم استرجاع جميع أجهزة الكمبيوتر المحمولة بنجاح"
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while retrieving all laptops with full details");
+                return ServiceResponse<IEnumerable<FullLaptopResponseDTO>>.InternalServerErrorResponse(
+                    "An error occurred while retrieving laptops",
+                    "حدث خطأ أثناء استرجاع أجهزة الكمبيوتر المحمولة"
+                );
+            }
+        }
 
         public async Task<ServiceResponse<PagedResult<LaptopResponseDTO>>> GetAllAsync(PaginationParamsDto<LaptopSortBy> paginationParams)
         {
