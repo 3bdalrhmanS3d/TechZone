@@ -23,6 +23,24 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(b => b.Description)
                    .HasColumnType("text");
+
+            builder.Property(b => b.IsActive)
+                   .HasDefaultValue(true);
+
+            builder.Property(b => b.CreatedAt)
+                   .IsRequired()
+                   .HasDefaultValueSql("GETUTCDATE()");
+
+            builder.Property(b => b.UpdatedAt)
+                   .IsRequired(false);
+
+            builder.Property(b => b.DeletedAt)
+                   .IsRequired(false);
+
+            builder.Property(b => b.IsDeleted)
+                   .HasDefaultValue(false);
+
+            builder.HasQueryFilter(b => !b.IsDeleted);
         }
     }
 }

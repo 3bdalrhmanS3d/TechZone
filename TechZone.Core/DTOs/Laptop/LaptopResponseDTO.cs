@@ -24,5 +24,11 @@ namespace TechZone.Core.DTOs.Laptop
 
         public string ShortDescription { get; set; } = null!;
 
+        // New properties for enhanced response
+        public string Brand { get; set; } = null!;
+        public string Processor { get; set; } = null!;
+        public string GPU { get; set; } = null!;
+        public string ScreenSize { get; set; } = null!;
+        public string PriceRange { get; set; } = null!;
     }
 }

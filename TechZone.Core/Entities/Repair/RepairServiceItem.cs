@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace TechZone.Core.Entities
@@ -7,24 +8,26 @@ namespace TechZone.Core.Entities
     {
         Hardware,
         Software,
+        Diagnostic,
+        Upgrade,
         Other
     }
 
-    public class RepairServiceItem
+    public class RepairServiceItem : BaseEntity
     {
-        public int ItemId { get; set; }
-
         [Required, MaxLength(100)]
         public string Name { get; set; } = string.Empty;
 
         [Required]
         public RepairType RepairType { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal Price { get; set; }
+        public string Description { get; set; } = string.Empty;
 
-        [MaxLength(100)]
-        public string EstimatedTime { get; set; } = string.Empty;
+        [Range(0, double.MaxValue)]
+        public decimal BasePrice { get; set; }
+
+        public int EstimatedDays { get; set; }
+        public bool IsActive { get; set; } = true;
 
         // Navigation
         public ICollection<RepairRequest> RepairRequests { get; set; } = new List<RepairRequest>();

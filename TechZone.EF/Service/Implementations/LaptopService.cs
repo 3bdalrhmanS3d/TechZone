@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using System.Linq.Expressions;
 using TechZone.Api.DTOs.Laptop;
 using TechZone.Api.Services.Interfaces;
 using TechZone.Core.DTOs.Laptop;
@@ -28,8 +28,6 @@ namespace TechZone.EF.Service.Implementations
             {
                 _logger.LogInformation("Retrieving laptops with parameters: {@PaginationParams}", paginationParams);
                 var result = await _unitOfWork.Laptops.GetPagedAsync(paginationParams);
-
-
 
                 return ServiceResponse<PagedResult<LaptopResponseDTO>>.SuccessResponse(
                     result,
@@ -61,7 +59,7 @@ namespace TechZone.EF.Service.Implementations
                     );
                 }
 
-                var laptop = await _unitOfWork.Laptops.GetByIdAsync(labId, l => l.Variants);
+                var laptop = await _unitOfWork.Laptops.GetByIdAsync(labId);
                 if (laptop == null)
                 {
                     _logger.LogWarning("Laptop with ID: {LaptopId} not found", labId);
@@ -104,7 +102,7 @@ namespace TechZone.EF.Service.Implementations
                     );
                 }
 
-                // Map DTO -> Model
+                // Map DTO -> Model with new schema properties
                 var laptop = new Laptop
                 {
                     ModelName = dto.ModelName,
@@ -114,7 +112,13 @@ namespace TechZone.EF.Service.Implementations
                     HasCamera = dto.HasCamera,
                     HasKeyboard = dto.HasKeyboard,
                     HasTouchScreen = dto.HasTouchScreen,
-                    Ports = dto.Ports
+                    Description = dto.Description ?? string.Empty,
+                    StoreLocation = dto.StoreLocation ?? string.Empty,
+                    StoreContact = dto.StoreContact ?? string.Empty,
+                    ReleaseYear = dto.ReleaseYear,
+                    BrandId = dto.BrandId ?? 0,
+                    CategoryId = dto.CategoryId??0,
+                    IsActive = true
                 };
 
                 await _unitOfWork.Laptops.AddAsync(laptop);
@@ -181,7 +185,14 @@ namespace TechZone.EF.Service.Implementations
                 existingLaptop.HasCamera = dto.HasCamera;
                 existingLaptop.HasKeyboard = dto.HasKeyboard;
                 existingLaptop.HasTouchScreen = dto.HasTouchScreen;
-                existingLaptop.Ports = dto.Ports;
+                existingLaptop.Description = dto.Description ?? existingLaptop.Description;
+                existingLaptop.StoreLocation = dto.StoreLocation ?? existingLaptop.StoreLocation;
+                existingLaptop.StoreContact = dto.StoreContact ?? existingLaptop.StoreContact;
+                existingLaptop.ReleaseYear = dto.ReleaseYear ?? existingLaptop.ReleaseYear;
+                existingLaptop.BrandId = dto.BrandId ?? existingLaptop.BrandId;
+                existingLaptop.CategoryId = dto.CategoryId ?? existingLaptop.CategoryId;
+                existingLaptop.IsActive = dto.IsActive ?? existingLaptop.IsActive;
+                existingLaptop.UpdatedAt = DateTime.UtcNow;
 
                 _unitOfWork.Laptops.Update(existingLaptop);
                 await _unitOfWork.CompleteAsync();
@@ -228,10 +239,14 @@ namespace TechZone.EF.Service.Implementations
                     );
                 }
 
-                _unitOfWork.Laptops.Delete(laptop);
+                // Soft delete by setting IsActive to false and DeletedAt timestamp
+                laptop.IsActive = false;
+                laptop.DeletedAt = DateTime.UtcNow;
+
+                _unitOfWork.Laptops.Update(laptop);
                 await _unitOfWork.CompleteAsync();
 
-                _logger.LogInformation("Laptop with ID {LaptopId} deleted successfully", id);
+                _logger.LogInformation("Laptop with ID {LaptopId} soft deleted successfully", id);
 
                 return ServiceResponse<bool>.SuccessResponse(
                     true,
@@ -262,12 +277,20 @@ namespace TechZone.EF.Service.Implementations
 
                 _logger.LogInformation("Searching laptops with term: {SearchTerm}", searchTerm);
 
-                var laptops = await _unitOfWork.Laptops.WhereAsync(
-                    l => l.ModelName.Contains(searchTerm) ||
-                         l.Processor.Contains(searchTerm) ||
-                         l.GPU.Contains(searchTerm),
-                    includes: l => l.Variants
+                // Use GetAllAsync with specific includes
+                var allLaptops = await _unitOfWork.Laptops.GetAllAsync(
+                    l => l.Variants,
+                    l => l.Brand,
+                    l => l.Category
                 );
+
+                // Apply search filter in memory (for simple scenarios) or use a different approach
+                var laptops = allLaptops.Where(l =>
+                    l.ModelName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    l.Processor.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    l.GPU.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    (l.Brand != null && l.Brand.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                ).ToList();
 
                 return ServiceResponse<IEnumerable<Laptop>>.SuccessResponse(
                     laptops,
@@ -282,18 +305,21 @@ namespace TechZone.EF.Service.Implementations
                 );
             }
         }
-
         public async Task<ServiceResponse<IEnumerable<Laptop>>> GetBySpecificationsAsync(
             string? processor = null,
             string? gpu = null,
-            int? minPrice = null,
-            int? maxPrice = null)
+            decimal? minPrice = null,
+            decimal? maxPrice = null)
         {
             try
             {
                 _logger.LogInformation("Filtering laptops by specifications");
 
-                var laptops = await _unitOfWork.Laptops.GetAllAsync(l => l.Variants);
+                var laptops = await _unitOfWork.Laptops.GetAllAsync(
+                    l => l.Variants,
+                    l => l.Brand,
+                    l => l.Category
+                );
 
                 var filteredLaptops = laptops.AsQueryable();
 
@@ -313,8 +339,8 @@ namespace TechZone.EF.Service.Implementations
                 {
                     filteredLaptops = filteredLaptops.Where(l =>
                         l.Variants.Any(v =>
-                            (!minPrice.HasValue || v.Price >= minPrice.Value) &&
-                            (!maxPrice.HasValue || v.Price <= maxPrice.Value)
+                            (!minPrice.HasValue || v.CurrentPrice >= minPrice.Value) && // Updated from Price to CurrentPrice
+                            (!maxPrice.HasValue || v.CurrentPrice <= maxPrice.Value)    // Updated from Price to CurrentPrice
                         ));
                 }
 
@@ -333,5 +359,31 @@ namespace TechZone.EF.Service.Implementations
                 );
             }
         }
+
+        // New method to get featured laptops
+        public async Task<ServiceResponse<IEnumerable<Laptop>>> GetFeaturedLaptopsAsync(int count = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Retrieving {Count} featured laptops", count);
+
+                var laptops = await _unitOfWork.Laptops.GetFeaturedLaptopsAsync(count);
+
+                return ServiceResponse<IEnumerable<Laptop>>.SuccessResponse(
+                    laptops,
+                    "Featured laptops retrieved successfully",
+                    "تم استرجاع أجهزة الكمبيوتر المحمولة المميزة بنجاح"
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while retrieving featured laptops");
+                return ServiceResponse<IEnumerable<Laptop>>.InternalServerErrorResponse(
+                    "An error occurred while retrieving featured laptops"
+                );
+            }
+        }
+
+
     }
 }

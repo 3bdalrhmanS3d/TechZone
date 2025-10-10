@@ -40,13 +40,15 @@ namespace TechZone.EF.Service.Implementations
                 foreach (var role in roles)
                     roleClaims.Add(new Claim("roles", role));
 
+                var fullName = $"{user.FirstName} {user.LastName}"; // Combine first and last name
+
                 var claims = new[]
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, user.UserName ?? string.Empty),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
                     new Claim("uid", user.Id),
-                    new Claim("fullName", user.FullName ?? string.Empty),
+                    new Claim("fullName", fullName), // Updated to use combined name
                     new Claim(JwtRegisteredClaimNames.Iat,
                         new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(),
                         ClaimValueTypes.Integer64)
@@ -75,6 +77,7 @@ namespace TechZone.EF.Service.Implementations
             }
         }
 
+        // ... rest of the JwtService methods remain the same ...
         public RefreshToken GenerateRefreshToken()
         {
             var randomNumber = new byte[64];
@@ -124,13 +127,13 @@ namespace TechZone.EF.Service.Implementations
             catch (SecurityTokenExpiredException)
             {
                 return ServiceResponse<ClaimsPrincipal>.ErrorResponse(
-                    "Token has expired", "الرمز مطلوب",  401);
+                    "Token has expired", "الرمز مطلوب", 401);
             }
             catch (SecurityTokenException ex)
             {
                 _logger.LogWarning("Token validation failed: {Message}", ex.Message);
                 return ServiceResponse<ClaimsPrincipal>.ErrorResponse(
-                    "Invalid token", "الرمز مطلوب",  401);
+                    "Invalid token", "الرمز مطلوب", 401);
             }
             catch (Exception ex)
             {
@@ -149,7 +152,7 @@ namespace TechZone.EF.Service.Implementations
                 if (!validationResult.IsSuccess)
                 {
                     return ServiceResponse<string>.ErrorResponse(
-                        validationResult.Message, 
+                        validationResult.Message,
                         validationResult.MessageAr,
                         validationResult.StatusCode);
                 }
@@ -159,7 +162,7 @@ namespace TechZone.EF.Service.Implementations
                 if (string.IsNullOrEmpty(userId))
                 {
                     return ServiceResponse<string>.ErrorResponse(
-                        "User ID not found in token", 
+                        "User ID not found in token",
                         "لم يتم العثور على معرف المستخدم في الرمز",
                         400);
                 }
@@ -197,7 +200,7 @@ namespace TechZone.EF.Service.Implementations
                 if (string.IsNullOrWhiteSpace(token))
                 {
                     return ServiceResponse<DateTime>.ErrorResponse(
-                        "Token is required", "الرمز مطلوب",  400);
+                        "Token is required", "الرمز مطلوب", 400);
                 }
 
                 var tokenHandler = new JwtSecurityTokenHandler();

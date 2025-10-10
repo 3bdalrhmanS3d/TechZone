@@ -155,6 +155,259 @@ namespace TechZone.EF.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("TechZone.Core.Entities.Accessory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccessoryTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<decimal>("CurrentPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("ReorderLevel")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(5);
+
+                    b.Property<int>("ReservedQuantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("SKU")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("StockQuantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccessoryTypeId");
+
+                    b.HasIndex("SKU")
+                        .IsUnique();
+
+                    b.ToTable("Accessories", (string)null);
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.AccessoryAttribute", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccessoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AttributeKey")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("AttributeValue")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccessoryId", "AttributeKey");
+
+                    b.ToTable("AccessoryAttributes", (string)null);
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.AccessoryCompatibility", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccessoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("LaptopId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LaptopId");
+
+                    b.HasIndex("AccessoryId", "LaptopId")
+                        .IsUnique();
+
+                    b.ToTable("AccessoryCompatibilities", (string)null);
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.AccessoryImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccessoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DisplayOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsMain")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccessoryId");
+
+                    b.ToTable("AccessoryImages", (string)null);
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.AccessoryType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("AccessoryTypes", (string)null);
+                });
+
             modelBuilder.Entity("TechZone.Core.Entities.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -163,14 +416,31 @@ namespace TechZone.EF.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("AddressLine")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("Egypt");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -179,15 +449,20 @@ namespace TechZone.EF.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("FullName")
+                    b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<bool>("IsActive")
+                    b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -206,29 +481,30 @@ namespace TechZone.EF.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Role")
+                    b.Property<string>("ProfileImageUrl")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasDefaultValue("User");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
@@ -260,30 +536,65 @@ namespace TechZone.EF.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("ApplicationUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<string>("Details")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Entity")
+                    b.Property<string>("EntityId")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("EntityId")
-                        .HasColumnType("int");
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("NewValues")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OldValues")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("Timestamp")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserAgent")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("Timestamp");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("EntityType", "EntityId");
 
                     b.ToTable("AuditLogs", (string)null);
                 });
@@ -301,9 +612,27 @@ namespace TechZone.EF.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("LogoUrl")
                         .IsRequired()
@@ -314,6 +643,9 @@ namespace TechZone.EF.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -328,26 +660,55 @@ namespace TechZone.EF.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AccessoryId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("AddedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<string>("ApplicationUserId")
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("LaptopVariantId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductType")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("LaptopVariantId")
-                        .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("AccessoryId");
 
                     b.HasIndex("LaptopVariantId");
+
+                    b.HasIndex("UserId", "ProductType", "ProductId")
+                        .IsUnique();
 
                     b.ToTable("CartItems", (string)null);
                 });
@@ -360,16 +721,52 @@ namespace TechZone.EF.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("DisplayOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int?>("ParentCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentCategoryId");
 
                     b.ToTable("Categories", (string)null);
                 });
@@ -382,9 +779,26 @@ namespace TechZone.EF.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<string>("DiscountType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
@@ -394,8 +808,16 @@ namespace TechZone.EF.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
-                    b.Property<decimal>("Percentage")
-                        .HasColumnType("decimal(5,2)");
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<decimal>("MaxDiscountAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MinimumPurchase")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -405,7 +827,26 @@ namespace TechZone.EF.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UsageCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int?>("UsageLimit")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Value")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("IsActive", "StartDate", "EndDate");
 
                     b.ToTable("Discounts", (string)null);
                 });
@@ -516,6 +957,14 @@ namespace TechZone.EF.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
@@ -534,34 +983,46 @@ namespace TechZone.EF.Migrations
                     b.Property<bool>("HasTouchScreen")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("ModelName")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Ports")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
 
                     b.Property<string>("Processor")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int?>("ReleaseYear")
+                        .HasColumnType("int");
+
                     b.Property<string>("ScreenSize")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Warranty")
+                    b.Property<string>("StoreContact")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("StoreLocation")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -580,10 +1041,28 @@ namespace TechZone.EF.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DisplayOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<bool>("IsMain")
                         .ValueGeneratedOnAdd()
@@ -592,6 +1071,9 @@ namespace TechZone.EF.Migrations
 
                     b.Property<int>("LaptopId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("UploadedAt")
                         .ValueGeneratedOnAdd()
@@ -605,6 +1087,50 @@ namespace TechZone.EF.Migrations
                     b.ToTable("LaptopImages", (string)null);
                 });
 
+            modelBuilder.Entity("TechZone.Core.Entities.LaptopPort", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("LaptopId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PortType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("Quantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LaptopId");
+
+                    b.ToTable("LaptopPorts", (string)null);
+                });
+
             modelBuilder.Entity("TechZone.Core.Entities.LaptopVariant", b =>
                 {
                     b.Property<int>("Id")
@@ -613,31 +1139,120 @@ namespace TechZone.EF.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("DiscountId")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<decimal>("CurrentPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<int>("LaptopId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<int>("RAM")
                         .HasColumnType("int");
 
+                    b.Property<int>("ReorderLevel")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(5);
+
+                    b.Property<int>("ReservedQuantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("SKU")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<int>("StockQuantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("StorageCapacityGB")
                         .HasColumnType("int");
 
-                    b.Property<int>("Storage")
-                        .HasColumnType("int");
+                    b.Property<string>("StorageType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DiscountId");
 
                     b.HasIndex("LaptopId");
 
                     b.ToTable("LaptopVariants", (string)null);
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.LaptopWarranty", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Coverage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DurationMonths")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("LaptopId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LaptopId");
+
+                    b.ToTable("LaptopWarranties", (string)null);
                 });
 
             modelBuilder.Entity("TechZone.Core.Entities.Order", b =>
@@ -648,24 +1263,110 @@ namespace TechZone.EF.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("CancelReason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeliveryAddress")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal>("DeliveryCost")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<string>("DeliveryInstructions")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("DiscountAmount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsReservationCompleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<DateTime>("OrderDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<string>("Status")
+                    b.Property<string>("OrderNumber")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("OrderType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)")
+                        .HasDefaultValue("Reservation");
+
+                    b.Property<decimal>("ReservationAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("ReservationExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("ShippingCost")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)")
+                        .HasDefaultValue("Pending");
+
+                    b.Property<decimal>("SubtotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TaxAmount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrderDate");
+
+                    b.HasIndex("OrderNumber")
+                        .IsUnique();
+
+                    b.HasIndex("OrderType");
+
+                    b.HasIndex("ReservationExpiryDate");
+
+                    b.HasIndex("Status");
 
                     b.HasIndex("UserId");
 
@@ -680,23 +1381,71 @@ namespace TechZone.EF.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("LaptopVariantId")
+                    b.Property<int?>("AccessoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("DiscountAmount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("LaptopVariantId")
                         .HasColumnType("int");
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ProductType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
+
+                    b.Property<string>("SKU")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("AccessoryId");
 
                     b.HasIndex("LaptopVariantId");
 
                     b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductType", "ProductId");
 
                     b.ToTable("OrderItems", (string)null);
                 });
@@ -709,32 +1458,298 @@ namespace TechZone.EF.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("AmountCents")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("BillingData")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("CapturedAmountCents")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasDefaultValue("EGP");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ErrorCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ErrorMessage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("IntegrationId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Is3DS")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsCaptured")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsRefunded")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("PaidAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PaymentStatus")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("Pending");
+                        .HasColumnType("nvarchar(450)")
+                        .HasDefaultValue("PENDING");
+
+                    b.Property<DateTime?>("PaymobCreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymobOrderId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("RefundedAmountCents")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<string>("TransactionFingerprint")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("TransactionId")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
 
+                    b.HasIndex("PaymentStatus");
+
+                    b.HasIndex("PaymobOrderId")
+                        .IsUnique();
+
+                    b.HasIndex("TransactionId")
+                        .IsUnique();
+
                     b.ToTable("Payments", (string)null);
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.PriceHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AccessoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ChangeReason")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ChangedByUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("EffectiveFrom")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("EffectiveTo")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("LaptopVariantId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("NewPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("OldPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccessoryId");
+
+                    b.HasIndex("ChangedByUserId");
+
+                    b.HasIndex("EffectiveFrom");
+
+                    b.HasIndex("LaptopVariantId");
+
+                    b.HasIndex("ProductType", "ProductId", "EffectiveFrom");
+
+                    b.ToTable("PriceHistories", (string)null);
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.ProductDiscount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AccessoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DiscountId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("LaptopVariantId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccessoryId");
+
+                    b.HasIndex("LaptopVariantId");
+
+                    b.HasIndex("DiscountId", "ProductType", "ProductId")
+                        .IsUnique();
+
+                    b.ToTable("ProductDiscounts", (string)null);
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.ProductView", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("ViewedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("ProductType", "ProductId", "ViewedAt");
+
+                    b.ToTable("ProductViews", (string)null);
                 });
 
             modelBuilder.Entity("TechZone.Core.Entities.Rating", b =>
@@ -745,6 +1760,9 @@ namespace TechZone.EF.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AccessoryId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Comment")
                         .IsRequired()
                         .HasColumnType("text");
@@ -754,11 +1772,128 @@ namespace TechZone.EF.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<int>("LaptopId")
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsVerifiedPurchase")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("LaptopId")
                         .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Stars")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccessoryId");
+
+                    b.HasIndex("LaptopId");
+
+                    b.HasIndex("Stars");
+
+                    b.HasIndex("ProductType", "ProductId");
+
+                    b.HasIndex("UserId", "ProductType", "ProductId")
+                        .IsUnique();
+
+                    b.ToTable("Ratings", (string)null);
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.RepairRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CompletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeviceSerial")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("DiagnosisNotes")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("IssueDescription")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("LaptopId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("LaptopVariantId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Priority")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("Normal");
+
+                    b.Property<decimal>("QuotedPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("RequestDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("RequestNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("ServiceItemId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)")
+                        .HasDefaultValue("Pending");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -768,86 +1903,23 @@ namespace TechZone.EF.Migrations
 
                     b.HasIndex("LaptopId");
 
+                    b.HasIndex("LaptopVariantId");
+
+                    b.HasIndex("RequestDate");
+
+                    b.HasIndex("RequestNumber")
+                        .IsUnique();
+
+                    b.HasIndex("ServiceItemId");
+
+                    b.HasIndex("Status");
+
                     b.HasIndex("UserId");
-
-                    b.ToTable("Ratings", (string)null);
-                });
-
-            modelBuilder.Entity("TechZone.Core.Entities.RepairRequest", b =>
-                {
-                    b.Property<int>("RequestId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RequestId"));
-
-                    b.Property<string>("ApplicationUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("ItemId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("LaptopId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("RequestDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("Pending");
-
-                    b.HasKey("RequestId");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("ItemId");
-
-                    b.HasIndex("LaptopId");
 
                     b.ToTable("RepairRequests", (string)null);
                 });
 
             modelBuilder.Entity("TechZone.Core.Entities.RepairServiceItem", b =>
-                {
-                    b.Property<int>("ItemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ItemId"));
-
-                    b.Property<string>("EstimatedTime")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("RepairType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ItemId");
-
-                    b.ToTable("RepairServiceItems", (string)null);
-                });
-
-            modelBuilder.Entity("TechZone.Core.Entities.Shipping", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -855,46 +1927,225 @@ namespace TechZone.EF.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                    b.Property<decimal>("BasePrice")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("City")
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("EstimatedDays")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Country")
+                    b.Property<string>("RepairType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("RepairType");
+
+                    b.ToTable("RepairServiceItems", (string)null);
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.Shipment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Carrier")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DeliveredAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("EstimatedDelivery")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FailedReason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<string>("PostalCode")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<DateTime?>("ShippedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)")
+                        .HasDefaultValue("Preparing");
 
                     b.Property<string>("TrackingNumber")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId")
                         .IsUnique();
 
-                    b.ToTable("Shippings", (string)null);
+                    b.HasIndex("Status");
+
+                    b.HasIndex("TrackingNumber")
+                        .IsUnique();
+
+                    b.ToTable("Shipments", (string)null);
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.StockAlert", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsNotified")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("NotifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsNotified");
+
+                    b.HasIndex("UserId", "ProductType", "ProductId")
+                        .IsUnique();
+
+                    b.ToTable("StockAlerts", (string)null);
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.UserDiscountUsage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DiscountId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UsedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiscountId");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("UserId", "DiscountId");
+
+                    b.ToTable("UserDiscountUsages", (string)null);
                 });
 
             modelBuilder.Entity("TechZone.Core.Entities.VerificationCode", b =>
@@ -1030,11 +2281,64 @@ namespace TechZone.EF.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("TechZone.Core.Entities.Accessory", b =>
+                {
+                    b.HasOne("TechZone.Core.Entities.AccessoryType", "AccessoryType")
+                        .WithMany("Accessories")
+                        .HasForeignKey("AccessoryTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AccessoryType");
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.AccessoryAttribute", b =>
+                {
+                    b.HasOne("TechZone.Core.Entities.Accessory", "Accessory")
+                        .WithMany("Attributes")
+                        .HasForeignKey("AccessoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Accessory");
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.AccessoryCompatibility", b =>
+                {
+                    b.HasOne("TechZone.Core.Entities.Accessory", "Accessory")
+                        .WithMany("CompatibleLaptops")
+                        .HasForeignKey("AccessoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TechZone.Core.Entities.Laptop", "Laptop")
+                        .WithMany("CompatibleAccessories")
+                        .HasForeignKey("LaptopId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Accessory");
+
+                    b.Navigation("Laptop");
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.AccessoryImage", b =>
+                {
+                    b.HasOne("TechZone.Core.Entities.Accessory", "Accessory")
+                        .WithMany("Images")
+                        .HasForeignKey("AccessoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Accessory");
+                });
+
             modelBuilder.Entity("TechZone.Core.Entities.ApplicationUser", b =>
                 {
                     b.OwnsMany("TechZone.Core.Entities.RefreshToken", "RefreshTokens", b1 =>
                         {
-                            b1.Property<string>("ApplicationUserId")
+                            b1.Property<string>("UserId")
+                                .HasMaxLength(450)
                                 .HasColumnType("nvarchar(450)");
 
                             b1.Property<int>("Id")
@@ -1056,12 +2360,12 @@ namespace TechZone.EF.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.HasKey("ApplicationUserId", "Id");
+                            b1.HasKey("UserId", "Id");
 
                             b1.ToTable("RefreshToken");
 
                             b1.WithOwner()
-                                .HasForeignKey("ApplicationUserId");
+                                .HasForeignKey("UserId");
                         });
 
                     b.Navigation("RefreshTokens");
@@ -1071,30 +2375,39 @@ namespace TechZone.EF.Migrations
                 {
                     b.HasOne("TechZone.Core.Entities.ApplicationUser", "User")
                         .WithMany("AuditLogs")
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("TechZone.Core.Entities.CartItem", b =>
                 {
+                    b.HasOne("TechZone.Core.Entities.Accessory", null)
+                        .WithMany("CartItems")
+                        .HasForeignKey("AccessoryId");
+
+                    b.HasOne("TechZone.Core.Entities.LaptopVariant", null)
+                        .WithMany("CartItems")
+                        .HasForeignKey("LaptopVariantId");
+
                     b.HasOne("TechZone.Core.Entities.ApplicationUser", "User")
                         .WithMany("CartItems")
-                        .HasForeignKey("ApplicationUserId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TechZone.Core.Entities.LaptopVariant", "LaptopVariant")
-                        .WithMany("CartItems")
-                        .HasForeignKey("LaptopVariantId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("LaptopVariant");
-
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.Category", b =>
+                {
+                    b.HasOne("TechZone.Core.Entities.Category", "ParentCategory")
+                        .WithMany("SubCategories")
+                        .HasForeignKey("ParentCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ParentCategory");
                 });
 
             modelBuilder.Entity("TechZone.Core.Entities.EmailQueue", b =>
@@ -1137,50 +2450,65 @@ namespace TechZone.EF.Migrations
                     b.Navigation("Laptop");
                 });
 
+            modelBuilder.Entity("TechZone.Core.Entities.LaptopPort", b =>
+                {
+                    b.HasOne("TechZone.Core.Entities.Laptop", "Laptop")
+                        .WithMany("Ports")
+                        .HasForeignKey("LaptopId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Laptop");
+                });
+
             modelBuilder.Entity("TechZone.Core.Entities.LaptopVariant", b =>
                 {
-                    b.HasOne("TechZone.Core.Entities.Discount", "Discount")
-                        .WithMany("LaptopVariants")
-                        .HasForeignKey("DiscountId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("TechZone.Core.Entities.Laptop", "Laptop")
                         .WithMany("Variants")
                         .HasForeignKey("LaptopId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Discount");
+                    b.Navigation("Laptop");
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.LaptopWarranty", b =>
+                {
+                    b.HasOne("TechZone.Core.Entities.Laptop", "Laptop")
+                        .WithMany("Warranties")
+                        .HasForeignKey("LaptopId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Laptop");
                 });
 
             modelBuilder.Entity("TechZone.Core.Entities.Order", b =>
                 {
-                    b.HasOne("TechZone.Core.Entities.ApplicationUser", "ApplicationUser")
+                    b.HasOne("TechZone.Core.Entities.ApplicationUser", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("ApplicationUser");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TechZone.Core.Entities.OrderItem", b =>
                 {
-                    b.HasOne("TechZone.Core.Entities.LaptopVariant", "LaptopVariant")
+                    b.HasOne("TechZone.Core.Entities.Accessory", null)
                         .WithMany("OrderItems")
-                        .HasForeignKey("LaptopVariantId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("AccessoryId");
+
+                    b.HasOne("TechZone.Core.Entities.LaptopVariant", null)
+                        .WithMany("OrderItems")
+                        .HasForeignKey("LaptopVariantId");
 
                     b.HasOne("TechZone.Core.Entities.Order", "Order")
                         .WithMany("Items")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("LaptopVariant");
 
                     b.Navigation("Order");
                 });
@@ -1196,13 +2524,63 @@ namespace TechZone.EF.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("TechZone.Core.Entities.Rating", b =>
+            modelBuilder.Entity("TechZone.Core.Entities.PriceHistory", b =>
                 {
-                    b.HasOne("TechZone.Core.Entities.Laptop", "Laptop")
-                        .WithMany("Ratings")
-                        .HasForeignKey("LaptopId")
+                    b.HasOne("TechZone.Core.Entities.Accessory", null)
+                        .WithMany("PriceHistories")
+                        .HasForeignKey("AccessoryId");
+
+                    b.HasOne("TechZone.Core.Entities.ApplicationUser", "ChangedByUser")
+                        .WithMany()
+                        .HasForeignKey("ChangedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TechZone.Core.Entities.LaptopVariant", null)
+                        .WithMany("PriceHistories")
+                        .HasForeignKey("LaptopVariantId");
+
+                    b.Navigation("ChangedByUser");
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.ProductDiscount", b =>
+                {
+                    b.HasOne("TechZone.Core.Entities.Accessory", null)
+                        .WithMany("ProductDiscounts")
+                        .HasForeignKey("AccessoryId");
+
+                    b.HasOne("TechZone.Core.Entities.Discount", "Discount")
+                        .WithMany("ProductDiscounts")
+                        .HasForeignKey("DiscountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("TechZone.Core.Entities.LaptopVariant", null)
+                        .WithMany("ProductDiscounts")
+                        .HasForeignKey("LaptopVariantId");
+
+                    b.Navigation("Discount");
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.ProductView", b =>
+                {
+                    b.HasOne("TechZone.Core.Entities.ApplicationUser", "User")
+                        .WithMany("ProductViews")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.Rating", b =>
+                {
+                    b.HasOne("TechZone.Core.Entities.Accessory", null)
+                        .WithMany("Ratings")
+                        .HasForeignKey("AccessoryId");
+
+                    b.HasOne("TechZone.Core.Entities.Laptop", null)
+                        .WithMany("Ratings")
+                        .HasForeignKey("LaptopId");
 
                     b.HasOne("TechZone.Core.Entities.ApplicationUser", "User")
                         .WithMany("Ratings")
@@ -1210,46 +2588,86 @@ namespace TechZone.EF.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Laptop");
-
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("TechZone.Core.Entities.RepairRequest", b =>
                 {
-                    b.HasOne("TechZone.Core.Entities.ApplicationUser", "User")
+                    b.HasOne("TechZone.Core.Entities.Laptop", null)
                         .WithMany("RepairRequests")
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("LaptopId");
 
-                    b.HasOne("TechZone.Core.Entities.RepairServiceItem", "RepairServiceItem")
+                    b.HasOne("TechZone.Core.Entities.LaptopVariant", "LaptopVariant")
                         .WithMany("RepairRequests")
-                        .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("TechZone.Core.Entities.Laptop", "Laptop")
-                        .WithMany("RepairRequests")
-                        .HasForeignKey("LaptopId")
+                        .HasForeignKey("LaptopVariantId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.Navigation("Laptop");
+                    b.HasOne("TechZone.Core.Entities.RepairServiceItem", "ServiceItem")
+                        .WithMany("RepairRequests")
+                        .HasForeignKey("ServiceItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("RepairServiceItem");
+                    b.HasOne("TechZone.Core.Entities.ApplicationUser", "User")
+                        .WithMany("RepairRequests")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("LaptopVariant");
+
+                    b.Navigation("ServiceItem");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TechZone.Core.Entities.Shipping", b =>
+            modelBuilder.Entity("TechZone.Core.Entities.Shipment", b =>
                 {
                     b.HasOne("TechZone.Core.Entities.Order", "Order")
-                        .WithOne("Shipping")
-                        .HasForeignKey("TechZone.Core.Entities.Shipping", "OrderId")
+                        .WithOne("Shipment")
+                        .HasForeignKey("TechZone.Core.Entities.Shipment", "OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.StockAlert", b =>
+                {
+                    b.HasOne("TechZone.Core.Entities.ApplicationUser", "User")
+                        .WithMany("StockAlerts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.UserDiscountUsage", b =>
+                {
+                    b.HasOne("TechZone.Core.Entities.Discount", "Discount")
+                        .WithMany("UserDiscountUsages")
+                        .HasForeignKey("DiscountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TechZone.Core.Entities.Order", "Order")
+                        .WithMany("UserDiscountUsages")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TechZone.Core.Entities.ApplicationUser", "User")
+                        .WithMany("UserDiscountUsages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Discount");
+
+                    b.Navigation("Order");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TechZone.Core.Entities.VerificationCode", b =>
@@ -1263,6 +2681,30 @@ namespace TechZone.EF.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TechZone.Core.Entities.Accessory", b =>
+                {
+                    b.Navigation("Attributes");
+
+                    b.Navigation("CartItems");
+
+                    b.Navigation("CompatibleLaptops");
+
+                    b.Navigation("Images");
+
+                    b.Navigation("OrderItems");
+
+                    b.Navigation("PriceHistories");
+
+                    b.Navigation("ProductDiscounts");
+
+                    b.Navigation("Ratings");
+                });
+
+            modelBuilder.Entity("TechZone.Core.Entities.AccessoryType", b =>
+                {
+                    b.Navigation("Accessories");
+                });
+
             modelBuilder.Entity("TechZone.Core.Entities.ApplicationUser", b =>
                 {
                     b.Navigation("AuditLogs");
@@ -1273,9 +2715,15 @@ namespace TechZone.EF.Migrations
 
                     b.Navigation("Orders");
 
+                    b.Navigation("ProductViews");
+
                     b.Navigation("Ratings");
 
                     b.Navigation("RepairRequests");
+
+                    b.Navigation("StockAlerts");
+
+                    b.Navigation("UserDiscountUsages");
 
                     b.Navigation("VerificationCodes");
                 });
@@ -1288,22 +2736,32 @@ namespace TechZone.EF.Migrations
             modelBuilder.Entity("TechZone.Core.Entities.Category", b =>
                 {
                     b.Navigation("Laptops");
+
+                    b.Navigation("SubCategories");
                 });
 
             modelBuilder.Entity("TechZone.Core.Entities.Discount", b =>
                 {
-                    b.Navigation("LaptopVariants");
+                    b.Navigation("ProductDiscounts");
+
+                    b.Navigation("UserDiscountUsages");
                 });
 
             modelBuilder.Entity("TechZone.Core.Entities.Laptop", b =>
                 {
+                    b.Navigation("CompatibleAccessories");
+
                     b.Navigation("Images");
+
+                    b.Navigation("Ports");
 
                     b.Navigation("Ratings");
 
                     b.Navigation("RepairRequests");
 
                     b.Navigation("Variants");
+
+                    b.Navigation("Warranties");
                 });
 
             modelBuilder.Entity("TechZone.Core.Entities.LaptopVariant", b =>
@@ -1311,6 +2769,12 @@ namespace TechZone.EF.Migrations
                     b.Navigation("CartItems");
 
                     b.Navigation("OrderItems");
+
+                    b.Navigation("PriceHistories");
+
+                    b.Navigation("ProductDiscounts");
+
+                    b.Navigation("RepairRequests");
                 });
 
             modelBuilder.Entity("TechZone.Core.Entities.Order", b =>
@@ -1319,8 +2783,10 @@ namespace TechZone.EF.Migrations
 
                     b.Navigation("Payments");
 
-                    b.Navigation("Shipping")
+                    b.Navigation("Shipment")
                         .IsRequired();
+
+                    b.Navigation("UserDiscountUsages");
                 });
 
             modelBuilder.Entity("TechZone.Core.Entities.RepairServiceItem", b =>

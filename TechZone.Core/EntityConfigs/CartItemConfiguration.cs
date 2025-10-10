@@ -11,6 +11,13 @@ namespace TechZone.Core.EntityConfigs
             builder.ToTable("CartItems");
             builder.HasKey(ci => ci.Id);
 
+            builder.Property(ci => ci.ProductType)
+                   .IsRequired()
+                   .HasConversion<string>();
+
+            builder.Property(ci => ci.ProductId)
+                   .IsRequired();
+
             builder.Property(ci => ci.Quantity)
                    .IsRequired();
 
@@ -18,15 +25,29 @@ namespace TechZone.Core.EntityConfigs
                    .IsRequired()
                    .HasDefaultValueSql("GETUTCDATE()");
 
+            builder.Property(ci => ci.CreatedAt)
+                   .IsRequired()
+                   .HasDefaultValueSql("GETUTCDATE()");
+
+            builder.Property(ci => ci.UpdatedAt)
+                   .IsRequired(false);
+
+            builder.Property(ci => ci.DeletedAt)
+                   .IsRequired(false);
+
+            builder.Property(ci => ci.IsDeleted)
+                   .HasDefaultValue(false);
+
             builder.HasOne(ci => ci.User)
                    .WithMany(u => u.CartItems)
-                   .HasForeignKey(ci => ci.ApplicationUserId)
+                   .HasForeignKey(ci => ci.UserId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(ci => ci.LaptopVariant)
-                   .WithMany(v => v.CartItems)
-                   .HasForeignKey(ci => ci.LaptopVariantId)
-                   .OnDelete(DeleteBehavior.Restrict);
+            builder.HasQueryFilter(ci => !ci.IsDeleted);
+
+            // Unique constraint - user can only have one cart item per product
+            builder.HasIndex(ci => new { ci.UserId, ci.ProductType, ci.ProductId })
+                   .IsUnique();
         }
     }
 }

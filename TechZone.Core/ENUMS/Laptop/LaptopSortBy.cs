@@ -11,6 +11,7 @@ namespace TechZone.Core.ENUMS.Laptop
         Id,
         ModelName,
         Price,
+        Brand
         //Processor,
         //GPU,
         //ScreenSize,
@@ -20,5 +21,4 @@ namespace TechZone.Core.ENUMS.Laptop
         //Ports,
         //VariantCount // Sort by number of variants
     }
-
 }

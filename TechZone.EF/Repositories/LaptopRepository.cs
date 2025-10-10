@@ -25,44 +25,63 @@ namespace TechZone.EF.Repositories
 
         public async Task<PagedResult<LaptopResponseDTO>> GetPagedAsync(PaginationParamsDto<LaptopSortBy> paginationParams)
         {
-            var query = _context.Laptops.AsNoTracking();
+            // FIXED: Remove the invalid cast by storing the query in a separate variable
+            IQueryable<Laptop> baseQuery = _context.Laptops
+                .AsNoTracking()
+                .Include(l => l.Brand)
+                .Include(l => l.Category)
+                .Include(l => l.Images)
+                .Include(l => l.Variants);
 
             // Filter (null-safe)
             if (!string.IsNullOrWhiteSpace(paginationParams.Search))
             {
                 var s = paginationParams.Search.ToLower();
-                query = query.Where(l =>
+                baseQuery = baseQuery.Where(l =>
                     ((l.ModelName ?? "").ToLower().Contains(s)) ||
                     ((l.Processor ?? "").ToLower().Contains(s)) ||
                     ((l.GPU ?? "").ToLower().Contains(s)) ||
                     ((l.ScreenSize ?? "").ToLower().Contains(s)) ||
-                    ((l.Ports ?? "").ToLower().Contains(s))
+                    (l.Ports.Any(p => (p.PortType ?? "").ToLower().Contains(s)))
                 );
             }
 
             // ✅ ALWAYS order before paging
-            query = ApplySorting(query, paginationParams.SortBy, paginationParams.SortDirection);
+            var orderedQuery = ApplySorting(baseQuery, paginationParams.SortBy, paginationParams.SortDirection);
 
-            // Projection (كلها null-safe)
-            var projected = query.Select(l => new
+            // Projection with actual data from new schema
+            var projected = orderedQuery.Select(l => new
             {
                 l.Id,
                 Name = l.ModelName ?? "",
                 Category = l.Category != null ? l.Category.Name : "unknown",
+                Brand = l.Brand != null ? l.Brand.Name : "",
+                Processor = l.Processor ?? "",
+                GPU = l.GPU ?? "",
+                ScreenSize = l.ScreenSize ?? "",
 
-                // ✅ التصحيح هنا
-                MinPrice = 10000.0m, // Amr, fix this
+                // Use actual CurrentPrice from variants instead of hardcoded value
+                MinPrice = l.Variants.Any() ? l.Variants.Min(v => v.CurrentPrice) : 0m,
+                MaxPrice = l.Variants.Any() ? l.Variants.Max(v => v.CurrentPrice) : 0m,
 
-                Images = l.Images.Select(img => img.ImageUrl ?? ""),
-                // Brand و Processor في الموديل strings default ""، بس نخليها defensive برضه
+                Images = l.Images.Select(img => img.ImageUrl ?? "").ToList(),
+                Variants = l.Variants.Select(v => new
+                {
+                    v.RAM,
+                    v.StorageCapacityGB,
+                    v.StorageType,
+                    v.CurrentPrice
+                }).ToList(),
+
+                // Build description from actual data
                 ShortDescription = string.Concat(
-        (l.Brand != null ? l.Brand.Name : ""),
-        ", RAM 16 GB, ",
-        (l.Processor ?? ""),
-        " ."
-    )
+                    (l.Brand != null ? l.Brand.Name : ""),
+                    ", ",
+                    (l.Processor ?? ""),
+                    ", ",
+                    l.Variants.Any() ? $"Up to {l.Variants.Max(v => v.RAM)}GB RAM" : "RAM info not available"
+                )
             });
-
 
             var totalCount = await projected.CountAsync();
 
@@ -75,30 +94,37 @@ namespace TechZone.EF.Repositories
                 .Take(size)
                 .ToListAsync();
 
-            // Post-processing (randoms خارج SQL)
+            // Post-processing
             var rnd = new Random();
             var items = pageItems.Select(x => new LaptopResponseDTO
             {
                 Id = x.Id,
                 Name = x.Name,
-                // خليه 0 لو لازم non-nullable، أو غيّر DTO لـ decimal?
-                Price = 10000.0m,
+                Price = x.MinPrice, // Use actual min price
                 Category = x.Category,
                 Images = x.Images.Where(u => !string.IsNullOrWhiteSpace(u)).ToList(),
-                ReviewsCount = rnd.Next(0, 500),
-                IsDiscounted = false,
+                ReviewsCount = rnd.Next(0, 500), // Keep random for demo
+                IsDiscounted = false, // You can implement discount logic later
                 DiscountedPrice = null,
-                Rate = Math.Round(rnd.NextDouble() * 5, 1),
-                ShortDescription = x.ShortDescription
+                Rate = Math.Round(rnd.NextDouble() * 5, 1), // Keep random for demo
+                ShortDescription = x.ShortDescription,
+                Brand = x.Brand,
+                Processor = x.Processor,
+                GPU = x.GPU,
+                ScreenSize = x.ScreenSize,
+                PriceRange = x.MinPrice == x.MaxPrice ?
+                    $"{x.MinPrice:C}" :
+                    $"{x.MinPrice:C} - {x.MaxPrice:C}"
             }).ToList();
 
             return new PagedResult<LaptopResponseDTO>(items, totalCount, page, size);
         }
 
+
         private static IQueryable<Laptop> ApplySorting(
-    IQueryable<Laptop> q,
-    LaptopSortBy? sortBy,
-    SortDirection dir)
+            IQueryable<Laptop> q,
+            LaptopSortBy? sortBy,
+            SortDirection dir)
         {
             IOrderedQueryable<Laptop> oq;
 
@@ -107,11 +133,13 @@ namespace TechZone.EF.Repositories
                 case LaptopSortBy.Price:
                     oq = (dir == SortDirection.Asc)
                         ? q.OrderBy(l => l.Variants
-                                .Select(v => (decimal?)v.Price)
+                                .Where(v => v.IsActive)
+                                .Select(v => (decimal?)v.CurrentPrice) // Updated from Price to CurrentPrice
                                 .DefaultIfEmpty()
                                 .Min())
                         : q.OrderByDescending(l => l.Variants
-                                .Select(v => (decimal?)v.Price)
+                                .Where(v => v.IsActive)
+                                .Select(v => (decimal?)v.CurrentPrice) // Updated from Price to CurrentPrice
                                 .DefaultIfEmpty()
                                 .Min());
                     break;
@@ -122,26 +150,30 @@ namespace TechZone.EF.Repositories
                         : q.OrderByDescending(l => l.ModelName);
                     break;
 
+                case LaptopSortBy.Brand:
+                    oq = (dir == SortDirection.Asc)
+                        ? q.OrderBy(l => l.Brand.Name)
+                        : q.OrderByDescending(l => l.Brand.Name);
+                    break;
+
                 default:
-                    // دايماً عندك ترتيب افتراضي ثابت
+                    // Default sorting by ID
                     oq = (dir == SortDirection.Asc)
                         ? q.OrderBy(l => l.Id)
                         : q.OrderByDescending(l => l.Id);
                     break;
             }
 
-            // تثبيت إضافي للنتائج
+            // Additional sorting for consistent results
             return (dir == SortDirection.Asc)
                 ? oq.ThenBy(l => l.Id)
                 : oq.ThenByDescending(l => l.Id);
         }
 
-
         public async Task<int> CountAsync()
         {
             return await _context.Laptops.CountAsync();
         }
-
 
         public async Task AddRangeAsync(IEnumerable<Laptop> entities)
         {
@@ -165,7 +197,7 @@ namespace TechZone.EF.Repositories
         {
             IQueryable<Laptop> query = _context.Laptops;
 
-            if (includes != null)
+            if (includes != null && includes.Length > 0)
             {
                 foreach (var include in includes)
                     query = query.Include(include);
@@ -178,7 +210,7 @@ namespace TechZone.EF.Repositories
         {
             IQueryable<Laptop> query = _context.Laptops;
 
-            if (includes != null)
+            if (includes != null && includes.Length > 0)
             {
                 foreach (var include in includes)
                     query = query.Include(include);
@@ -191,7 +223,7 @@ namespace TechZone.EF.Repositories
         {
             IQueryable<Laptop> query = _context.Laptops;
 
-            if (includes != null)
+            if (includes != null && includes.Length > 0)
             {
                 foreach (var include in includes)
                     query = query.Include(include);
@@ -210,7 +242,7 @@ namespace TechZone.EF.Repositories
         {
             IQueryable<Laptop> query = _context.Laptops;
 
-            if (includes != null)
+            if (includes != null && includes.Length > 0)
             {
                 foreach (var include in includes)
                     query = query.Include(include);
@@ -232,6 +264,33 @@ namespace TechZone.EF.Repositories
                 query = query.Take(take.Value);
 
             return await query.ToListAsync();
+        }
+
+        // New method to get laptops with all related data
+        public async Task<Laptop> GetLaptopWithDetailsAsync(int id)
+        {
+            return await _context.Laptops
+                .Include(l => l.Brand)
+                .Include(l => l.Category)
+                .Include(l => l.Images)
+                .Include(l => l.Variants)
+                .Include(l => l.Ports)
+                .Include(l => l.Warranties)
+                .Include(l => l.Ratings)
+                .FirstOrDefaultAsync(l => l.Id == id);
+        }
+
+        // New method to get featured laptops
+        public async Task<IEnumerable<Laptop>> GetFeaturedLaptopsAsync(int count = 10)
+        {
+            return await _context.Laptops
+                .Where(l => l.IsActive)
+                .Include(l => l.Brand)
+                .Include(l => l.Images)
+                .Include(l => l.Variants)
+                .OrderByDescending(l => l.Variants.Any() ? l.Variants.Max(v => v.CurrentPrice) : 0)
+                .Take(count)
+                .ToListAsync();
         }
     }
 }

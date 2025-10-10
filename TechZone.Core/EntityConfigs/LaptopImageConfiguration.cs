@@ -16,17 +16,34 @@ namespace TechZone.Core.EntityConfigs
                    .HasMaxLength(500);
 
             builder.Property(li => li.IsMain)
-                   .IsRequired()
                    .HasDefaultValue(false);
+
+            builder.Property(li => li.DisplayOrder)
+                   .HasDefaultValue(0);
 
             builder.Property(li => li.UploadedAt)
                    .IsRequired()
                    .HasDefaultValueSql("GETUTCDATE()");
 
+            builder.Property(li => li.CreatedAt)
+                   .IsRequired()
+                   .HasDefaultValueSql("GETUTCDATE()");
+
+            builder.Property(li => li.UpdatedAt)
+                   .IsRequired(false);
+
+            builder.Property(li => li.DeletedAt)
+                   .IsRequired(false);
+
+            builder.Property(li => li.IsDeleted)
+                   .HasDefaultValue(false);
+
             builder.HasOne(li => li.Laptop)
                    .WithMany(l => l.Images)
                    .HasForeignKey(li => li.LaptopId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasQueryFilter(li => !li.IsDeleted);
         }
     }
 }

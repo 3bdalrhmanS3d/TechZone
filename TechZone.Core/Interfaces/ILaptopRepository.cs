@@ -17,5 +17,7 @@ namespace TechZone.Core.Interfaces
 
         Task<PagedResult<LaptopResponseDTO>> GetPagedAsync(PaginationParamsDto<LaptopSortBy> paginationParams);
         Task<int> CountAsync();
+        Task<Laptop?> GetLaptopWithDetailsAsync(int labId);
+        Task<IEnumerable<Laptop>?> GetFeaturedLaptopsAsync(int count);
     }
 }

@@ -2,24 +2,35 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using TechZone.Core.Entities;
 
 namespace TechZone.Core.Entities
 {
     public class ApplicationUser : IdentityUser
     {
+        [Required, MaxLength(100)]
+        public string FirstName { get; set; } = string.Empty;
+
+        [Required, MaxLength(100)]
+        public string LastName { get; set; } = string.Empty;
+
+        [MaxLength(500)]
+        public string ProfileImageUrl { get; set; } = string.Empty;
+
+        [MaxLength(500)]
+        public string AddressLine { get; set; } = string.Empty;
+
         [MaxLength(100)]
-        public string FullName { get; set; } = string.Empty;
+        public string City { get; set; } = string.Empty;
 
-        [MaxLength(20)]
-        public string Phone { get; set; } = string.Empty;
+        [MaxLength(100)]
+        public string State { get; set; } = string.Empty;
 
-        [Required]
-        public string Role { get; set; } = "User"; // Enum: User, Moderator, Admin
-
-        public bool IsActive { get; set; } = true;
+        [MaxLength(100)]
+        public string Country { get; set; } = "Egypt";
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
         // Navigation properties
         public ICollection<Order> Orders { get; set; } = new List<Order>();
@@ -27,8 +38,11 @@ namespace TechZone.Core.Entities
         public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
         public ICollection<RepairRequest> RepairRequests { get; set; } = new List<RepairRequest>();
         public ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
+        public ICollection<UserDiscountUsage> UserDiscountUsages { get; set; } = new List<UserDiscountUsage>();
+        public ICollection<ProductView> ProductViews { get; set; } = new List<ProductView>();
+        public ICollection<StockAlert> StockAlerts { get; set; } = new List<StockAlert>();
         public List<RefreshToken>? RefreshTokens { get; set; }
         public virtual ICollection<VerificationCode> VerificationCodes { get; set; } = new List<VerificationCode>();
-        public virtual ICollection<EmailQueue> EmailQueue { get; set; }
+        public virtual ICollection<EmailQueue> EmailQueue { get; set; } = new List<EmailQueue>();
     }
 }

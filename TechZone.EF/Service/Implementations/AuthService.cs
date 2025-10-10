@@ -58,7 +58,8 @@ namespace TechZone.EF.Service.Implementations
                 {
                     UserName = dto.UserName,
                     Email = dto.Email,
-                    FullName = dto.FullName,
+                    FirstName = dto.FirstName, // Updated from FullName
+                    LastName = dto.LastName,   // Updated from FullName
                     EmailConfirmed = false
                 };
 
@@ -75,7 +76,7 @@ namespace TechZone.EF.Service.Implementations
                 await _userManager.AddToRoleAsync(user, "User");
 
                 // Get the user ID for verification code
-                var userId =  (user.Id);
+                var userId = user.Id;
 
                 // Create verification code
                 var codeResult = await _verificationService.CreateVerificationCodeAsync(
@@ -126,7 +127,7 @@ namespace TechZone.EF.Service.Implementations
                     return ServiceResponse<bool>.SuccessResponse(true, "Email is already confirmed");
                 }
 
-                var userId =  (user.Id);
+                var userId = user.Id;
 
                 // Verify the code using VerificationService
                 var verificationResult = await _verificationService.VerifyCodeAsync(
@@ -142,7 +143,8 @@ namespace TechZone.EF.Service.Implementations
                 await _userManager.UpdateAsync(user);
 
                 // Send welcome email
-                var welcomeEmailResult = await _emailService.SendWelcomeEmailAsync(user.Email, user.FullName);
+                var fullName = $"{user.FirstName} {user.LastName}"; // Combine first and last name
+                var welcomeEmailResult = await _emailService.SendWelcomeEmailAsync(user.Email, fullName);
                 if (!welcomeEmailResult.IsSuccess)
                 {
                     _logger.LogWarning("Failed to send welcome email to {Email}", user.Email);
@@ -173,8 +175,8 @@ namespace TechZone.EF.Service.Implementations
                         "If the email exists, a verification code has been sent");
                 }
 
-                var userId =  (user.Id);
-                var verificationType = (dto.VerificationType);
+                var userId = user.Id;
+                var verificationType = dto.VerificationType;
 
                 // Check if email is already confirmed for email verification
                 if (verificationType == VerificationCodeType.EmailVerification && user.EmailConfirmed)
@@ -236,7 +238,7 @@ namespace TechZone.EF.Service.Implementations
                         "If the email exists, a password reset code has been sent");
                 }
 
-                var userId =  (user.Id);
+                var userId = user.Id;
 
                 // Create password reset verification code
                 var codeResult = await _verificationService.CreateVerificationCodeAsync(
@@ -281,7 +283,7 @@ namespace TechZone.EF.Service.Implementations
                     return ServiceResponse<bool>.NotFoundResponse("User not found");
                 }
 
-                var userId =  (user.Id);
+                var userId = user.Id;
 
                 // Verify the reset code
                 var verificationResult = await _verificationService.VerifyCodeAsync(
