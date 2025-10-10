@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TechZone.Core.Entities;
+using TechZone.Core.Entities.User;
 
 namespace TechZone.Core.EntityConfigs
 {

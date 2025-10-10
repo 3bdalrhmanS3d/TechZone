@@ -6,6 +6,7 @@ using TechZone.Api.Extensions;
 using TechZone.Api.Services.Interfaces;
 using TechZone.Core.DTOs.Laptop;
 using TechZone.Core.Entities;
+using TechZone.Core.Entities.Laptop;
 using TechZone.Core.ENUMS.Laptop;
 using TechZone.Core.PagedResult;
 using TechZone.Core.ServiceResponse;

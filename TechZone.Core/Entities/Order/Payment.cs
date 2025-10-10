@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace TechZone.Core.Entities
+namespace TechZone.Core.Entities.Order
 {
     public enum PaymentMethod
     {

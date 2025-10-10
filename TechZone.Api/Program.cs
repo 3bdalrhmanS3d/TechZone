@@ -17,6 +17,7 @@ using TechZone.EF.UnitOfWork;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using dotenv.net;
+using TechZone.Core.Entities.User;
 
 namespace TechZone.Api
 {
@@ -78,6 +79,8 @@ namespace TechZone.Api
                 builder.Services.AddScoped<IEmailService, EmailService>();
                 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
                 builder.Services.AddScoped<ILaptopService, LaptopService>();
+                builder.Services.AddScoped<ICategoryService, CategoryService>();
+                builder.Services.AddScoped<IBrandService, BrandService>();
 
                 // Background Services
                 builder.Services.AddHostedService<EmailBackgroundService>();

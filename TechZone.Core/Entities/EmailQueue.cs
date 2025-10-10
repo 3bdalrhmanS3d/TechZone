@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TechZone.Core.Entities.User;
 
 namespace TechZone.Core.Entities
 {

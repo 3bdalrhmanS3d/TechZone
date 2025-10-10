@@ -1,13 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using TechZone.Core.Entities.Laptop;
+using TechZone.Core.Entities.User;
 
-namespace TechZone.Core.Entities
+namespace TechZone.Core.Entities.Repair
 {
     public enum RepairType
     {
         Hardware,
         Software,
         Other
+    }
+
+    public enum RepairRequestStatus
+    {
+        Pending,
+        InProgress,
+        Completed,
+        Cancelled
     }
 
     public class RepairServiceItem
