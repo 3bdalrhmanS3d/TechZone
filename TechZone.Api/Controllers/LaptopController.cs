@@ -6,13 +6,13 @@ using TechZone.Api.Extensions;
 using TechZone.Api.Services.Interfaces;
 using TechZone.Core.DTOs.Laptop;
 using TechZone.Core.Entities;
+using TechZone.Core.Entities.Laptop;
 using TechZone.Core.ENUMS.Laptop;
 using TechZone.Core.PagedResult;
 using TechZone.Core.ServiceResponse;
 
 namespace TechZone.Api.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class LaptopController : ControllerBase
@@ -24,6 +24,22 @@ namespace TechZone.Api.Controllers
         {
             _laptopService = laptopService;
             _logger = logger;
+        }
+        /// <summary>
+        /// Get all laptops with all their details (no pagination)
+        /// </summary>
+        /// <returns>List of all laptops with full details</returns>
+        [HttpGet("all")]
+        [ProducesResponseType(typeof(ServiceResponse<IEnumerable<LaptopResponseDTO>>), 200)]
+        [ProducesResponseType(typeof(ServiceResponse<IEnumerable<LaptopResponseDTO>>), 400)]
+        [ProducesResponseType(typeof(ServiceResponse<IEnumerable<LaptopResponseDTO>>), 500)]
+        [AllowAnonymous]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<FullLaptopResponseDTO>>>> GetAllFull()
+        {
+            _logger.LogInformation("GET api/laptop/all - Retrieving all laptops with full details (no pagination)");
+
+            var response = await _laptopService.GetAllFullAsync();
+            return response.ToActionResult();
         }
 
         /// <summary>
@@ -93,80 +109,6 @@ namespace TechZone.Api.Controllers
         }
 
         /// <summary>
-        /// Create a new laptop
-        /// </summary>
-        /// <param name="laptop">Laptop details</param>
-        /// <returns>Created laptop</returns>
-        [HttpPost]
-        [ProducesResponseType(typeof(ServiceResponse<CreateLaptopDto>), 201)]
-        [ProducesResponseType(typeof(ServiceResponse<object>), 400)]
-        [ProducesResponseType(typeof(ServiceResponse<object>), 409)]
-        [ProducesResponseType(typeof(ServiceResponse<object>), 500)]
-        public async Task<ActionResult<ServiceResponse<Laptop>>> Create([FromBody] CreateLaptopDto laptop)
-        {
-            _logger.LogInformation("POST api/laptop - Creating new laptop");
-
-            if (!ModelState.IsValid)
-            {
-                var validationResponse = ModelState.ToValidationErrorResponse<Laptop>();
-                return validationResponse.ToActionResult();
-            }
-
-            var response = await _laptopService.CreateAsync(laptop);
-
-            if (response.IsSuccessful())
-            {
-                return response.ToCreatedActionResult(nameof(GetById), new { id = response.Data?.Id });
-            }
-
-            return response.ToActionResult();
-        }
-
-        /// <summary>
-        /// Update an existing laptop
-        /// </summary>
-        /// <param name="id">Laptop ID</param>
-        /// <param name="laptop">Updated laptop details</param>
-        /// <returns>Updated laptop</returns>
-        [HttpPut("{id}")]
-        [ProducesResponseType(typeof(ServiceResponse<Laptop>), 200)]
-        [ProducesResponseType(typeof(ServiceResponse<Laptop>), 400)]
-        [ProducesResponseType(typeof(ServiceResponse<Laptop>), 404)]
-        [ProducesResponseType(typeof(ServiceResponse<Laptop>), 409)]
-        [ProducesResponseType(typeof(ServiceResponse<Laptop>), 500)]
-        public async Task<ActionResult<ServiceResponse<Laptop>>> Update(int id, [FromBody] UpdateLaptopDto laptop)
-        {
-            _logger.LogInformation("PUT api/laptop/{LaptopId} - Updating laptop", id);
-
-            if (!ModelState.IsValid)
-            {
-                var validationResponse = ModelState.ToValidationErrorResponse<Laptop>();
-                return validationResponse.ToActionResult();
-            }
-
-            var response = await _laptopService.UpdateAsync(id, laptop);
-            return response.ToActionResult();
-        }
-
-        /// <summary>
-        /// Delete a laptop
-        /// </summary>
-        /// <param name="id">Laptop ID</param>
-        /// <returns>Deletion result</returns>
-        [HttpDelete("{id}")]
-        [ProducesResponseType(typeof(ServiceResponse<bool>), 200)]
-        [ProducesResponseType(typeof(ServiceResponse<bool>), 400)]
-        [ProducesResponseType(typeof(ServiceResponse<bool>), 404)]
-        [ProducesResponseType(typeof(ServiceResponse<bool>), 500)]
-        public async Task<ActionResult<ServiceResponse<bool>>> Delete(int id)
-        {
-            _logger.LogInformation("DELETE api/laptop/{LaptopId} - Deleting laptop", id);
-
-            var response = await _laptopService.DeleteAsync(id);
-            return response.ToActionResult();
-        }
-
-        /// <summary>
         /// Search laptops by term
         /// </summary>
         /// <param name="searchTerm">Search term for model name, processor, or GPU</param>
@@ -206,6 +148,83 @@ namespace TechZone.Api.Controllers
             var response = await _laptopService.GetBySpecificationsAsync(processor, gpu, minPrice, maxPrice);
             return response.ToActionResult();
         }
+
+        /// <summary>
+        /// Create a new laptop
+        /// </summary>
+        /// <param name="laptop">Laptop details</param>
+        /// <returns>Created laptop</returns>
+        [HttpPost]
+        [ProducesResponseType(typeof(ServiceResponse<CreateLaptopDto>), 201)]
+        [ProducesResponseType(typeof(ServiceResponse<object>), 400)]
+        [ProducesResponseType(typeof(ServiceResponse<object>), 409)]
+        [ProducesResponseType(typeof(ServiceResponse<object>), 500)]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ServiceResponse<Laptop>>> Create([FromBody] CreateLaptopDto laptop)
+        {
+            _logger.LogInformation("POST api/laptop - Creating new laptop");
+
+            if (!ModelState.IsValid)
+            {
+                var validationResponse = ModelState.ToValidationErrorResponse<Laptop>();
+                return validationResponse.ToActionResult();
+            }
+
+            var response = await _laptopService.CreateAsync(laptop);
+
+            if (response.IsSuccessful())
+            {
+                return response.ToCreatedActionResult(nameof(GetById), new { id = response.Data?.Id });
+            }
+
+            return response.ToActionResult();
+        }
+        /// <summary>
+        /// Update an existing laptop
+        /// </summary>
+        /// <param name="id">Laptop ID</param>
+        /// <param name="laptop">Updated laptop details</param>
+        /// <returns>Updated laptop</returns>
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(ServiceResponse<Laptop>), 200)]
+        [ProducesResponseType(typeof(ServiceResponse<Laptop>), 400)]
+        [ProducesResponseType(typeof(ServiceResponse<Laptop>), 404)]
+        [ProducesResponseType(typeof(ServiceResponse<Laptop>), 409)]
+        [ProducesResponseType(typeof(ServiceResponse<Laptop>), 500)]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ServiceResponse<Laptop>>> Update(int id, [FromBody] UpdateLaptopDto laptop)
+        {
+            _logger.LogInformation("PUT api/laptop/{LaptopId} - Updating laptop", id);
+
+            if (!ModelState.IsValid)
+            {
+                var validationResponse = ModelState.ToValidationErrorResponse<Laptop>();
+                return validationResponse.ToActionResult();
+            }
+
+            var response = await _laptopService.UpdateAsync(id, laptop);
+            return response.ToActionResult();
+        }
+        /// <summary>
+        /// Delete a laptop
+        /// </summary>
+        /// <param name="id">Laptop ID</param>
+        /// <returns>Deletion result</returns>
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(ServiceResponse<bool>), 200)]
+        [ProducesResponseType(typeof(ServiceResponse<bool>), 400)]
+        [ProducesResponseType(typeof(ServiceResponse<bool>), 404)]
+        [ProducesResponseType(typeof(ServiceResponse<bool>), 500)]
+        [Authorize(Roles = "Admin")]
+
+        public async Task<ActionResult<ServiceResponse<bool>>> Delete(int id)
+        {
+            _logger.LogInformation("DELETE api/laptop/{LaptopId} - Deleting laptop", id);
+
+            var response = await _laptopService.DeleteAsync(id);
+            return response.ToActionResult();
+        }
+
 
     }
 }

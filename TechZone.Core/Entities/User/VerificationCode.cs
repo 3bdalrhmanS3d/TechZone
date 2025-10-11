@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TechZone.Core.Entities
+namespace TechZone.Core.Entities.User
 {
     public enum VerificationCodeType
     {

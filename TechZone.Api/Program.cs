@@ -16,6 +16,10 @@ using TechZone.EF.Application;
 using TechZone.EF.Features.Profile.Endpoints;
 using TechZone.EF.Service.Implementations;
 using TechZone.EF.UnitOfWork;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using dotenv.net;
+using TechZone.Core.Entities.User;
 
 namespace TechZone.Api
 {
@@ -45,6 +49,16 @@ namespace TechZone.Api
                 Log.Information("🚀 Starting TechZone API application");
 
                 var builder = WebApplication.CreateBuilder(args);
+                // Load environment variables from .env
+                DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
+
+                // Initialize Cloudinary
+                var cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
+                cloudinary.Api.Secure = true;
+
+                // Register Cloudinary as a service
+                builder.Services.AddSingleton(cloudinary);
+
 
                 // Replace default logging with Serilog
                 builder.Host.UseSerilog();
@@ -67,6 +81,8 @@ namespace TechZone.Api
                 builder.Services.AddScoped<IEmailService, EmailService>();
                 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
                 builder.Services.AddScoped<ILaptopService, LaptopService>();
+                builder.Services.AddScoped<ICategoryService, CategoryService>();
+                builder.Services.AddScoped<IBrandService, BrandService>();
 
                 // mediator services for CQRS
                 //builder.Services.AddMediatR(typeof(Program).Assembly);
@@ -107,26 +123,44 @@ namespace TechZone.Api
                 // Database Configuration with reduced logging
                 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 {
-                    options.UseSqlServer(
-                        builder.Configuration.GetConnectionString("DefaultConnection"),
-                        sqlOptions =>
-                        {
-                            sqlOptions.EnableRetryOnFailure(
-                                maxRetryCount: 3,
-                                maxRetryDelay: TimeSpan.FromSeconds(5),
-                                errorNumbersToAdd: null
-                            );
-                            sqlOptions.CommandTimeout(30);
-                        });
+                    // Try to read DATABASE_URL from Railway
+                    var dbUrl = "postgresql://postgres:GRgpDWQqsyUjfpcfZCYCvcmGiHCUTbGt@switchyard.proxy.rlwy.net:46456/railway";
+                    string connectionString;
 
-                    // Reduce EF Core logging
+                    if (!string.IsNullOrEmpty(dbUrl))
+                    {
+                        // Convert postgres://... into Npgsql connection string
+                        var uri = new Uri(dbUrl);
+                        var userInfo = uri.UserInfo.Split(':');
+
+                        connectionString =
+                            $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};" +
+                            $"Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+                    }
+                    else
+                    {
+                        // Local fallback (from appsettings.json)
+                        connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                    }
+
+                    options.UseNpgsql(connectionString, npgsqlOptions =>
+                    {
+                        npgsqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 3,
+                            maxRetryDelay: TimeSpan.FromSeconds(5),
+                            errorCodesToAdd: null
+                        );
+                        npgsqlOptions.CommandTimeout(30);
+                    });
+
                     options.EnableSensitiveDataLogging(false);
                     options.EnableServiceProviderCaching();
                     options.EnableDetailedErrors(builder.Environment.IsDevelopment());
 
-                    // Only log warnings and errors for EF
                     options.LogTo(message => Log.Debug("[EF] {Message}", message), LogLevel.Warning);
                 });
+
+
 
                 // Authentication Configuration
                 builder.Services.AddAuthentication(option =>
@@ -181,6 +215,7 @@ namespace TechZone.Api
                     .AddJsonOptions(options =>
                     {
                         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+                        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
                         options.JsonSerializerOptions.WriteIndented = true;
                     });
 

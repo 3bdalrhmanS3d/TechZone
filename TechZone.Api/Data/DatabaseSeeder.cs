@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -7,6 +9,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using TechZone.Core.Entities;
 using TechZone.EF.Application;
+using TechZone.Core.Entities.User;
+using TechZone.Core.Entities.Laptop;
+using TechZone.Core.Entities.Order;
 
 namespace TechZone.Api.Data
 {

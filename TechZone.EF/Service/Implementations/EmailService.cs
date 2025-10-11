@@ -11,6 +11,7 @@ using System.Text.Json;
 using TechZone.core.Service.Interfaces;
 using TechZone.Core.Entities;
 using TechZone.Core.Entities;
+using TechZone.Core.Entities.User;
 using TechZone.Core.ServiceResponse;
 using TechZone.EF.Application;
 

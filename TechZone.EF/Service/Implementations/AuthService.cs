@@ -6,6 +6,7 @@ using TechZone.Api.DTOs.Auth;
 using TechZone.Api.Services.Interfaces;
 using TechZone.core.Service.Interfaces;
 using TechZone.Core.Entities;
+using TechZone.Core.Entities.User;
 using TechZone.Core.Service.Interfaces;
 using TechZone.Core.ServiceResponse;
 
