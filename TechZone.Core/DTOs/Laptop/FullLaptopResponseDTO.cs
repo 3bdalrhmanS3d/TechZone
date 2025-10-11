@@ -1,4 +1,6 @@
-﻿namespace TechZone.Core.DTOs.Laptop
+﻿using TechZone.Core.Entities;
+
+namespace TechZone.Core.DTOs.Laptop
 {
     public class FullLaptopResponseDTO
     {
@@ -10,10 +12,10 @@
         public bool HasCamera { get; set; }
         public bool HasKeyboard { get; set; }
         public bool HasTouchScreen { get; set; }
-        public string Ports { get; set; } = string.Empty;
+        public ICollection<LaptopPort> Ports { get; set; } = new List<LaptopPort>();
         public string Description { get; set; } = string.Empty;
         public string Notes { get; set; } = string.Empty;
-        public string Warranty { get; set; } = string.Empty;
+        public ICollection<LaptopWarranty> Warranty { get; set; } = new List<LaptopWarranty>();
 
         // Related data
         public BrandDTO Brand { get; set; }

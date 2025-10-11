@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using TechZone.Core.Consts;
 using TechZone.Core.DTOs.Laptop;
 using TechZone.Core.Entities;
-using TechZone.Core.Entities.Laptop;
 using TechZone.Core.ENUMS.Laptop;
 using TechZone.Core.Interfaces;
 using TechZone.Core.PagedResult;
@@ -30,6 +29,8 @@ namespace TechZone.EF.Repositories
                 .Include(l => l.Category)
                 .Include(l => l.Images)
                 .Include(l => l.Variants)
+                .Include(l => l.Ports)
+                .Include(l => l.Warranties)
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -45,8 +46,7 @@ namespace TechZone.EF.Repositories
                 HasTouchScreen = l.HasTouchScreen,
                 Ports = l.Ports,
                 Description = l.Description,
-                Notes = l.Notes,
-                Warranty = l.Warranty,
+                Warranty = l.Warranties,
 
                 Brand = new BrandDTO
                 {
@@ -62,8 +62,8 @@ namespace TechZone.EF.Repositories
                 {
                     Id = v.Id,
                     Ram = v.RAM,
-                    Storage = v.Storage,
-                    Price = v.Price,
+                    Storage = v.StorageCapacityGB,
+                    Price = v.CurrentPrice,
                     StockQuantity = v.StockQuantity
                 }).ToList(),
                 Images = l.Images.Select(i => new LaptopImageDTO

@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using TechZone.Core.DTOs.Laptop;
 using TechZone.Core.Entities;
-using TechZone.Core.Entities.Laptop;
 using TechZone.Core.ENUMS.Laptop;
 using TechZone.Core.PagedResult;
 

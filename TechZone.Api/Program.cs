@@ -19,7 +19,7 @@ using TechZone.EF.UnitOfWork;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using dotenv.net;
-using TechZone.Core.Entities.User;
+using TechZone.EF.Repositories;
 
 namespace TechZone.Api
 {
@@ -88,7 +88,19 @@ namespace TechZone.Api
                 //builder.Services.AddMediatR(typeof(Program).Assembly);
                 builder.Services.AddMediatR(typeof(TechZone.EF.Features.Profile.Queries.GetProfileQueryHandler).Assembly);
 
+                // Dynamic generic repositories for BaseEntity subclasses
+                var baseEntityAssembly = Assembly.GetAssembly(typeof(BaseEntity)) ?? Assembly.GetExecutingAssembly();  // Fallback if null
+                var entityTypes = baseEntityAssembly
+                    .GetTypes()
+                    .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(BaseEntity)))
+                    .ToList();
 
+                foreach (var entityType in entityTypes)
+                {
+                    var interfaceType = typeof(IBaseRepository<>).MakeGenericType(entityType);
+                    var implementationType = typeof(BaseRepository<>).MakeGenericType(entityType);
+                    builder.Services.AddScoped(interfaceType, implementationType);
+                }
 
                 // Background Services
                 builder.Services.AddHostedService<EmailBackgroundService>();

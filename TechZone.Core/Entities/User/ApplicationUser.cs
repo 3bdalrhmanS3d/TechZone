@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace TechZone.Core.Entities.User
+namespace TechZone.Core.Entities
 {
     public class ApplicationUser : IdentityUser
     {
@@ -30,7 +30,7 @@ namespace TechZone.Core.Entities.User
         public bool IsDeleted { get; set; } = false;
 
         // Navigation properties
-        public ICollection<TechZone.Core.Entities.Order.Order> Orders { get; set; } = new List<TechZone.Core.Entities.Order.Order>();
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
         public ICollection<Rating> Ratings { get; set; } = new List<Rating>();
         public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
         public ICollection<RepairRequest> RepairRequests { get; set; } = new List<RepairRequest>();

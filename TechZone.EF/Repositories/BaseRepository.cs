@@ -33,6 +33,10 @@ namespace TechZone.EF.Repositories
         {
             return await _dbSet.ToListAsync();
         }
+        public virtual IQueryable<T> GetAll()
+        {
+            return _dbSet;
+        }
 
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
         {

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TechZone.Core.Entities;
-using TechZone.Core.Entities.Laptop;
 
 namespace TechZone.Core.EntityConfigs
 {
@@ -30,7 +29,7 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(r => r.CreatedAt)
                    .IsRequired()
-                   .HasDefaultValueSql("now()");
+                   .HasDefaultValueSql("GETUTCDATE()");
 
             builder.Property(r => r.UpdatedAt)
                    .IsRequired(false);

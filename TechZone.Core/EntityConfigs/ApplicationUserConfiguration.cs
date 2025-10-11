@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TechZone.Core.Entities;
-using TechZone.Core.Entities.User;
 
 namespace TechZone.Core.EntityConfigs
 {
@@ -12,6 +11,7 @@ namespace TechZone.Core.EntityConfigs
             builder.Property(u => u.FullName)
                    .IsRequired()
                    .HasMaxLength(100);
+
 
             builder.Property(u => u.ProfileImageUrl)
                    .HasMaxLength(500);

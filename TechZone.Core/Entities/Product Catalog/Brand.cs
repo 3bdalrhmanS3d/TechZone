@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TechZone.Core.Entities.Laptop
+namespace TechZone.Core.Entities
 {
     public class Brand : BaseEntity
     {

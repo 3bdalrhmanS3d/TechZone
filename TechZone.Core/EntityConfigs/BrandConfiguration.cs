@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TechZone.Core.Entities;
-using TechZone.Core.Entities.Laptop;
 
 namespace TechZone.Core.EntityConfigs
 {

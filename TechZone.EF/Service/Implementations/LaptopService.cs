@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 using TechZone.Api.DTOs.Laptop;
 using TechZone.Api.Services.Interfaces;
 using TechZone.Core.DTOs.Laptop;
 using TechZone.Core.Entities;
-using TechZone.Core.Entities.Laptop;
 using TechZone.Core.ENUMS.Laptop;
 using TechZone.Core.Interfaces;
 using TechZone.Core.PagedResult;
@@ -16,11 +16,19 @@ namespace TechZone.EF.Service.Implementations
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<LaptopService> _logger;
+        private readonly IBaseRepository<LaptopWarranty> _laptopWarranty;
+        private readonly IBaseRepository<LaptopPort> _laptopPorts; 
 
-        public LaptopService(IUnitOfWork unitOfWork, ILogger<LaptopService> logger)
+
+        public LaptopService(IUnitOfWork unitOfWork, ILogger<LaptopService> logger,
+            IBaseRepository<LaptopPort> laptopPorts , 
+            IBaseRepository<LaptopWarranty> laptopWarranty
+            )
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _laptopPorts = laptopPorts;
+            _laptopWarranty = laptopWarranty;
         }
         public async Task<ServiceResponse<IEnumerable<FullLaptopResponseDTO>>> GetAllFullAsync()
         {
@@ -44,7 +52,8 @@ namespace TechZone.EF.Service.Implementations
                     );
                 }
 
-                var laptopDtos = laptops.Select(l => new FullLaptopResponseDTO
+
+                var laptopDtos = laptops.Select( l => new FullLaptopResponseDTO
                 {
                     Id = l.Id,
                     ModelName = l.ModelName,
@@ -54,10 +63,10 @@ namespace TechZone.EF.Service.Implementations
                     HasCamera = l.HasCamera,
                     HasKeyboard = l.HasKeyboard,
                     HasTouchScreen = l.HasTouchScreen,
-                    Ports = l.Ports,
+                    Ports = _laptopPorts.GetAll().Where(lp => lp.LaptopId == l.Id).ToList(),
+                    Warranty =_laptopWarranty.GetAll().Where(lw => lw.LaptopId == l.Id).ToList(),
                     Description = l.Description,
-                    Notes = l.Notes,
-                    Warranty = l.Warranty,
+                    //Notes = l.Notes,
 
                     Brand = new BrandDTO
                     {
@@ -75,8 +84,8 @@ namespace TechZone.EF.Service.Implementations
                     {
                         Id = v.Id,
                         Ram = v.RAM,
-                        Storage = v.Storage,
-                        Price = v.Price,
+                        Storage = v.StorageCapacityGB,
+                        Price = v.CurrentPrice,
                         StockQuantity = v.StockQuantity
                     }).ToList(),
 

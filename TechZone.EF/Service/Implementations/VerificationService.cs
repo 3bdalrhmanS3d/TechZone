@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using TechZone.Api.Services.Interfaces;
 using TechZone.Core.Entities;
-using TechZone.Core.Entities.User;
 using TechZone.Core.Service.Interfaces;
 using TechZone.Core.ServiceResponse;
 using TechZone.EF.Application;

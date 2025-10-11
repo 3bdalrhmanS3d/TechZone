@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using TechZone.Core.Consts;
 using TechZone.Core.Entities;
-using TechZone.Core.Entities.Order;
 using TechZone.Core.Interfaces;
 using TechZone.EF.Application;
 
