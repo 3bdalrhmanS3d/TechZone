@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TechZone.Core.DTOs.Brand;
-using TechZone.Core.PagedResult;
-using TechZone.Core.Service.Interfaces;
-using TechZone.Core.ServiceResponse;
+using TechZone.Domain.DTOs.Brand;
+using TechZone.Domain.PagedResult;
+using TechZone.Domain.Service.Interfaces;
+using TechZone.Domain.ServiceResponse;
 
-namespace TechZone.Api.Controllers
+namespace TechZoneV1.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

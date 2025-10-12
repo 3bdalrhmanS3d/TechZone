@@ -5,21 +5,21 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Filters;
 using System.Reflection;
-using TechZone.Api.Data;
-using TechZone.Api.Services.Interfaces;
+using TechZoneV1.Services.Interfaces;
 using TechZone.core.Service.Interfaces;
-using TechZone.Core.Entities;
-using TechZone.Core.Interfaces;
-using TechZone.Core.Service.Interfaces;
-using TechZone.EF.Application;
-using TechZone.EF.Service.Implementations;
-using TechZone.EF.UnitOfWork;
+using TechZone.Domain.Entities;
+using TechZone.Domain.Interfaces;
+using TechZone.Domain.Service.Interfaces;
+using TechZone.Infrastructure.Application;
+using TechZone.Shared.Service.Implementations;
+using TechZone.Infrastructure.UnitOfWork;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using dotenv.net;
-using TechZone.Core.Entities.User;
+using TechZone.Domain.Entities.User;
+using TechZoneV1.Shared.Data;
 
-namespace TechZone.Api
+namespace TechZoneV1
 {
     public class Program
     {
@@ -33,7 +33,7 @@ namespace TechZone.Api
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
-                .Enrich.WithProperty("Application", "TechZone.Api")
+                .Enrich.WithProperty("Application", "TechZoneV1")
                 .WriteTo.Console(
                     outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} | {CorrelationId} | {Message:lj}{NewLine}{Exception}",
                     theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme.Literate)
@@ -116,24 +116,25 @@ namespace TechZone.Api
                 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 {
                     // Try to read DATABASE_URL from Railway
-                    var dbUrl = "postgresql://postgres:GRgpDWQqsyUjfpcfZCYCvcmGiHCUTbGt@switchyard.proxy.rlwy.net:46456/railway";
+                    //var dbUrl = null as string;
+                    //"postgresql://postgres:GRgpDWQqsyUjfpcfZCYCvcmGiHCUTbGt@switchyard.proxy.rlwy.net:46456/railway";
                     string connectionString;
 
-                    if (!string.IsNullOrEmpty(dbUrl))
-                    {
-                        // Convert postgres://... into Npgsql connection string
-                        var uri = new Uri(dbUrl);
-                        var userInfo = uri.UserInfo.Split(':');
+                    //if (!string.IsNullOrEmpty(dbUrl))
+                    //{
+                    //    // Convert postgres://... into Npgsql connection string
+                    //    var uri = new Uri(dbUrl);
+                    //    var userInfo = uri.UserInfo.Split(':');
 
-                        connectionString =
-                            $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};" +
-                            $"Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
-                    }
-                    else
-                    {
+                    //    connectionString =
+                    //        $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};" +
+                    //        $"Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+                    //}
+                    //else
+               //     {
                         // Local fallback (from appsettings.json)
                         connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-                    }
+             //       }
 
                     options.UseNpgsql(connectionString, npgsqlOptions =>
                     {

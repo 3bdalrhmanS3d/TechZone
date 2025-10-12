@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text.Json;
-using TechZone.Core.ServiceResponse;
+using TechZone.Domain.ServiceResponse;
 
-namespace TechZone.Api.Middleware
+namespace TechZoneV1.Middleware
 {
     public class GlobalExceptionHandlerMiddleware
     {

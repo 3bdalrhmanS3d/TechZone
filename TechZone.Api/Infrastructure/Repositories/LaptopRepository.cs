@@ -1,0 +1,291 @@
+﻿using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+using TechZone.Domain.Consts;
+using TechZone.Domain.DTOs.Laptop;
+using TechZone.Domain.Entities;
+using TechZone.Domain.Entities.Laptop;
+using TechZone.Domain.ENUMS.Laptop;
+using TechZone.Domain.Interfaces;
+using TechZone.Domain.PagedResult;
+using TechZone.Infrastructure.Application;
+
+namespace TechZone.Infrastructure.Repositories
+{
+    internal class LaptopRepository : BaseRepository<Laptop>, ILaptopRepository
+    {
+        private readonly ApplicationDbContext _context;
+
+        public LaptopRepository(ApplicationDbContext context) : base(context)
+        {
+            _context = context;
+        }
+        public async Task<IEnumerable<FullLaptopResponseDTO>> GetAllFullAsync()
+        {
+            var laptops = await _context.Laptops
+                .Include(l => l.Brand)
+                .Include(l => l.Category)
+                .Include(l => l.Images)
+                .Include(l => l.Variants)
+                .AsNoTracking()
+                .ToListAsync();
+
+            return laptops.Select(l => new FullLaptopResponseDTO
+            {
+                Id = l.Id,
+                ModelName = l.ModelName,
+                Processor = l.Processor,
+                GPU = l.GPU,
+                ScreenSize = l.ScreenSize,
+                HasCamera = l.HasCamera,
+                HasKeyboard = l.HasKeyboard,
+                HasTouchScreen = l.HasTouchScreen,
+                Ports = l.Ports,
+                Description = l.Description,
+                Notes = l.Notes,
+                Warranty = l.Warranty,
+
+                Brand = new BrandDTO
+                {
+                    Id = l.Brand.Id,
+                    Name = l.Brand.Name
+                },
+                Category = new CategoryDTO
+                {
+                    Id = l.Category.Id,
+                    Name = l.Category.Name
+                },
+                Variants = l.Variants.Select(v => new LaptopVariantDTO
+                {
+                    Id = v.Id,
+                    Ram = v.RAM,
+                    Storage = v.Storage,
+                    Price = v.Price,
+                    StockQuantity = v.StockQuantity
+                }).ToList(),
+                Images = l.Images.Select(i => new LaptopImageDTO
+                {
+                    Id = i.Id,
+                    ImageUrl = i.ImageUrl,
+                    IsMain = i.IsMain
+                }).ToList()
+            }).ToList();
+        }
+
+
+        public async Task<PagedResult<LaptopResponseDTO>> GetPagedAsync(PaginationParamsDto<LaptopSortBy> paginationParams)
+        {
+            var query = _context.Laptops.AsNoTracking();
+
+            // Filter (null-safe)
+            if (!string.IsNullOrWhiteSpace(paginationParams.Search))
+            {
+                var s = paginationParams.Search.ToLower();
+                query = query.Where(l =>
+                    ((l.ModelName ?? "").ToLower().Contains(s)) ||
+                    ((l.Processor ?? "").ToLower().Contains(s)) ||
+                    ((l.GPU ?? "").ToLower().Contains(s)) ||
+                    ((l.ScreenSize ?? "").ToLower().Contains(s)) ||
+                    ((l.Ports ?? "").ToLower().Contains(s))
+                );
+            }
+
+            // ✅ ALWAYS order before paging
+            query = ApplySorting(query, paginationParams.SortBy, paginationParams.SortDirection);
+
+            // Projection (كلها null-safe)
+            var projected = query.Select(l => new
+            {
+                l.Id,
+                Name = l.ModelName ?? "",
+                Category = l.Category != null ? l.Category.Name : "unknown",
+
+                // ✅ التصحيح هنا
+                MinPrice = 10000.0m, // Amr, fix this
+
+                Images = l.Images.Select(img => img.ImageUrl ?? ""),
+                // Brand و Processor في الموديل strings default ""، بس نخليها defensive برضه
+                ShortDescription = string.Concat(
+        (l.Brand != null ? l.Brand.Name : ""),
+        ", RAM 16 GB, ",
+        (l.Processor ?? ""),
+        " ."
+    )
+            });
+
+
+            var totalCount = await projected.CountAsync();
+
+            // Paging
+            var page = paginationParams.Page;
+            var size = paginationParams.PageSize;
+
+            var pageItems = await projected
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            // Post-processing (randoms خارج SQL)
+            var rnd = new Random();
+            var items = pageItems.Select(x => new LaptopResponseDTO
+            {
+                Id = x.Id,
+                Name = x.Name,
+                // خليه 0 لو لازم non-nullable، أو غيّر DTO لـ decimal?
+                Price = 10000.0m,
+                Category = x.Category,
+                Images = x.Images.Where(u => !string.IsNullOrWhiteSpace(u)).ToList(),
+                ReviewsCount = rnd.Next(0, 500),
+                IsDiscounted = false,
+                DiscountedPrice = null,
+                Rate = Math.Round(rnd.NextDouble() * 5, 1),
+                ShortDescription = x.ShortDescription
+            }).ToList();
+
+            return new PagedResult<LaptopResponseDTO>(items, totalCount, page, size);
+        }
+
+        private static IQueryable<Laptop> ApplySorting(
+    IQueryable<Laptop> q,
+    LaptopSortBy? sortBy,
+    SortDirection dir)
+        {
+            IOrderedQueryable<Laptop> oq;
+
+            switch (sortBy)
+            {
+                case LaptopSortBy.Price:
+                    oq = (dir == SortDirection.Asc)
+                        ? q.OrderBy(l => l.Variants
+                                .Select(v => (decimal?)v.Price)
+                                .DefaultIfEmpty()
+                                .Min())
+                        : q.OrderByDescending(l => l.Variants
+                                .Select(v => (decimal?)v.Price)
+                                .DefaultIfEmpty()
+                                .Min());
+                    break;
+
+                case LaptopSortBy.ModelName:
+                    oq = (dir == SortDirection.Asc)
+                        ? q.OrderBy(l => l.ModelName)
+                        : q.OrderByDescending(l => l.ModelName);
+                    break;
+
+                default:
+                    // دايماً عندك ترتيب افتراضي ثابت
+                    oq = (dir == SortDirection.Asc)
+                        ? q.OrderBy(l => l.Id)
+                        : q.OrderByDescending(l => l.Id);
+                    break;
+            }
+
+            // تثبيت إضافي للنتائج
+            return (dir == SortDirection.Asc)
+                ? oq.ThenBy(l => l.Id)
+                : oq.ThenByDescending(l => l.Id);
+        }
+
+
+        public async Task<int> CountAsync()
+        {
+            return await _context.Laptops.CountAsync();
+        }
+
+
+        public async Task AddRangeAsync(IEnumerable<Laptop> entities)
+        {
+            await _context.Laptops.AddRangeAsync(entities);
+            await _context.SaveChangesAsync();
+        }
+
+        public void Delete(Laptop entity)
+        {
+            _context.Laptops.Remove(entity);
+            _context.SaveChanges();
+        }
+
+        public void DeleteRange(IEnumerable<Laptop> entities)
+        {
+            _context.Laptops.RemoveRange(entities);
+            _context.SaveChanges();
+        }
+
+        public async Task<Laptop> FirstOrDefaultAsync(Expression<Func<Laptop, bool>> criteria, params Expression<Func<Laptop, object>>[] includes)
+        {
+            IQueryable<Laptop> query = _context.Laptops;
+
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                    query = query.Include(include);
+            }
+
+            return await query.FirstOrDefaultAsync(criteria);
+        }
+
+        public async Task<IEnumerable<Laptop>> GetAllAsync(params Expression<Func<Laptop, object>>[] includes)
+        {
+            IQueryable<Laptop> query = _context.Laptops;
+
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                    query = query.Include(include);
+            }
+
+            return await query.ToListAsync();
+        }
+
+
+        public async Task<Laptop> GetByIdAsync(int id, params Expression<Func<Laptop, object>>[] includes)
+        {
+            IQueryable<Laptop> query = _context.Laptops;
+
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                    query = query.Include(include);
+            }
+
+            return await query.FirstOrDefaultAsync(l => l.Id == id);
+        }
+
+        public async Task<IEnumerable<Laptop>> WhereAsync(
+            Expression<Func<Laptop, bool>> criteria,
+            int? skip = null,
+            int? take = null,
+            Expression<Func<Laptop, object>>? orderBy = null,
+            OrderBy orderDirection = OrderBy.Ascending,
+            params Expression<Func<Laptop, object>>[] includes)
+        {
+            IQueryable<Laptop> query = _context.Laptops;
+
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                    query = query.Include(include);
+            }
+
+            query = query.Where(criteria);
+
+            if (orderBy != null)
+            {
+                query = orderDirection == OrderBy.Ascending
+                    ? query.OrderBy(orderBy)
+                    : query.OrderByDescending(orderBy);
+            }
+
+            if (skip.HasValue)
+                query = query.Skip(skip.Value);
+
+            if (take.HasValue)
+                query = query.Take(take.Value);
+
+            return await query.ToListAsync();
+        }
+    }
+}
