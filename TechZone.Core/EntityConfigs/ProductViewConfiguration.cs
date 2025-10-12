@@ -23,11 +23,11 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(pv => pv.ViewedAt)
                    .IsRequired()
-                   .HasDefaultValueSql("GETUTCDATE()");
+                   .HasDefaultValueSql("TIMEZONE('utc', NOW())"); // Changed from GETUTCDATE()
 
             builder.Property(pv => pv.CreatedAt)
                    .IsRequired()
-                   .HasDefaultValueSql("GETUTCDATE()");
+                   .HasDefaultValueSql("TIMEZONE('utc', NOW())"); // Changed from GETUTCDATE()
 
             builder.Property(pv => pv.UpdatedAt)
                    .IsRequired(false);

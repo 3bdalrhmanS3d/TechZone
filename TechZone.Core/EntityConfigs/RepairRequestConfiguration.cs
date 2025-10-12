@@ -40,14 +40,16 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(rr => rr.RequestDate)
                    .IsRequired()
-                   .HasDefaultValueSql("GETUTCDATE()");
+                   .HasDefaultValueSql("TIMEZONE('utc', NOW())"); // Changed from GETUTCDATE()
+
+
 
             builder.Property(rr => rr.CompletedDate)
                    .IsRequired(false);
 
             builder.Property(rr => rr.CreatedAt)
                    .IsRequired()
-                   .HasDefaultValueSql("GETUTCDATE()");
+                   .HasDefaultValueSql("TIMEZONE('utc', NOW())"); // Changed from GETUTCDATE()
 
             builder.Property(rr => rr.UpdatedAt)
                    .IsRequired(false);

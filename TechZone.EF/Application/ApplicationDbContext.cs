@@ -60,18 +60,10 @@ namespace TechZone.EF.Application
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            foreach (var entity in modelBuilder.Model.GetEntityTypes())
-            {
-                entity.SetTableName(entity.GetTableName().ToLower());
-
-                foreach (var property in entity.GetProperties())
-                {
-                    property.SetColumnName(property.GetColumnName().ToLower());
-                }
-            }
+            // Call base FIRST
             base.OnModelCreating(modelBuilder);
 
-            // Apply individual configurations
+            // Then apply your configurations
             modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
 
             // Core Product Configurations
@@ -121,9 +113,19 @@ namespace TechZone.EF.Application
             modelBuilder.ApplyConfiguration(new VerificationCodeConfiguration());
             modelBuilder.ApplyConfiguration(new EmailQueueConfiguration());
 
-            // Apply any additional configurations from assembly
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+            // Remove this line - it's redundant since you're applying configurations manually
+            // modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
+            // Move the table/column naming to the END
+            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            {
+                entity.SetTableName(entity.GetTableName().ToLower());
+
+                foreach (var property in entity.GetProperties())
+                {
+                    property.SetColumnName(property.GetColumnName().ToLower());
+                }
+            }
         }
     }
 }

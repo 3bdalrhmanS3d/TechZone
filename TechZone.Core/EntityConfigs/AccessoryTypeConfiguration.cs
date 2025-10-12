@@ -20,7 +20,7 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(at => at.CreatedAt)
                    .IsRequired()
-                   .HasDefaultValueSql("GETUTCDATE()");
+                   .HasDefaultValueSql("TIMEZONE('utc', NOW())"); // Changed from GETUTCDATE()
 
             builder.Property(at => at.UpdatedAt)
                    .IsRequired(false);

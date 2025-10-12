@@ -24,9 +24,8 @@ namespace TechZone.Core.EntityConfigs
                    .HasDefaultValueSql("NEWSEQUENTIALID()")
                    .IsRequired();
 
-            // FK to AspNetUsers (nvarchar(450))
+            // FK to AspNetUsers )
             builder.Property(vc => vc.UserId)
-                   .HasMaxLength(450)
                    .IsRequired();
 
             // Code

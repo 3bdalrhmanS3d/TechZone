@@ -13,11 +13,11 @@ namespace TechZone.Core.EntityConfigs
 
             builder.Property(udu => udu.UsedAt)
                    .IsRequired()
-                   .HasDefaultValueSql("GETUTCDATE()");
+                   .HasDefaultValueSql("TIMEZONE('utc', NOW())"); // Changed from GETUTCDATE()
 
             builder.Property(udu => udu.CreatedAt)
                    .IsRequired()
-                   .HasDefaultValueSql("GETUTCDATE()");
+                   .HasDefaultValueSql("TIMEZONE('utc', NOW())"); // Changed from GETUTCDATE()
 
             builder.Property(udu => udu.UpdatedAt)
                    .IsRequired(false);

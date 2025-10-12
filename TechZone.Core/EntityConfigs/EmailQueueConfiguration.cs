@@ -41,8 +41,12 @@ namespace TechZone.Core.EntityConfigs
             builder.Property(eq => eq.ErrorMessage);
 
 
+            //builder.Property(eq => eq.TemplateData)
+            //    .HasColumnType("nvarchar(max)");
+
             builder.Property(eq => eq.TemplateData)
-                .HasColumnType("nvarchar(max)");
+                .HasColumnType("text"); // Changed from nvarchar(max) to text
+
 
             // Performance Indexes
             builder.HasIndex(eq => eq.Status)

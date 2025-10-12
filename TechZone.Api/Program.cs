@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using dotenv.net;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -13,13 +16,9 @@ using TechZone.Core.Entities;
 using TechZone.Core.Interfaces;
 using TechZone.Core.Service.Interfaces;
 using TechZone.EF.Application;
-using TechZone.EF.Features.Profile.Endpoints;
+using TechZone.EF.Repositories;
 using TechZone.EF.Service.Implementations;
 using TechZone.EF.UnitOfWork;
-using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
-using dotenv.net;
-using TechZone.EF.Repositories;
 
 namespace TechZone.Api
 {
@@ -84,9 +83,14 @@ namespace TechZone.Api
                 builder.Services.AddScoped<ICategoryService, CategoryService>();
                 builder.Services.AddScoped<IBrandService, BrandService>();
 
+                // Background Services
+                builder.Services.AddHostedService<EmailBackgroundService>();
+
                 // mediator services for CQRS
                 //builder.Services.AddMediatR(typeof(Program).Assembly);
                 builder.Services.AddMediatR(typeof(TechZone.EF.Features.Profile.Queries.GetProfileQueryHandler).Assembly);
+
+                //builder.Services.AddScoped<IBaseRepository<LaptopPort>, BaseRepository<LaptopPort>>();
 
                 // Dynamic generic repositories for BaseEntity subclasses
                 var baseEntityAssembly = Assembly.GetAssembly(typeof(BaseEntity)) ?? Assembly.GetExecutingAssembly();  // Fallback if null
@@ -102,8 +106,7 @@ namespace TechZone.Api
                     builder.Services.AddScoped(interfaceType, implementationType);
                 }
 
-                // Background Services
-                builder.Services.AddHostedService<EmailBackgroundService>();
+
 
                 // Identity Configuration
                 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -377,7 +380,7 @@ namespace TechZone.Api
                 app.UseAuthentication();
                 app.UseAuthorization();
                 app.MapControllers();
-                app.MapProfileEndpoint();
+
                 // Logging startup information
                 Log.Information("🌟 TechZone API started successfully");
                 Log.Information("🔧 Environment: {Environment}", app.Environment.EnvironmentName);
