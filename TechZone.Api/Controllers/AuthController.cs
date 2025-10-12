@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using TechZone.Api.DTOs.Auth;
-using TechZone.Api.Extensions;
-using TechZone.Core.Service.Interfaces;
-using TechZone.Core.ServiceResponse;
+using TechZone.Domain.DTOs.Auth;
+using TechZone.Domain.Service.Interfaces;
+using TechZone.Domain.ServiceResponse;
+using TechZone.Shared.Extensions;
 
 namespace TechZone.Api.Controllers
 {

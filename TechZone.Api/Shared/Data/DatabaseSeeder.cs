@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TechZone.Core.Entities;
-using TechZone.EF.Application;
+using TechZone.Domain.Entities;
+using TechZone.Infrastructure.Application;
 
-namespace TechZone.Api.Data
+namespace TechZone.Shared.Data
 {
     public static class DatabaseSeeder
     {

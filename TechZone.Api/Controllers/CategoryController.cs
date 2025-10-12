@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TechZone.Core.DTOs.Category;
-using TechZone.EF.Application;
+using TechZone.Domain.DTOs.Category;
+using TechZone.Infrastructure.Application;
 
 namespace TechZone.Api.Controllers
 {

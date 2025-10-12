@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TechZone.Api.DTOs.Laptop;
-using TechZone.Api.Extensions;
+using TechZone.Domain.DTOs.Laptop;
 using TechZone.Api.Services.Interfaces;
-using TechZone.Core.DTOs.Laptop;
-using TechZone.Core.Entities;
-using TechZone.Core.ENUMS.Laptop;
-using TechZone.Core.PagedResult;
-using TechZone.Core.ServiceResponse;
+using TechZone.Domain.DTOs.Laptop;
+using TechZone.Domain.Entities;
+using TechZone.Domain.ENUMS.Laptop;
+using TechZone.Domain.PagedResult;
+using TechZone.Domain.ServiceResponse;
+using TechZone.Shared.Extensions;
 
 namespace TechZone.Api.Controllers
 {
@@ -35,6 +35,7 @@ namespace TechZone.Api.Controllers
         [ProducesResponseType(typeof(ServiceResponse<PagedResult<LaptopResponseDTO>>), 200)]
         [ProducesResponseType(typeof(ServiceResponse<PagedResult<LaptopResponseDTO>>), 400)]
         [ProducesResponseType(typeof(ServiceResponse<PagedResult<LaptopResponseDTO>>), 500)]
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResponse<PagedResult<LaptopResponseDTO>>>> GetAll(
             [FromQuery] PaginationParamsDto<LaptopSortBy> paginationParams)
         {

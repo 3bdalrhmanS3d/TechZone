@@ -5,15 +5,16 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Filters;
 using System.Reflection;
-using TechZone.Api.Data;
 using TechZone.Api.Services.Interfaces;
 using TechZone.core.Service.Interfaces;
-using TechZone.Core.Entities;
-using TechZone.Core.Interfaces;
-using TechZone.Core.Service.Interfaces;
-using TechZone.EF.Application;
-using TechZone.EF.Service.Implementations;
+using TechZone.Domain.Entities;
+using TechZone.Domain.Interfaces;
+using TechZone.Domain.Service.Interfaces;
+using TechZone.Infrastructure.Application;
+using TechZone.Service.Implementations;
 using TechZone.EF.UnitOfWork;
+using TechZone.Shared.Data;
+using TechZone.Shared.helper;
 
 namespace TechZone.Api
 {
@@ -48,7 +49,7 @@ namespace TechZone.Api
                 builder.Host.UseSerilog();
 
                 // Add services to the container.
-                builder.Services.Configure<helper.JWT>(builder.Configuration.GetSection("JWT"));
+                builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
                 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
                 builder.Services.AddOptions<EmailSettings>()
