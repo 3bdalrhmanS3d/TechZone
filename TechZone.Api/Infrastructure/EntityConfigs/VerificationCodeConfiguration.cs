@@ -8,23 +8,19 @@ namespace TechZone.Infrastructure.EntityConfigs
     {
         public void Configure(EntityTypeBuilder<VerificationCode> builder)
         {
-            builder.ToTable("VerificationCodes", t =>
-            {
-                t.HasCheckConstraint("CK_VerificationCodes_Expiry_After_Created", "[ExpiryDate] > [CreatedAt]");
-                t.HasCheckConstraint("CK_VerificationCodes_Attempt_NonNegative", "[AttemptCount] >= 0");
-                t.HasCheckConstraint("CK_VerificationCodes_MaxAttempts_Positive", "[MaxAttempts] > 0");
-            });
+
+
 
             // PK
             builder.HasKey(vc => vc.Id);
 
-            // Id (DB default)
+            // Id (PostgreSQL default)
             builder.Property(vc => vc.Id)
-                   .HasColumnType("uniqueidentifier")
-                   .HasDefaultValueSql("NEWSEQUENTIALID()")
+                   .HasColumnType("uuid")
+                   .HasDefaultValueSql("gen_random_uuid()") // instead of NEWSEQUENTIALID()
                    .IsRequired();
 
-            // FK to AspNetUsers )
+            // FK to AspNetUsers
             builder.Property(vc => vc.UserId)
                    .IsRequired();
 
@@ -50,12 +46,12 @@ namespace TechZone.Infrastructure.EntityConfigs
                    .IsRequired();
 
             builder.Property(vc => vc.CreatedAt)
-                   .HasDefaultValueSql("GETUTCDATE()")
+                   .HasDefaultValueSql("TIMEZONE('utc', NOW())") // PostgreSQL equivalent of GETUTCDATE()
                    .ValueGeneratedOnAdd()
                    .IsRequired();
 
             builder.Property(vc => vc.ExpiryDate)
-                   .HasDefaultValueSql("DATEADD(MINUTE, 60, GETUTCDATE())")
+                   .HasDefaultValueSql("NOW() + INTERVAL '60 minutes'") // PostgreSQL equivalent of DATEADD(MINUTE, 60, GETUTCDATE())
                    .ValueGeneratedOnAdd()
                    .IsRequired();
 
@@ -92,8 +88,6 @@ namespace TechZone.Infrastructure.EntityConfigs
 
             builder.HasIndex(vc => new { vc.Code, vc.Type, vc.IsUsed, vc.ExpiryDate })
                    .HasDatabaseName("IX_VerificationCodes_Verification_Query");
-
-
         }
     }
 }

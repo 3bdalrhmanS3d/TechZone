@@ -1,23 +1,24 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using dotenv.net;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
 using Serilog.Filters;
 using System.Reflection;
-using TechZone.Services.Interfaces;
 using TechZone.core.Service.Interfaces;
 using TechZone.Domain.Entities;
+using TechZone.Domain.Entities.User;
 using TechZone.Domain.Interfaces;
 using TechZone.Domain.Service.Interfaces;
 using TechZone.Infrastructure.Application;
-using TechZone.Shared.Service.Implementations;
+using TechZone.Infrastructure.Repositories;
 using TechZone.Infrastructure.UnitOfWork;
-using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
-using dotenv.net;
-using TechZone.Domain.Entities.User;
+using TechZone.Services.Interfaces;
 using TechZone.Shared.Data;
+using TechZone.Shared.Service.Implementations;
 
 namespace TechZone
 {
@@ -152,6 +153,27 @@ namespace TechZone
 
                     options.LogTo(message => Log.Debug("[EF] {Message}", message), LogLevel.Warning);
                 });
+
+                // mediator services for CQRS
+                //builder.Services.AddMediatR(typeof(Program).Assembly);
+               // builder.Services.AddMediatR(typeof(TechZone.EF.Features.Profile.Queries.GetProfileQueryHandler).Assembly);
+
+                //builder.Services.AddScoped<IBaseRepository<LaptopPort>, BaseRepository<LaptopPort>>();
+
+                // Dynamic generic repositories for BaseEntity subclasses
+                var baseEntityAssembly = Assembly.GetAssembly(typeof(BaseEntity)) ?? Assembly.GetExecutingAssembly();  // Fallback if null
+                var entityTypes = baseEntityAssembly
+                    .GetTypes()
+                    .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(BaseEntity)))
+                    .ToList();
+
+                foreach (var entityType in entityTypes)
+                {
+                    var interfaceType = typeof(IBaseRepository<>).MakeGenericType(entityType);
+                    var implementationType = typeof(BaseRepository<>).MakeGenericType(entityType);
+                    builder.Services.AddScoped(interfaceType, implementationType);
+                }
+
 
 
 
