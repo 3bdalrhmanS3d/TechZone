@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TechZone.Domain.Entities;
 using TechZone.Domain.Entities.User;
 
 namespace TechZone.Infrastructure.EntityConfigs
@@ -11,25 +10,22 @@ namespace TechZone.Infrastructure.EntityConfigs
         {
             builder.ToTable("VerificationCodes", t =>
             {
-                t.HasCheckConstraint("CK_VerificationCodes_Expiry_After_Created", "ExpiryDate > CreatedAt");
-                t.HasCheckConstraint("CK_VerificationCodes_Attempt_NonNegative", "AttemptCount >= 0");
-                t.HasCheckConstraint("CK_VerificationCodes_MaxAttempts_Positive", "MaxAttempts > 0");
+                t.HasCheckConstraint("CK_VerificationCodes_Expiry_After_Created", "[ExpiryDate] > [CreatedAt]");
+                t.HasCheckConstraint("CK_VerificationCodes_Attempt_NonNegative", "[AttemptCount] >= 0");
+                t.HasCheckConstraint("CK_VerificationCodes_MaxAttempts_Positive", "[MaxAttempts] > 0");
             });
-
 
             // PK
             builder.HasKey(vc => vc.Id);
 
             // Id (DB default)
             builder.Property(vc => vc.Id)
-                .HasColumnType("uuid")
-                .HasDefaultValueSql("gen_random_uuid()")
-                .IsRequired();
+                   .HasColumnType("uniqueidentifier")
+                   .HasDefaultValueSql("NEWSEQUENTIALID()")
+                   .IsRequired();
 
-
-            // FK to AspNetUsers (nvarchar(450))
+            // FK to AspNetUsers )
             builder.Property(vc => vc.UserId)
-                   .HasMaxLength(450)
                    .IsRequired();
 
             // Code
@@ -54,15 +50,14 @@ namespace TechZone.Infrastructure.EntityConfigs
                    .IsRequired();
 
             builder.Property(vc => vc.CreatedAt)
-                   .HasDefaultValueSql("now()")
+                   .HasDefaultValueSql("GETUTCDATE()")
                    .ValueGeneratedOnAdd()
                    .IsRequired();
 
             builder.Property(vc => vc.ExpiryDate)
-                    .HasDefaultValueSql("now() + interval '60 minutes'")
-                    .ValueGeneratedOnAdd()
-                    .IsRequired();
-
+                   .HasDefaultValueSql("DATEADD(MINUTE, 60, GETUTCDATE())")
+                   .ValueGeneratedOnAdd()
+                   .IsRequired();
 
             builder.Property(vc => vc.AttemptCount)
                    .HasDefaultValue(0)
@@ -98,7 +93,7 @@ namespace TechZone.Infrastructure.EntityConfigs
             builder.HasIndex(vc => new { vc.Code, vc.Type, vc.IsUsed, vc.ExpiryDate })
                    .HasDatabaseName("IX_VerificationCodes_Verification_Query");
 
-            
+
         }
     }
 }

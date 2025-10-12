@@ -1,4 +1,4 @@
-﻿namespace TechZoneV1.helper
+﻿namespace TechZone.helper
 {
     public class JWT
     {

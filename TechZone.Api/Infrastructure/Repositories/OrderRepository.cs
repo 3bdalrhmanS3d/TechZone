@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using TechZone.Domain.Consts;
 using TechZone.Domain.Entities;
-using TechZone.Domain.Entities.Order;
 using TechZone.Domain.Interfaces;
 
 namespace TechZone.Infrastructure.Repositories
@@ -33,6 +32,11 @@ namespace TechZone.Infrastructure.Repositories
         }
 
         public Task<Order> FirstOrDefaultAsync(Expression<Func<Order, bool>> criteria, params Expression<Func<Order, object>>[] includes)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IQueryable<Order> GetAll()
         {
             throw new NotImplementedException();
         }

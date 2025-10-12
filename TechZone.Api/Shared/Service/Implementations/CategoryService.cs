@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using TechZone.Domain.DTOs;
 using TechZone.Domain.DTOs.Category;
 using TechZone.Domain.Entities;
-using TechZone.Domain.Entities.Laptop;
 using TechZone.Domain.PagedResult;
 using TechZone.Domain.Service.Interfaces;
 using TechZone.Domain.ServiceResponse;
@@ -66,7 +65,7 @@ namespace TechZone.Shared.Service.Implementations
                         Id = c.Id,
                         Name = c.Name,
                         Description = c.Description ?? string.Empty,
-                        CategoryImageUrl = c.CategoryImageURL ?? string.Empty
+                        CategoryImageUrl = c.ImageUrl ?? string.Empty
                     })
                     .ToListAsync(ct);
 
@@ -91,7 +90,7 @@ namespace TechZone.Shared.Service.Implementations
                         Id = c.Id,
                         Name = c.Name,
                         Description = c.Description ?? string.Empty,
-                        CategoryImageUrl = c.CategoryImageURL ?? string.Empty
+                        CategoryImageUrl = c.ImageUrl ?? string.Empty
                     })
                     .FirstOrDefaultAsync(ct);
 
@@ -133,7 +132,7 @@ namespace TechZone.Shared.Service.Implementations
                 {
                     Name = name,
                     Description = dto.Description?.Trim() ?? string.Empty,
-                    CategoryImageURL = imageUrl
+                    ImageUrl = imageUrl
                 };
 
                 await _db.Categories.AddAsync(entity, ct);
@@ -144,7 +143,7 @@ namespace TechZone.Shared.Service.Implementations
                     Id = entity.Id,
                     Name = entity.Name,
                     Description = entity.Description ?? string.Empty,
-                    CategoryImageUrl = entity.CategoryImageURL ?? string.Empty
+                    CategoryImageUrl = entity.ImageUrl ?? string.Empty
                 };
 
                 var resp = ServiceResponse<CategoryDto>.SuccessResponse(result, "Created", "تم الإنشاء");
@@ -184,7 +183,7 @@ namespace TechZone.Shared.Service.Implementations
 
                 if (dto.ClearImage == true)
                 {
-                    entity.CategoryImageURL = string.Empty;
+                    entity.ImageUrl = string.Empty;
                 }
                 else if (dto.Image is not null && dto.Image.Length > 0)
                 {
@@ -196,7 +195,7 @@ namespace TechZone.Shared.Service.Implementations
                         return ServiceResponse<object>.ErrorResponse("Image upload failed", "فشل رفع الصورة", 500);
 
                     // (اختياري) احذف القديمة من Cloudinary لو بتخزن الـ public_id
-                    entity.CategoryImageURL = newUrl;
+                    entity.ImageUrl = newUrl;
                 }
 
                 await _db.SaveChangesAsync(ct);
@@ -254,7 +253,7 @@ namespace TechZone.Shared.Service.Implementations
                         Id = c.Id,
                         Name = c.Name,
                         LaptopsCount = c.Laptops.Count(),
-                        CategoryImageUrl = c.CategoryImageURL ?? string.Empty
+                        CategoryImageUrl = c.ImageUrl ?? string.Empty
                     })
                     .ToListAsync(ct);
 

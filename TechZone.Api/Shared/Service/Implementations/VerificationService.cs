@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using TechZoneV1.Services.Interfaces;
+using TechZone.Services.Interfaces;
 using TechZone.Domain.Entities;
 using TechZone.Domain.Entities.User;
 using TechZone.Domain.Service.Interfaces;

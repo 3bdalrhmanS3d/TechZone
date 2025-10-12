@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using TechZoneV1.DTOs.Auth;
+using TechZone.DTOs.Auth;
 using TechZone.Domain.Service.Interfaces;
 using TechZone.Domain.ServiceResponse;
-using TechZoneV1.Shared.Extensions;
+using TechZone.Shared.Extensions;
 
-namespace TechZoneV1.Controllers
+namespace TechZone.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TechZone.Domain.Entities;
 using TechZone.Domain.Entities.User;
 
 namespace TechZone.Infrastructure.EntityConfigs
@@ -13,21 +12,48 @@ namespace TechZone.Infrastructure.EntityConfigs
                    .IsRequired()
                    .HasMaxLength(100);
 
-            builder.Property(u => u.Phone)
-                   .HasMaxLength(20);
 
-            builder.Property(u => u.Role)
-                   .IsRequired()
-                   .HasMaxLength(20)
-                   .HasDefaultValue("User");
+            builder.Property(u => u.ProfileImageUrl)
+                   .HasMaxLength(500);
 
-            builder.Property(u => u.IsActive)
-                   .IsRequired()
-                   .HasDefaultValue(true);
+            builder.Property(u => u.AddressLine)
+                   .HasMaxLength(500);
+
+            builder.Property(u => u.City)
+                   .HasMaxLength(100);
+
+            builder.Property(u => u.State)
+                   .HasMaxLength(100);
+
+            builder.Property(u => u.Country)
+                   .HasMaxLength(100)
+                   .HasDefaultValue("Egypt");
 
             builder.Property(u => u.CreatedAt)
                    .IsRequired()
-                   .HasDefaultValueSql("NOW()");
+                   .HasDefaultValueSql("TIMEZONE('utc', NOW())"); // Changed from GETUTCDATE()
+
+
+
+
+            builder.Property(u => u.UpdatedAt)
+                   .IsRequired(false);
+
+            builder.Property(u => u.IsDeleted)
+                   .HasDefaultValue(false);
+
+            // Configure owned type for RefreshTokens
+            builder.OwnsMany(u => u.RefreshTokens, rt =>
+            {
+                rt.WithOwner().HasForeignKey("UserId");
+                rt.Property<string>("UserId").IsRequired().HasMaxLength(450);
+                rt.Property(r => r.Token).IsRequired();
+                rt.Property(r => r.ExpiresOn).IsRequired();
+                rt.Property(r => r.CreatedOn).IsRequired();
+                rt.Property(r => r.RevokedOn).IsRequired(false);
+            });
+
+
         }
     }
 }

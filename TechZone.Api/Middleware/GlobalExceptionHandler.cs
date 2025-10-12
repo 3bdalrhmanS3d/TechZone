@@ -3,7 +3,7 @@ using System.Net;
 using System.Text.Json;
 using TechZone.Domain.ServiceResponse;
 
-namespace TechZoneV1.Middleware
+namespace TechZone.Middleware
 {
     public class GlobalExceptionHandlerMiddleware
     {

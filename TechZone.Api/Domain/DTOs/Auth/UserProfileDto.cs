@@ -1,4 +1,4 @@
-﻿namespace TechZoneV1.DTOs.Auth
+﻿namespace TechZone.DTOs.Auth
 {
     public class UserProfileDto
     {

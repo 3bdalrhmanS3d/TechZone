@@ -5,7 +5,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Filters;
 using System.Reflection;
-using TechZoneV1.Services.Interfaces;
+using TechZone.Services.Interfaces;
 using TechZone.core.Service.Interfaces;
 using TechZone.Domain.Entities;
 using TechZone.Domain.Interfaces;
@@ -17,9 +17,9 @@ using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using dotenv.net;
 using TechZone.Domain.Entities.User;
-using TechZoneV1.Shared.Data;
+using TechZone.Shared.Data;
 
-namespace TechZoneV1
+namespace TechZone
 {
     public class Program
     {
@@ -33,7 +33,7 @@ namespace TechZoneV1
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
-                .Enrich.WithProperty("Application", "TechZoneV1")
+                .Enrich.WithProperty("Application", "TechZone")
                 .WriteTo.Console(
                     outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} | {CorrelationId} | {Message:lj}{NewLine}{Exception}",
                     theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme.Literate)

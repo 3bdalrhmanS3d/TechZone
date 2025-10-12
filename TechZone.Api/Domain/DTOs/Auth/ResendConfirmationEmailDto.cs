@@ -2,7 +2,7 @@
 using TechZone.Domain.Entities;
 using TechZone.Domain.Entities.User;
 
-namespace TechZoneV1.DTOs.Auth
+namespace TechZone.DTOs.Auth
 {
     public class ResendConfirmationEmailDto
     {

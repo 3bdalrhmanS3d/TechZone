@@ -1,16 +1,19 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using TechZone.Domain.Entities;
-using TechZone.Domain.Entities.Laptop;
 using TechZone.Domain.Entities.User;
 
-namespace TechZone.Domain.Entities.Order
+namespace TechZone.Domain.Entities
 {
-    public class CartItem
+    public class CartItem : BaseEntity
     {
-        public int Id { get; set; }
-        public string ApplicationUserId { get; set; }
-        public int LaptopVariantId { get; set; }
+        public string UserId { get; set; }
+
+        [Required]
+        public ProductType ProductType { get; set; }
+
+        [Required]
+        public int ProductId { get; set; }
 
         [Range(1, int.MaxValue)]
         public int Quantity { get; set; }
@@ -19,6 +22,5 @@ namespace TechZone.Domain.Entities.Order
 
         // Navigation
         public ApplicationUser User { get; set; }
-        public LaptopVariant LaptopVariant { get; set; }
     }
 }

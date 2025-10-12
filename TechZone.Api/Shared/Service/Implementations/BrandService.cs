@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TechZone.Domain.DTOs.Brand;
 using TechZone.Domain.Entities;
-using TechZone.Domain.Entities.Laptop;
 using TechZone.Domain.PagedResult;
 using TechZone.Domain.Service.Interfaces;
 using TechZone.Domain.ServiceResponse;

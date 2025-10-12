@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TechZone.Domain.Entities;
-using TechZone.Domain.Entities.Laptop;
 
 namespace TechZone.Infrastructure.EntityConfigs
 {
@@ -24,6 +23,27 @@ namespace TechZone.Infrastructure.EntityConfigs
 
             builder.Property(b => b.Description)
                    .HasColumnType("text");
+
+            builder.Property(b => b.IsActive)
+                   .HasDefaultValue(true);
+
+            builder.Property(b => b.CreatedAt)
+                   .IsRequired()
+                   .HasDefaultValueSql("TIMEZONE('utc', NOW())"); // Changed from GETUTCDATE()
+
+
+
+
+            builder.Property(b => b.UpdatedAt)
+                   .IsRequired(false);
+
+            builder.Property(b => b.DeletedAt)
+                   .IsRequired(false);
+
+            builder.Property(b => b.IsDeleted)
+                   .HasDefaultValue(false);
+
+            builder.HasQueryFilter(b => !b.IsDeleted);
         }
     }
 }

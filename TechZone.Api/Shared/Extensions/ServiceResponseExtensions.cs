@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TechZone.Domain.ServiceResponse;
 
-namespace TechZoneV1.Shared.Extensions
+namespace TechZone.Shared.Extensions
 {
     /// <summary>
     /// Extension methods for ServiceResponse to easily convert to ActionResult

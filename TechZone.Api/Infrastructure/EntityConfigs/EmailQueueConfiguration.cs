@@ -41,8 +41,11 @@ namespace TechZone.Infrastructure.EntityConfigs
             builder.Property(eq => eq.ErrorMessage);
 
 
+            //builder.Property(eq => eq.TemplateData)
+            //    .HasColumnType("nvarchar(max)");
+
             builder.Property(eq => eq.TemplateData)
-        .HasColumnType("text"); // PostgreSQL equivalent
+                .HasColumnType("text"); // Changed from nvarchar(max) to text
 
 
             // Performance Indexes
@@ -70,11 +73,11 @@ namespace TechZone.Infrastructure.EntityConfigs
             builder.HasIndex(eq => new { eq.Status, eq.NextRetryAt })
                 .HasDatabaseName("IX_EmailQueues_Status_NextRetryAt");
 
-            builder.HasOne(eq => eq.User)   
-                .WithMany(u => u.EmailQueue) 
+            builder.HasOne(eq => eq.User)
+                .WithMany(u => u.EmailQueue)
                 .HasForeignKey(eq => eq.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
-                
+
 
         }
     }

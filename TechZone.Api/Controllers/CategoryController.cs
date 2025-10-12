@@ -5,7 +5,7 @@ using TechZone.Domain.PagedResult;
 using TechZone.Domain.Service.Interfaces;
 using TechZone.Domain.ServiceResponse;
 
-namespace TechZoneV1.Controllers
+namespace TechZone.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

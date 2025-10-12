@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace TechZoneV1.DTOs.Auth
+namespace TechZone.DTOs.Auth
 {
     public class AuthDto
     {

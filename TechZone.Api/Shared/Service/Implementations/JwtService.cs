@@ -6,12 +6,12 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using TechZoneV1.Services.Interfaces;
+using TechZone.Services.Interfaces;
 using TechZone.Domain.Entities;
 using TechZone.Domain.Entities.User;
 using TechZone.Domain.Service.Interfaces;
 using TechZone.Domain.ServiceResponse;
-using TechZoneV1.helper;
+using TechZone.helper;
 
 namespace TechZone.Shared.Service.Implementations
 {

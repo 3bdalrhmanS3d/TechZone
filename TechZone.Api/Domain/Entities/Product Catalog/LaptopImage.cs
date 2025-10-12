@@ -1,17 +1,17 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using TechZone.Domain.Entities;
 
-namespace TechZone.Domain.Entities.Laptop
+namespace TechZone.Domain.Entities
 {
-    public class LaptopImage
+    public class LaptopImage : BaseEntity
     {
-        public int Id { get; set; }
         public int LaptopId { get; set; }
 
         [Required, MaxLength(500)]
         public string ImageUrl { get; set; } = string.Empty;
 
         public bool IsMain { get; set; }
+        public int DisplayOrder { get; set; } = 0;
         public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation

@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using TechZone.Domain.Entities;
 
-namespace TechZone.Domain.Entities.Laptop
+namespace TechZone.Domain.Entities
 {
-    public class Category
+    public class AccessoryType : BaseEntity
     {
-        public int Id { get; set; }
-
         [Required, MaxLength(100)]
         public string Name { get; set; } = string.Empty;
 
@@ -14,6 +13,6 @@ namespace TechZone.Domain.Entities.Laptop
 
         public string? CategoryImageURL { get; set; } = string.Empty;
         // Navigation
-        public ICollection<Laptop> Laptops { get; set; } = new List<Laptop>();
+        public ICollection<Accessory> Accessories { get; set; } = new List<Accessory>();
     }
 }

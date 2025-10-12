@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TechZone.Domain.Entities;
-using TechZone.Domain.Entities.Order;
 
 namespace TechZone.Infrastructure.EntityConfigs
 {
@@ -12,6 +11,9 @@ namespace TechZone.Infrastructure.EntityConfigs
             builder.ToTable("Discounts");
             builder.HasKey(d => d.Id);
 
+            builder.Property(d => d.Code)
+                   .HasMaxLength(50);
+
             builder.Property(d => d.Title)
                    .IsRequired()
                    .HasMaxLength(100);
@@ -19,9 +21,25 @@ namespace TechZone.Infrastructure.EntityConfigs
             builder.Property(d => d.Description)
                    .HasColumnType("text");
 
-            builder.Property(d => d.Percentage)
+            builder.Property(d => d.DiscountType)
                    .IsRequired()
-                   .HasColumnType("decimal(5,2)");
+                   .HasConversion<string>();
+
+            builder.Property(d => d.Value)
+                   .IsRequired()
+                   .HasColumnType("decimal(18,2)");
+
+            builder.Property(d => d.MinimumPurchase)
+                   .HasColumnType("decimal(18,2)");
+
+            builder.Property(d => d.MaxDiscountAmount)
+                   .HasColumnType("decimal(18,2)");
+
+            builder.Property(d => d.UsageLimit)
+                   .IsRequired(false);
+
+            builder.Property(d => d.UsageCount)
+                   .HasDefaultValue(0);
 
             builder.Property(d => d.StartDate)
                    .IsRequired();
@@ -30,8 +48,26 @@ namespace TechZone.Infrastructure.EntityConfigs
                    .IsRequired();
 
             builder.Property(d => d.IsActive)
-                   .IsRequired()
                    .HasDefaultValue(true);
+
+            builder.Property(d => d.CreatedAt)
+                   .IsRequired()
+                   .HasDefaultValueSql("TIMEZONE('utc', NOW())"); // Changed from GETUTCDATE()
+
+            builder.Property(d => d.UpdatedAt)
+                   .IsRequired(false);
+
+            builder.Property(d => d.DeletedAt)
+                   .IsRequired(false);
+
+            builder.Property(d => d.IsDeleted)
+                   .HasDefaultValue(false);
+
+            builder.HasQueryFilter(d => !d.IsDeleted);
+
+            // Indexes
+            builder.HasIndex(d => d.Code).IsUnique();
+            builder.HasIndex(d => new { d.IsActive, d.StartDate, d.EndDate });
         }
     }
 }

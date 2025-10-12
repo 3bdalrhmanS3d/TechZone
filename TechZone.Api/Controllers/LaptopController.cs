@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TechZoneV1.DTOs.Laptop;
-using TechZoneV1.Services.Interfaces;
+using TechZone.DTOs.Laptop;
+using TechZone.Services.Interfaces;
 using TechZone.Domain.DTOs.Laptop;
 using TechZone.Domain.Entities;
-using TechZone.Domain.Entities.Laptop;
 using TechZone.Domain.ENUMS.Laptop;
 using TechZone.Domain.PagedResult;
 using TechZone.Domain.ServiceResponse;
-using TechZoneV1.Shared.Extensions;
+using TechZone.Shared.Extensions;
+using TechZone.Domain.Entities;
 
-namespace TechZoneV1.Controllers
+namespace TechZone.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

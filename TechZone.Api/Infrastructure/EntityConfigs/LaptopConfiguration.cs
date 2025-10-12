@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TechZone.Domain.Entities;
-using TechZone.Domain.Entities.Laptop;
 
 namespace TechZone.Infrastructure.EntityConfigs
 {
@@ -17,6 +16,7 @@ namespace TechZone.Infrastructure.EntityConfigs
                    .HasMaxLength(200);
 
             builder.Property(l => l.Processor)
+                   .IsRequired()
                    .HasMaxLength(100);
 
             builder.Property(l => l.GPU)
@@ -25,48 +25,35 @@ namespace TechZone.Infrastructure.EntityConfigs
             builder.Property(l => l.ScreenSize)
                    .HasMaxLength(50);
 
-            builder.Property(l => l.Ports)
-                   .HasMaxLength(300);
-
             builder.Property(l => l.Description)
                    .HasColumnType("text");
 
-            builder.Property(l => l.Notes)
-                   .HasColumnType("text");
-
-            builder.Property(l => l.Warranty)
+            builder.Property(l => l.StoreLocation)
                    .HasMaxLength(200);
 
-            builder.Property(l => l.HasCamera)
-                   .IsRequired();
+            builder.Property(l => l.StoreContact)
+                   .HasMaxLength(100);
 
-            builder.Property(l => l.HasKeyboard)
-                   .IsRequired();
+            builder.Property(l => l.ReleaseYear)
+                   .IsRequired(false);
 
-            builder.Property(l => l.HasTouchScreen)
-                   .IsRequired();
+            builder.Property(l => l.IsActive)
+                   .HasDefaultValue(true);
+
+            builder.Property(l => l.CreatedAt)
+                   .IsRequired()
+                   .HasDefaultValueSql("TIMEZONE('utc', NOW())"); // Changed from GETUTCDATE()
+
+            builder.Property(l => l.UpdatedAt)
+                   .IsRequired(false);
+
+            builder.Property(l => l.DeletedAt)
+                   .IsRequired(false);
+
+            builder.Property(l => l.IsDeleted)
+                   .HasDefaultValue(false);
 
             // Relations
-            builder.HasMany(l => l.Variants)
-                   .WithOne(v => v.Laptop)
-                   .HasForeignKey(v => v.LaptopId)
-                   .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasMany(l => l.Images)
-                   .WithOne(i => i.Laptop)
-                   .HasForeignKey(i => i.LaptopId)
-                   .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasMany(l => l.Ratings)
-                   .WithOne(r => r.Laptop)
-                   .HasForeignKey(r => r.LaptopId)
-                   .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasMany(l => l.RepairRequests)
-                   .WithOne(r => r.Laptop)
-                   .HasForeignKey(r => r.LaptopId)
-                   .OnDelete(DeleteBehavior.SetNull);
-
             builder.HasOne(l => l.Brand)
                    .WithMany(b => b.Laptops)
                    .HasForeignKey(l => l.BrandId)
@@ -76,6 +63,8 @@ namespace TechZone.Infrastructure.EntityConfigs
                    .WithMany(c => c.Laptops)
                    .HasForeignKey(l => l.CategoryId)
                    .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasQueryFilter(l => !l.IsDeleted);
         }
     }
 }

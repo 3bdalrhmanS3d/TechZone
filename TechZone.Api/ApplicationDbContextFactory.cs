@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Design;
 using TechZone.Infrastructure.Application; // تأكد أن هذا هو namespace الصحيح لـ ApplicationDbContext
 
-namespace TechZoneV1
+namespace TechZone
 {
     /// <summary>
     /// Factory لـ EF Core Design-Time (يُستخدم عند تشغيل Update-Database أو Add-Migration)

@@ -6,9 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using TechZone.Domain.DTOs.Laptop;
 using TechZone.Domain.Entities;
-using TechZone.Domain.Entities.Laptop;
+using TechZone.Domain.Entities;
 using TechZone.Domain.ENUMS.Laptop;
 using TechZone.Domain.PagedResult;
+using TechZone.Domain.ServiceResponse;
+using TechZone.DTOs.Laptop;
 
 namespace TechZone.Domain.Interfaces
 {
@@ -17,5 +19,7 @@ namespace TechZone.Domain.Interfaces
         Task<IEnumerable<FullLaptopResponseDTO>> GetAllFullAsync();
         Task<PagedResult<LaptopResponseDTO>> GetPagedAsync(PaginationParamsDto<LaptopSortBy> paginationParams);
         Task<int> CountAsync();
+        Task<Laptop?> GetLaptopWithDetailsAsync(int labId);
+        Task<IEnumerable<Laptop>?> GetFeaturedLaptopsAsync(int count);
     }
 }

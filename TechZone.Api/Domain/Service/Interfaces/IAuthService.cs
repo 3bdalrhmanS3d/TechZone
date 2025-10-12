@@ -1,4 +1,4 @@
-﻿using TechZoneV1.DTOs.Auth;
+﻿using TechZone.DTOs.Auth;
 using TechZone.Domain.ServiceResponse;
 
 namespace TechZone.Domain.Service.Interfaces

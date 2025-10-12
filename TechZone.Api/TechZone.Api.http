@@ -1,6 +1,6 @@
-@TechZoneV1_HostAddress = http://localhost:5195
+@TechZone_HostAddress = http://localhost:5195
 
-GET {{TechZoneV1_HostAddress}}/weatherforecast/
+GET {{TechZone_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
