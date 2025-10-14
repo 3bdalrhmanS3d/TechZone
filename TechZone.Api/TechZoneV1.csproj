@@ -11,6 +11,8 @@
     <PackageReference Include="CloudinaryDotNet" Version="1.27.8" />
     <PackageReference Include="dotenv.net" Version="4.0.0" />
     <PackageReference Include="MailKit" Version="4.13.0" />
+    <PackageReference Include="MediatR" Version="10.0.1" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.19" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.19" />
@@ -34,7 +36,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\" />
+    <Folder Include="Features\Category\Add\" />
+    <Folder Include="Features\Category\Delete\" />
+    <Folder Include="Features\Category\GetAll\" />
+    <Folder Include="Features\Category\GetDetailedInfo\" />
+    <Folder Include="Features\Category\Update\" />
+    <Folder Include="Features\Laptops\AddLaptop\" />
+    <Folder Include="Features\Laptops\DeleteLaptop\" />
+    <Folder Include="Features\Laptops\GetAllLaptops\Commands\" />
+    <Folder Include="Features\Laptops\GetDetailedLaptopInfo\" />
+    <Folder Include="Features\Laptops\UpdateLaptop\" />
   </ItemGroup>
 
 </Project>

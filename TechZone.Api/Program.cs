@@ -1,6 +1,7 @@
 ﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using dotenv.net;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -19,6 +20,7 @@ using TechZone.Infrastructure.UnitOfWork;
 using TechZone.Services.Interfaces;
 using TechZone.Shared.Data;
 using TechZone.Shared.Service.Implementations;
+using TechZoneV1.Features.Laptops.GetAllLaptops.Endpoints;
 
 namespace TechZone
 {
@@ -155,7 +157,7 @@ namespace TechZone
                 });
 
                 // mediator services for CQRS
-                //builder.Services.AddMediatR(typeof(Program).Assembly);
+                builder.Services.AddMediatR(typeof(Program).Assembly);
                // builder.Services.AddMediatR(typeof(TechZone.EF.Features.Profile.Queries.GetProfileQueryHandler).Assembly);
 
                 //builder.Services.AddScoped<IBaseRepository<LaptopPort>, BaseRepository<LaptopPort>>();
@@ -175,7 +177,10 @@ namespace TechZone
                 }
 
 
-
+                builder.Services.AddControllers().AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+                });
 
                 // Authentication Configuration
                 builder.Services.AddAuthentication(option =>
@@ -287,6 +292,7 @@ namespace TechZone
                     }
                 });
 
+
                 // CORS Configuration
                 builder.Services.AddCors(options =>
                 {
@@ -375,7 +381,7 @@ namespace TechZone
                     context.Response.Headers.Add("Referrer-Policy", "strict-origin-when-cross-origin");
                     await next();
                 });
-
+                app.MapGetAllLaptopEndpoint();
                 app.UseCors("AllowSpecificOrigins");
                 app.UseAuthentication();
                 app.UseAuthorization();

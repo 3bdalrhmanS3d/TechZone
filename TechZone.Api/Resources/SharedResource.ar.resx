@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<data name="OperationSuccess" xml:space="preserve">
+    <value>العملية تمت بنجاح</value>
+  </data>
+	<data name="OperationFailed" xml:space="preserve">
+    <value>فشل العملية</value>
+  </data>
+	<data name="Unauthorized" xml:space="preserve">
+    <value>الوصول غير مصرح به</value>
+  </data>
+	<data name="ResourceNotFound" xml:space="preserve">
+    <value>المورد غير موجود</value>
+  </data>
+	<data name="ValidationFailed" xml:space="preserve">
+    <value>فشل التحقق من الصحة</value>
+  </data>
+</root>

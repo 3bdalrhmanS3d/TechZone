@@ -78,8 +78,12 @@ namespace TechZone.Infrastructure.Repositories
 
         public async Task<PagedResult<LaptopResponseDTO>> GetPagedAsync(PaginationParamsDto<LaptopSortBy> paginationParams)
         {
+       // Id Name Price Category Images Rate
+       // ReviewsCount IsDiscounted DiscountedPrice
+       // ShortDescription Brand Processor GPU ScreenSize PriceRange 
+        
             // FIXED: Remove the invalid cast by storing the query in a separate variable
-            IQueryable<Laptop> baseQuery = _context.Laptops
+        IQueryable<Laptop> baseQuery = _context.Laptops
                 .AsNoTracking()
                 .Include(l => l.Brand)
                 .Include(l => l.Category)
