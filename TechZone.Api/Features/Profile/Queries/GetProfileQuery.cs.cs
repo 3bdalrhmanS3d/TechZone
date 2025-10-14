@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TechZone.Domain.Entities.User;
 using TechZone.Domain.ServiceResponse;
-using TechZone.EF.Features.Profile.Dtos;
+using TechZone.Features.Profile.Dtos;
 
 namespace TechZone.Features.Profile.Queries
 {
