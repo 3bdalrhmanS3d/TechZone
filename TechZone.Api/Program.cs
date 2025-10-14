@@ -14,6 +14,7 @@ using TechZone.Domain.Entities;
 using TechZone.Domain.Entities.User;
 using TechZone.Domain.Interfaces;
 using TechZone.Domain.Service.Interfaces;
+using TechZone.Features.Profile.Endpoints;
 using TechZone.Infrastructure.Application;
 using TechZone.Infrastructure.Repositories;
 using TechZone.Infrastructure.UnitOfWork;
@@ -381,6 +382,7 @@ namespace TechZone
                     context.Response.Headers.Add("Referrer-Policy", "strict-origin-when-cross-origin");
                     await next();
                 });
+                app.MapProfileEndpoint();
                 app.MapGetAllLaptopEndpoint();
                 app.UseCors("AllowSpecificOrigins");
                 app.UseAuthentication();
