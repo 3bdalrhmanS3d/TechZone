@@ -20,6 +20,7 @@ using TechZone.Infrastructure.UnitOfWork;
 using TechZone.Services.Interfaces;
 using TechZone.Shared.Data;
 using TechZone.Shared.Service.Implementations;
+using TechZoneV1.Features.Category.ChangeCategoryName.Endpoints;
 using TechZoneV1.Features.Laptops.GetAllLaptops.Endpoints;
 using TechZoneV1.Features.Profile.EditUserProfile.Endpoints;
 using TechZoneV1.Features.Profile.GetUserProfile.Endpoints;
@@ -149,9 +150,7 @@ namespace TechZone
                             errorCodesToAdd: null
                         );
                         npgsqlOptions.CommandTimeout(30);
-                    });
-
-                    //.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                    }).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 
                     options.EnableSensitiveDataLogging(false);
                     options.EnableServiceProviderCaching();
@@ -387,6 +386,7 @@ namespace TechZone
                 });
                 app.MapProfileEndpoint();
                 app.MapGetAllLaptopEndpoint();
+                app.MapChangeCategoryNameEndpoint();
                 app.MapEditEndpoint();
                 app.UseCors("AllowSpecificOrigins");
                 app.UseAuthentication();

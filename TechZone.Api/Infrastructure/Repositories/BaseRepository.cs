@@ -119,40 +119,73 @@ namespace TechZone.Infrastructure.Repositories
         {
             _dbSet.Update(entity);
         }
-
         public void SaveInclude(T entity, params string[] includedProperties)
         {
-            var LocalEntity = _dbSet.Local.FirstOrDefault(e => e.Id == entity.Id);
+            // شوف هل فيه كيان متتبع بنفس الـ Id
+            var localEntity = _dbSet.Local.FirstOrDefault(e => e.Id == entity.Id);
             EntityEntry entry;
 
-            if (LocalEntity == null)
+            if (localEntity == null)
             {
+                // لو مش متتبع، اربطه بالـ context
+                _dbSet.Attach(entity);
                 entry = _context.Entry(entity);
             }
             else
             {
-                entry = _context.ChangeTracker.Entries<T>().First(e => e.Entity.Id == entity.Id);
+                // لو فيه كيان متتبع بالفعل، اشتغل عليه
+                entry = _context.Entry(localEntity);
+
+                // وحدث القيم اللي جايه من الكيان الجديد
+                _context.Entry(localEntity).CurrentValues.SetValues(entity);
             }
 
+            // حدد الخصائص اللي عايز تحدثها بس
             foreach (var property in entry.Properties)
             {
                 if (property.Metadata.IsPrimaryKey())
                     continue;
-                else
-                {
-                    if (includedProperties.Contains(property.Metadata.Name))
-                    {
-                        property.IsModified = true;
-                    }
-                    else
-                    {
-                        property.IsModified = false;
-                    }
-                }
 
+                property.IsModified = includedProperties.Contains(property.Metadata.Name);
             }
-
         }
+        #region oldsaveInclude
+        //public void SaveInclude(T entity, params string[] includedProperties)
+        //{
+        //    var LocalEntity = _dbSet.Local.FirstOrDefault(e => e.Id == entity.Id);
+        //    EntityEntry entry;
+
+        //    if (LocalEntity == null)
+        //    {
+        //        //_dbSet.Attach(entity);
+        //        entry = _context.Entry(entity);
+        //    }
+        //    else
+        //    {
+        //        entry = _context.ChangeTracker.Entries<T>().First(e => e.Entity.Id == entity.Id);
+        //    }
+
+        //    foreach (var property in entry.Properties)
+        //    {
+        //        if (property.Metadata.IsPrimaryKey())
+        //            continue;
+        //        else
+        //        {
+        //            if (includedProperties.Contains(property.Metadata.Name))
+        //            {
+        //                property.IsModified = true;
+        //            }
+        //            else
+        //            {
+        //                property.IsModified = false;
+        //            }
+        //        }
+
+        //    }
+
+        //}
+
+        #endregion
         public void Delete(T entity)
         {
             _dbSet.Remove(entity);
