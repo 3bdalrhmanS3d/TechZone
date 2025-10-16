@@ -14,7 +14,6 @@ using TechZone.Domain.Entities;
 using TechZone.Domain.Entities.User;
 using TechZone.Domain.Interfaces;
 using TechZone.Domain.Service.Interfaces;
-using TechZone.Features.Profile.Endpoints;
 using TechZone.Infrastructure.Application;
 using TechZone.Infrastructure.Repositories;
 using TechZone.Infrastructure.UnitOfWork;
@@ -22,6 +21,8 @@ using TechZone.Services.Interfaces;
 using TechZone.Shared.Data;
 using TechZone.Shared.Service.Implementations;
 using TechZoneV1.Features.Laptops.GetAllLaptops.Endpoints;
+using TechZoneV1.Features.Profile.EditUserProfile.Endpoints;
+using TechZoneV1.Features.Profile.GetUserProfile.Endpoints;
 
 namespace TechZone
 {
@@ -138,7 +139,7 @@ namespace TechZone
                //     {
                         // Local fallback (from appsettings.json)
                         connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-             //       }
+                    //       }
 
                     options.UseNpgsql(connectionString, npgsqlOptions =>
                     {
@@ -149,6 +150,8 @@ namespace TechZone
                         );
                         npgsqlOptions.CommandTimeout(30);
                     });
+
+                    //.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 
                     options.EnableSensitiveDataLogging(false);
                     options.EnableServiceProviderCaching();
@@ -384,6 +387,7 @@ namespace TechZone
                 });
                 app.MapProfileEndpoint();
                 app.MapGetAllLaptopEndpoint();
+                app.MapEditEndpoint();
                 app.UseCors("AllowSpecificOrigins");
                 app.UseAuthentication();
                 app.UseAuthorization();

@@ -10,9 +10,9 @@ using System.Text;
 using System.Threading.Tasks;
 using TechZone.Domain.Entities.User;
 using TechZone.Domain.ServiceResponse;
-using TechZone.Features.Profile.Dtos;
+using TechZoneV1.Features.Profile.GetUserProfile.Dtos;
 
-namespace TechZone.Features.Profile.Queries
+namespace TechZoneV1.Features.Profile.GetUserProfile.Queries
 {
     public record GetProfileQuery : IRequest<ServiceResponse<ProfileDto>>;
 

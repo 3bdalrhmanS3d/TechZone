@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TechZone.Features.Profile.Dtos
+namespace TechZoneV1.Features.Profile.GetUserProfile.Dtos
 {
     public class ProfileDto
     {

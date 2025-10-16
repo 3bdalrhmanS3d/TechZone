@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,12 +7,13 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using TechZone.Domain.Consts;
+using TechZone.Domain.Entities;
 using TechZone.Domain.Interfaces;
 using TechZone.Infrastructure.Application;
 
 namespace TechZone.Infrastructure.Repositories
 {
-    public class BaseRepository<T> : IBaseRepository<T> where T : class
+    public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
     {
         protected readonly ApplicationDbContext _context;
         protected readonly DbSet<T> _dbSet;
@@ -118,6 +120,39 @@ namespace TechZone.Infrastructure.Repositories
             _dbSet.Update(entity);
         }
 
+        public void SaveInclude(T entity, params string[] includedProperties)
+        {
+            var LocalEntity = _dbSet.Local.FirstOrDefault(e => e.Id == entity.Id);
+            EntityEntry entry;
+
+            if (LocalEntity == null)
+            {
+                entry = _context.Entry(entity);
+            }
+            else
+            {
+                entry = _context.ChangeTracker.Entries<T>().First(e => e.Entity.Id == entity.Id);
+            }
+
+            foreach (var property in entry.Properties)
+            {
+                if (property.Metadata.IsPrimaryKey())
+                    continue;
+                else
+                {
+                    if (includedProperties.Contains(property.Metadata.Name))
+                    {
+                        property.IsModified = true;
+                    }
+                    else
+                    {
+                        property.IsModified = false;
+                    }
+                }
+
+            }
+
+        }
         public void Delete(T entity)
         {
             _dbSet.Remove(entity);

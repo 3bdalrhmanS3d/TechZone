@@ -46,6 +46,7 @@
     <Folder Include="Features\Laptops\GetAllLaptops\Commands\" />
     <Folder Include="Features\Laptops\GetDetailedLaptopInfo\" />
     <Folder Include="Features\Laptops\UpdateLaptop\" />
+    <Folder Include="Features\Laptopvariant\" />
   </ItemGroup>
 
 </Project>

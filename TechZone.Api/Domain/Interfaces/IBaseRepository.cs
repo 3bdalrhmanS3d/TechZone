@@ -29,6 +29,7 @@ namespace TechZone.Domain.Interfaces
         Task AddAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);
         void Update(T entity);
+        public void SaveInclude(T entity, params string[] includedProperties);
         void Delete(T entity);
         void DeleteRange(IEnumerable<T> entities);
 

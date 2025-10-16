@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TechZone.Features.Profile.Endpoints
+namespace TechZoneV1.Features.Profile.GetUserProfile.Endpoints
 {
     public static class GetProfileEndpoint
     {
