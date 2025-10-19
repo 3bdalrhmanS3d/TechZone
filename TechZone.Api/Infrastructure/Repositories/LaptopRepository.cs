@@ -146,10 +146,9 @@ namespace TechZone.Infrastructure.Repositories
             var page = paginationParams.Page;
             var size = paginationParams.PageSize;
 
-            var pageItems = await projected
+            var pageItems = projected
                 .Skip((page - 1) * size)
-                .Take(size)
-                .ToListAsync();
+                .Take(size);
 
             // Post-processing
             var rnd = new Random();
@@ -172,7 +171,7 @@ namespace TechZone.Infrastructure.Repositories
                 PriceRange = x.MinPrice == x.MaxPrice ?
                     $"{x.MinPrice:C}" :
                     $"{x.MinPrice:C} - {x.MaxPrice:C}"
-            }).ToList();
+            });
 
             return new PagedResult<LaptopResponseDTO>(items, totalCount, page, size);
         }

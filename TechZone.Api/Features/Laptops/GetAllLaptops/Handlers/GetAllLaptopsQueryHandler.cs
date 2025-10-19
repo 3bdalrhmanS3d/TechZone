@@ -8,10 +8,11 @@ using TechZone.Domain.PagedResult;
 using TechZone.Domain.ServiceResponse;
 using TechZoneV1.Features.Laptops.GetAllLaptops.Dtos;
 using TechZoneV1.Features.Laptops.GetAllLaptops.Queries;
+using TechZoneV1.Features.Shared;
 
 namespace TechZoneV1.Features.Laptops.GetAllLaptops.Handlers
 {
-    public class GetAllLaptopsQueryHandler : IRequestHandler<GetAllLaptopsQuery, ServiceResponse<PagedResult<LaptopsDto>>>
+    public class GetAllLaptopsQueryHandler : IRequestHandler<GetAllLaptopsQuery, RequestResponse<PagedResult<LaptopsDto>>>
     {
         private readonly IBaseRepository<Laptop> _laptopRepository;
 
@@ -20,7 +21,7 @@ namespace TechZoneV1.Features.Laptops.GetAllLaptops.Handlers
             _laptopRepository = laptopRepository;
         }
 
-        public async Task<ServiceResponse<PagedResult<LaptopsDto>>> Handle(GetAllLaptopsQuery request, CancellationToken cancellationToken)
+        public async Task<RequestResponse<PagedResult<LaptopsDto>>> Handle(GetAllLaptopsQuery request, CancellationToken cancellationToken)
         {
             // Single query with explicit joins and projection
             var laptopsDto = await _laptopRepository.GetAll()
@@ -96,7 +97,7 @@ namespace TechZoneV1.Features.Laptops.GetAllLaptops.Handlers
 
             if (!laptopsDto.Any())
             {
-                return ServiceResponse<PagedResult<LaptopsDto>>.NotFoundResponse();
+                return RequestResponse<PagedResult<LaptopsDto>>.Fail();
             }
             var pagedResult = new PagedResult<LaptopsDto>
             (
@@ -105,7 +106,7 @@ namespace TechZoneV1.Features.Laptops.GetAllLaptops.Handlers
                 1,
                 1
             );
-            return ServiceResponse<PagedResult<LaptopsDto>>.SuccessResponse(pagedResult, "","");
+            return RequestResponse<PagedResult<LaptopsDto>>.Success(pagedResult);
         }
     }
 }

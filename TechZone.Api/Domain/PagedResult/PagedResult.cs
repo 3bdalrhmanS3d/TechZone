@@ -78,7 +78,7 @@ namespace TechZone.Domain.PagedResult
             TotalPages = totalCount > 0 ? (int)Math.Ceiling(totalCount / (double)pageSize) : 0;
         }
 
-        public static PagedResult<T> Create(IEnumerable<T> source, int page, int pageSize)
+        public static PagedResult<T> Create(IQueryable<T> source, int page, int pageSize)
         {
             var totalCount = source.Count();
             var items = source.Skip((page - 1) * pageSize).Take(pageSize);
@@ -102,7 +102,7 @@ namespace TechZone.Domain.PagedResult
         public SortInfo? SortInfo { get; }
 
         public PagedResultWithMetadata(
-            IEnumerable<T> items,
+            IQueryable<T> items,
             int totalCount,
             int page,
             int pageSize,

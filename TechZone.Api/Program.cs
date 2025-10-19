@@ -24,6 +24,8 @@ using TechZoneV1.Features.Category.ChangeCategoryName.Endpoints;
 using TechZoneV1.Features.Laptops.GetAllLaptops.Endpoints;
 using TechZoneV1.Features.Profile.EditUserProfile.Endpoints;
 using TechZoneV1.Features.Profile.GetUserProfile.Endpoints;
+using Mapster;
+using MapsterMapper;
 
 namespace TechZone
 {
@@ -90,6 +92,13 @@ namespace TechZone
 
                 // Background Services
                 builder.Services.AddHostedService<EmailBackgroundService>();
+                // 1️⃣ أنشئ config أساسي
+                var config = TypeAdapterConfig.GlobalSettings;
+                builder.Services.AddSingleton(config);
+
+                // 2️⃣ سجل المابر نفسه
+                builder.Services.AddScoped<IMapper, ServiceMapper>();
+
 
                 // Identity Configuration
                 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TechZone.Domain.DTOs.Brand;
 using TechZone.Domain.Entities;
+using TechZone.Domain.Interfaces;
 using TechZone.Domain.PagedResult;
 using TechZone.Domain.Service.Interfaces;
 using TechZone.Domain.ServiceResponse;
@@ -14,14 +15,20 @@ namespace TechZone.Shared.Service.Implementations
 {
     public class BrandService : IBrandService
     {
-        private readonly ApplicationDbContext _db;
+        //private readonly ApplicationDbContext _db;
+        private readonly IBaseRepository<Brand> _brandRepository;
         private readonly ILogger<BrandService> _logger;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly Cloudinary? _cloudinary;
 
-        public BrandService(ApplicationDbContext db, ILogger<BrandService> logger)
+        public BrandService(ApplicationDbContext db, ILogger<BrandService> logger,
+            IBaseRepository<Brand> brandRepository,
+            IUnitOfWork unitOfWork
+            )
         {
-            _db = db;
             _logger = logger;
+            _brandRepository = brandRepository;
+            _unitOfWork = unitOfWork;
 
             var cloudUrl = Environment.GetEnvironmentVariable("CLOUDINARY_URL");
             if (!string.IsNullOrWhiteSpace(cloudUrl))
@@ -35,7 +42,7 @@ namespace TechZone.Shared.Service.Implementations
         {
             try
             {
-                var query = _db.Brands.AsNoTracking();
+                var query = _brandRepository.GetAll();
 
                 if (!string.IsNullOrWhiteSpace(request.Search))
                 {
@@ -59,7 +66,7 @@ namespace TechZone.Shared.Service.Implementations
                 int total = await query.CountAsync(ct);
                 int skip = (request.Page <= 1 ? 0 : (request.Page - 1) * request.PageSize);
 
-                var items = await query.Skip(skip).Take(request.PageSize)
+                var items =  query.Skip(skip).Take(request.PageSize)
                     .Select(b => new BrandDto
                     {
                         Id = b.Id,
@@ -67,8 +74,7 @@ namespace TechZone.Shared.Service.Implementations
                         Country = b.Country ?? string.Empty,
                         LogoUrl = b.LogoUrl ?? string.Empty,
                         Description = b.Description ?? string.Empty
-                    })
-                    .ToListAsync(ct);
+                    });
 
                 var page = new PagedResult<BrandDto>(items, total, request.Page, request.PageSize);
                 return ServiceResponse<PagedResult<BrandDto>>.SuccessResponse(page, "Fetched successfully", "تم الجلب بنجاح");
@@ -84,7 +90,8 @@ namespace TechZone.Shared.Service.Implementations
         {
             try
             {
-                var dto = await _db.Brands.AsNoTracking()
+                var dto = await
+                _brandRepository.GetAll()
                     .Where(b => b.Id == id)
                     .Select(b => new BrandDto
                     {
@@ -122,7 +129,7 @@ namespace TechZone.Shared.Service.Implementations
                 if (!IsImage(dto.Image))
                     return ServiceResponse<BrandDto>.ErrorResponse("Only image files are allowed", "يُسمح بملفات الصور فقط", 400);
 
-                bool exists = await _db.Brands.AnyAsync(b => b.Name.ToLower() == name.ToLower(), ct);
+                bool exists = await _brandRepository.GetAll().AnyAsync(b => b.Name.ToLower() == name.ToLower(), ct);
                 if (exists)
                     return ServiceResponse<BrandDto>.ConflictResponse($"Brand with name '{name}' already exists.", "اسم الماركة مستخدم بالفعل");
 
@@ -138,8 +145,8 @@ namespace TechZone.Shared.Service.Implementations
                     Description = dto.Description?.Trim() ?? string.Empty
                 };
 
-                await _db.Brands.AddAsync(entity, ct);
-                await _db.SaveChangesAsync(ct);
+                await _brandRepository.AddAsync(entity);
+                await _unitOfWork.SaveChangesAsync();
 
                 var result = new BrandDto
                 {
@@ -170,7 +177,7 @@ namespace TechZone.Shared.Service.Implementations
         {
             try
             {
-                var entity = await _db.Brands.FirstOrDefaultAsync(b => b.Id == id, ct);
+                var entity = await _brandRepository.FirstOrDefaultAsync(b => b.Id == id);
                 if (entity == null)
                     return ServiceResponse<object>.NotFoundResponse("Brand not found", "الماركة غير موجودة");
 
@@ -178,8 +185,8 @@ namespace TechZone.Shared.Service.Implementations
                 if (string.IsNullOrWhiteSpace(newName))
                     return ServiceResponse<object>.ErrorResponse("Name is required", "الاسم مطلوب", 400);
 
-                bool nameTaken = await _db.Brands.AnyAsync(b => b.Id != id && b.Name.ToLower() == newName.ToLower(), ct);
-                if (nameTaken)
+                var nameTaken = _brandRepository.GetAll().Where(b => b.Id != id && b.Name.ToLower() == newName.ToLower());
+                if (nameTaken.Any())
                     return ServiceResponse<object>.ConflictResponse($"Brand with name '{newName}' already exists.", "اسم الماركة مستخدم بالفعل");
 
                 entity.Name = newName;
@@ -203,7 +210,7 @@ namespace TechZone.Shared.Service.Implementations
                     entity.LogoUrl = newUrl;
                 }
 
-                await _db.SaveChangesAsync(ct);
+                await _unitOfWork.SaveChangesAsync();
                 return ServiceResponse<object>.SuccessResponse(null, "Updated", "تم التحديث");
             }
             catch (DbUpdateException ex)
@@ -222,16 +229,16 @@ namespace TechZone.Shared.Service.Implementations
         {
             try
             {
-                var entity = await _db.Brands.FirstOrDefaultAsync(b => b.Id == id, ct);
+                var entity = await _brandRepository.FirstOrDefaultAsync(b => b.Id == id);
                 if (entity == null)
                     return ServiceResponse<object>.NotFoundResponse("Brand not found", "الماركة غير موجودة");
 
-                bool inUse = await _db.Laptops.AnyAsync(l => l.BrandId == id, ct);
+                bool inUse = _brandRepository.GetAll().Where(l => l.Id == id).Any();
                 if (inUse)
                     return ServiceResponse<object>.ConflictResponse("Cannot delete brand because it has related laptops.", "لا يمكن حذف الماركة لوجود لابتوبات مرتبطة بها");
 
-                _db.Brands.Remove(entity);
-                await _db.SaveChangesAsync(ct);
+                _brandRepository.Delete(entity);
+                await _unitOfWork.SaveChangesAsync();
 
                 return ServiceResponse<object>.SuccessResponse(null, "Deleted", "تم الحذف");
             }
@@ -251,7 +258,7 @@ namespace TechZone.Shared.Service.Implementations
         {
             try
             {
-                var data = await _db.Brands.AsNoTracking()
+                var data =await _brandRepository.GetAll()
                     .OrderBy(b => b.Name)
                     .Select(b => new BrandWithCountDto
                     {

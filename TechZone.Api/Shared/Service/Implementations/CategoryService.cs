@@ -59,7 +59,7 @@ namespace TechZone.Shared.Service.Implementations
                 int total = await query.CountAsync(ct);
                 int skip = (request.Page <= 1 ? 0 : (request.Page - 1) * request.PageSize);
 
-                var items = await query.Skip(skip).Take(request.PageSize)
+                var items = query.Skip(skip).Take(request.PageSize)
                     .Select(c => new CategoryDto
                     {
                         Id = c.Id,
@@ -67,7 +67,7 @@ namespace TechZone.Shared.Service.Implementations
                         Description = c.Description ?? string.Empty,
                         CategoryImageUrl = c.ImageUrl ?? string.Empty
                     })
-                    .ToListAsync(ct);
+                    ;
 
                 var page = new PagedResult<CategoryDto>(items, total, request.Page, request.PageSize);
                 return ServiceResponse<PagedResult<CategoryDto>>.SuccessResponse(page, "Fetched successfully", "تم الجلب بنجاح");
