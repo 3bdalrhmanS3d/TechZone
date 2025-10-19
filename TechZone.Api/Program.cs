@@ -131,25 +131,25 @@ namespace TechZone
                 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 {
                     // Try to read DATABASE_URL from Railway
-                    //var dbUrl = null as string;
-                    //"postgresql://postgres:GRgpDWQqsyUjfpcfZCYCvcmGiHCUTbGt@switchyard.proxy.rlwy.net:46456/railway";
+                    var dbUrl = null as string;
+                    dbUrl = "postgresql://postgres:GRgpDWQqsyUjfpcfZCYCvcmGiHCUTbGt@switchyard.proxy.rlwy.net:46456/railway";
                     string connectionString;
 
-                    //if (!string.IsNullOrEmpty(dbUrl))
-                    //{
-                    //    // Convert postgres://... into Npgsql connection string
-                    //    var uri = new Uri(dbUrl);
-                    //    var userInfo = uri.UserInfo.Split(':');
+                if (!string.IsNullOrEmpty(dbUrl))
+                {
+                    // Convert postgres://... into Npgsql connection string
+                    var uri = new Uri(dbUrl);
+                    var userInfo = uri.UserInfo.Split(':');
 
-                    //    connectionString =
-                    //        $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};" +
-                    //        $"Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
-                    //}
-                    //else
-               //     {
-                        // Local fallback (from appsettings.json)
-                        connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-                    //       }
+                    connectionString =
+                        $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};" +
+                        $"Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+                }
+                else
+                {
+                    //Local fallback(from appsettings.json)
+                    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                         }
 
                     options.UseNpgsql(connectionString, npgsqlOptions =>
                     {
