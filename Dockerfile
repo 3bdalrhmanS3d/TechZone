@@ -8,7 +8,7 @@ WORKDIR /src
  COPY TechZoneV1/TechZoneV1.csproj TechZoneV1/
 
 # Restore dependencies
-RUN dotnet restore TechZone.Api/TechZone.Api.csproj
+RUN dotnet restore TechZoneV1/TechZoneV1.csproj
 
 # Copy everything else
 COPY . .
