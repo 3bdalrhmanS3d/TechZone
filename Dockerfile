@@ -1,33 +1,36 @@
-﻿# Stage 1: Build
+﻿# =========================
+# Stage 1: Build
+# =========================
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy csproj files first (better caching of restore step)
-# COPY TechZone.Core/TechZone.Core.csproj TechZone.Core/
-# COPY TechZone.EF/TechZone.EF.csproj TechZone.EF/
- COPY TechZone.Api/TechZone.Api.csproj TechZone.Api/
+# Copy only the csproj first (for better caching)
+COPY TechZoneV1/TechZoneV1.csproj TechZoneV1/
 
 # Restore dependencies
-RUN dotnet restore TechZone/TechZone.csproj
+RUN dotnet restore TechZoneV1/TechZoneV1.csproj
 
-# Copy everything else
+# Copy the rest of the source code
 COPY . .
 
-# Build and publish API project
-RUN dotnet publish TechZone/TechZone.csproj -c Release -o /app/publish
+# Build and publish the app
+RUN dotnet publish TechZoneV1/TechZoneV1.csproj -c Release -o /app/publish
 
+
+# =========================
 # Stage 2: Runtime
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# =========================
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
-# Copy published output
+# Copy published files from build stage
 COPY --from=build /app/publish .
 
 # Railway provides PORT → bind to it
 ENV ASPNETCORE_URLS=http://+:${PORT}
 
-# Optional: Default connection string (overwritten by Railway env)
-# If using Railway SQL Server plugin, Railway injects RAILWAY_TCP_* env vars
+# Optional: Default connection string (Railway overrides it)
 ENV ConnectionStrings__DefaultConnection="Server=${RAILWAY_TCP_HOST},${RAILWAY_TCP_PORT};Database=mydb;User Id=${RAILWAY_TCP_USER};Password=${RAILWAY_TCP_PASSWORD};TrustServerCertificate=True;"
 
-ENTRYPOINT ["dotnet", "TechZone.dll"]
+# Run the app
+ENTRYPOINT ["dotnet", "TechZoneV1.dll"]

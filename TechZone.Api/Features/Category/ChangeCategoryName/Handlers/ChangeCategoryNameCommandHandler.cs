@@ -19,7 +19,7 @@ namespace TechZoneV1.Features.Category.ChangeCategoryName.Handlers
         }
         public async Task<ServiceResponse<ChangeCategoryNameResponseDto>> Handle(ChangeCategoryNameCommand request, CancellationToken cancellationToken)
         {
-            //var category = await _categoryRepository.GetByIdAsync(request.RequestDto.Id);
+            //var categorytst = await _categoryRepository.GetByIdAsync(request.RequestDto.Id);
             //if (category == null)
             //{
             //    return ServiceResponse<ChangeCategoryNameResponseDto>.NotFoundResponse();

@@ -121,70 +121,70 @@ namespace TechZone.Infrastructure.Repositories
         }
         public void SaveInclude(T entity, params string[] includedProperties)
         {
-            // شوف هل فيه كيان متتبع بنفس الـ Id
-            var localEntity = _dbSet.Local.FirstOrDefault(e => e.Id == entity.Id);
+            var LocalEntity = _dbSet.Local.FirstOrDefault(e => e.Id == entity.Id);
             EntityEntry entry;
 
-            if (localEntity == null)
+            if (LocalEntity == null)
             {
-                // لو مش متتبع، اربطه بالـ context
-                _dbSet.Attach(entity);
+                //_dbSet.Attach(entity);
                 entry = _context.Entry(entity);
             }
             else
             {
-                // لو فيه كيان متتبع بالفعل، اشتغل عليه
-                entry = _context.Entry(localEntity);
-
-                // وحدث القيم اللي جايه من الكيان الجديد
-                _context.Entry(localEntity).CurrentValues.SetValues(entity);
+                entry = _context.ChangeTracker.Entries<T>().First(e => e.Entity.Id == entity.Id);
             }
 
-            // حدد الخصائص اللي عايز تحدثها بس
             foreach (var property in entry.Properties)
             {
                 if (property.Metadata.IsPrimaryKey())
                     continue;
+                else
+                {
+                    if (includedProperties.Contains(property.Metadata.Name))
+                    {
+                        property.IsModified = true;
+                    }
+                    else
+                    {
+                        property.IsModified = false;
+                    }
+                }
 
-                property.IsModified = includedProperties.Contains(property.Metadata.Name);
             }
+
         }
-        #region oldsaveInclude
+
+        #region oldsaveInclude_withtracking
         //public void SaveInclude(T entity, params string[] includedProperties)
         //{
-        //    var LocalEntity = _dbSet.Local.FirstOrDefault(e => e.Id == entity.Id);
+        //    // شوف هل فيه كيان متتبع بنفس الـ Id
+        //    var localEntity = _dbSet.Local.FirstOrDefault(e => e.Id == entity.Id);
         //    EntityEntry entry;
 
-        //    if (LocalEntity == null)
+        //    if (localEntity == null)
         //    {
-        //        //_dbSet.Attach(entity);
+        //        // لو مش متتبع، اربطه بالـ context
+        //        _dbSet.Attach(entity);
         //        entry = _context.Entry(entity);
         //    }
         //    else
         //    {
-        //        entry = _context.ChangeTracker.Entries<T>().First(e => e.Entity.Id == entity.Id);
+        //        // لو فيه كيان متتبع بالفعل، اشتغل عليه
+        //        entry = _context.Entry(localEntity);
+
+        //        // وحدث القيم اللي جايه من الكيان الجديد
+        //        _context.Entry(localEntity).CurrentValues.SetValues(entity);
         //    }
 
+        //    // حدد الخصائص اللي عايز تحدثها بس
         //    foreach (var property in entry.Properties)
         //    {
         //        if (property.Metadata.IsPrimaryKey())
         //            continue;
-        //        else
-        //        {
-        //            if (includedProperties.Contains(property.Metadata.Name))
-        //            {
-        //                property.IsModified = true;
-        //            }
-        //            else
-        //            {
-        //                property.IsModified = false;
-        //            }
-        //        }
 
+        //        property.IsModified = includedProperties.Contains(property.Metadata.Name);
         //    }
-
         //}
-
         #endregion
         public void Delete(T entity)
         {
