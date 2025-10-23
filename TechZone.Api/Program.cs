@@ -26,6 +26,7 @@ using TechZoneV1.Features.Profile.EditUserProfile.Endpoints;
 using TechZoneV1.Features.Profile.GetUserProfile.Endpoints;
 using Mapster;
 using MapsterMapper;
+using TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Endpoints;
 
 namespace TechZone
 {
@@ -94,9 +95,11 @@ namespace TechZone
                 builder.Services.AddHostedService<EmailBackgroundService>();
                 // 1️⃣ أنشئ config أساسي
                 var config = TypeAdapterConfig.GlobalSettings;
-                builder.Services.AddSingleton(config);
 
-                // 2️⃣ سجل المابر نفسه
+                // mapster configuration
+                TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
+                builder.Services.AddSingleton(config);
+                builder.Services.AddMapster();
                 builder.Services.AddScoped<IMapper, ServiceMapper>();
 
 
@@ -132,7 +135,7 @@ namespace TechZone
                 {
                     // Try to read DATABASE_URL from Railway
                     var dbUrl = null as string;
-                    dbUrl = "postgresql://postgres:GRgpDWQqsyUjfpcfZCYCvcmGiHCUTbGt@switchyard.proxy.rlwy.net:46456/railway";
+                    //dbUrl = "postgresql://postgres:GRgpDWQqsyUjfpcfZCYCvcmGiHCUTbGt@switchyard.proxy.rlwy.net:46456/railway";
                     string connectionString;
 
                 if (!string.IsNullOrEmpty(dbUrl))
@@ -394,6 +397,7 @@ namespace TechZone
                     await next();
                 });
                 app.MapProfileEndpoint();
+                app.MapGetRecommendedLaptopVariantsEndpoint();
                 app.MapGetAllLaptopEndpoint();
                 app.MapChangeCategoryNameEndpoint();
                 app.MapEditEndpoint();

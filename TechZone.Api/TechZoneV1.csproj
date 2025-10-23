@@ -48,12 +48,19 @@
     <Folder Include="Features\Category\GetAll\" />
     <Folder Include="Features\Category\GetDetailedInfo\" />
     <Folder Include="Features\Category\Update\" />
-    <Folder Include="Features\Laptops\AddLaptop\" />
+    <Folder Include="Features\Laptops\GetAllLaptops1\Commands\" />
+    <Folder Include="Features\Laptops\GetAllLaptops\" />
     <Folder Include="Features\Laptops\DeleteLaptop\" />
-    <Folder Include="Features\Laptops\GetAllLaptops\Commands\" />
-    <Folder Include="Features\Laptops\GetDetailedLaptopInfo\" />
     <Folder Include="Features\Laptops\UpdateLaptop\" />
-    <Folder Include="Features\Laptopvariant\" />
+    <Folder Include="Features\Laptopvariant\FilterVariants\" />
+    <Folder Include="Features\Laptopvariant\GetVariantById\" />
+    <Folder Include="Features\Laptopvariant\GetVariantsByLaptopId\" />
+    <Folder Include="Features\Laptopvariant\CreateVariant\" />
+    <Folder Include="Features\Laptopvariant\DeleteVariant\" />
+    <Folder Include="Features\Laptopvariant\GetPriceHistory\" />
+    <Folder Include="Features\Laptopvariant\BulkUpdateStock\" />
+    <Folder Include="Features\Laptopvariant\UpdateStock\" />
+    <Folder Include="Features\Laptopvariant\UpdateVariant\" />
   </ItemGroup>
 
 </Project>
