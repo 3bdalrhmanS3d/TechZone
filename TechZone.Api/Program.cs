@@ -1,6 +1,8 @@
 ﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using dotenv.net;
+using Mapster;
+using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -22,11 +24,10 @@ using TechZone.Shared.Data;
 using TechZone.Shared.Service.Implementations;
 using TechZoneV1.Features.Category.ChangeCategoryName.Endpoints;
 using TechZoneV1.Features.Laptops.GetAllLaptops.Endpoints;
+using TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Endpoints;
+using TechZoneV1.Features.LaptopVariant.FilterVariants.Endpoints;
 using TechZoneV1.Features.Profile.EditUserProfile.Endpoints;
 using TechZoneV1.Features.Profile.GetUserProfile.Endpoints;
-using Mapster;
-using MapsterMapper;
-using TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Endpoints;
 
 namespace TechZone
 {
@@ -398,6 +399,7 @@ namespace TechZone
                 });
                 app.MapProfileEndpoint();
                 app.MapGetRecommendedLaptopVariantsEndpoint();
+                app.MapFilterLaptopVariantsEndpoint();
                 app.MapGetAllLaptopEndpoint();
                 app.MapChangeCategoryNameEndpoint();
                 app.MapEditEndpoint();

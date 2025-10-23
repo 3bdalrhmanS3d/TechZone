@@ -52,7 +52,6 @@
     <Folder Include="Features\Laptops\GetAllLaptops\" />
     <Folder Include="Features\Laptops\DeleteLaptop\" />
     <Folder Include="Features\Laptops\UpdateLaptop\" />
-    <Folder Include="Features\Laptopvariant\FilterVariants\" />
     <Folder Include="Features\Laptopvariant\GetVariantById\" />
     <Folder Include="Features\Laptopvariant\GetVariantsByLaptopId\" />
     <Folder Include="Features\Laptopvariant\CreateVariant\" />

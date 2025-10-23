@@ -4,19 +4,19 @@ using TechZone.Domain.Entities;
 using TechZone.Domain.Interfaces;
 using TechZone.Domain.PagedResult;
 using TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Dtos;
-using TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Queries;
 using TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.ViewModels;
+using TechZoneV1.Features.LaptopVariant.FilterVariants.Queries;
 using TechZoneV1.Features.Shared;
 
-namespace TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Handlers
+namespace TechZoneV1.Features.LaptopVariant.FilterVariants.Handlers
 {
-    public class GetRecommendedLaptopVariantsQueryHandler : IRequestHandler<GetRecommendedLaptopVariantsQuery, RequestResponse<PagedResult<RecommendedLaptopVariantViewModel>>>
+    public class FilterLaptopVariantsQueryHandler : IRequestHandler<FilterLaptopVariantsQuery, RequestResponse<PagedResult<RecommendedLaptopVariantViewModel>>>
     {
         private readonly IBaseRepository<TechZone.Domain.Entities.LaptopVariant> _laptopVariantRepository;
         private readonly IBaseRepository<ProductDiscount> _productDiscountRepository;
         private readonly IBaseRepository<Discount> _discountRepository;
 
-        public GetRecommendedLaptopVariantsQueryHandler(
+        public FilterLaptopVariantsQueryHandler(
             IBaseRepository<TechZone.Domain.Entities.LaptopVariant> laptopVariantRepository,
             IBaseRepository<ProductDiscount> productDiscountRepository,
             IBaseRepository<Discount> discountRepository)
@@ -27,7 +27,7 @@ namespace TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Handlers
         }
 
         public async Task<RequestResponse<PagedResult<RecommendedLaptopVariantViewModel>>> Handle(
-            GetRecommendedLaptopVariantsQuery request,
+            FilterLaptopVariantsQuery request,
             CancellationToken cancellationToken)
         {
             try
@@ -69,14 +69,81 @@ namespace TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Handlers
                         lv.Laptop.Brand.Name.Contains(queryDto.Search));
                 }
 
-                if (queryDto.CategoryId.HasValue)
+                // Brand filter
+                if (queryDto.BrandIds != null && queryDto.BrandIds.Any())
                 {
-                    baseQuery = baseQuery.Where(lv => lv.Laptop.CategoryId == queryDto.CategoryId.Value);
+                    baseQuery = baseQuery.Where(lv => queryDto.BrandIds.Contains(lv.Laptop.BrandId));
                 }
 
-                if (queryDto.BrandId.HasValue)
+                // Category filter
+                if (queryDto.CategoryIds != null && queryDto.CategoryIds.Any())
                 {
-                    baseQuery = baseQuery.Where(lv => lv.Laptop.BrandId == queryDto.BrandId.Value);
+                    baseQuery = baseQuery.Where(lv => queryDto.CategoryIds.Contains(lv.Laptop.CategoryId));
+                }
+
+                // Price range filter
+                if (queryDto.MinPrice.HasValue)
+                {
+                    baseQuery = baseQuery.Where(lv => lv.CurrentPrice >= queryDto.MinPrice.Value);
+                }
+
+                if (queryDto.MaxPrice.HasValue)
+                {
+                    baseQuery = baseQuery.Where(lv => lv.CurrentPrice <= queryDto.MaxPrice.Value);
+                }
+
+                // Processor filter
+                if (!string.IsNullOrEmpty(queryDto.Processor))
+                {
+                    baseQuery = baseQuery.Where(lv => lv.Laptop.Processor.Contains(queryDto.Processor));
+                }
+
+                // RAM filter
+                if (queryDto.Ram != null && queryDto.Ram.Any())
+                {
+                    baseQuery = baseQuery.Where(lv => queryDto.Ram.Contains(lv.RAM));
+                }
+
+                // Storage filter
+                if (queryDto.Storage != null && queryDto.Storage.Any())
+                {
+                    baseQuery = baseQuery.Where(lv => queryDto.Storage.Contains(lv.StorageCapacityGB));
+                }
+
+                // Storage Type filter
+                if (!string.IsNullOrEmpty(queryDto.StorageType))
+                {
+                    baseQuery = baseQuery.Where(lv => lv.StorageType == queryDto.StorageType);
+                }
+
+                // Screen Size filter
+                if (queryDto.ScreenSize != null && queryDto.ScreenSize.Any())
+                {
+                    baseQuery = baseQuery.Where(lv => queryDto.ScreenSize.Contains(lv.Laptop.ScreenSize));
+                }
+
+                // Camera filter
+                if (queryDto.HasCamera.HasValue)
+                {
+                    baseQuery = baseQuery.Where(lv => lv.Laptop.HasCamera == queryDto.HasCamera.Value);
+                }
+
+                // Touch Screen filter
+                if (queryDto.HasTouchScreen.HasValue)
+                {
+                    baseQuery = baseQuery.Where(lv => lv.Laptop.HasTouchScreen == queryDto.HasTouchScreen.Value);
+                }
+
+                // In Stock filter
+                if (queryDto.InStock.HasValue && queryDto.InStock.Value)
+                {
+                    baseQuery = baseQuery.Where(lv => (lv.StockQuantity - lv.ReservedQuantity) > 0);
+                }
+
+                // Release Year filter
+                if (queryDto.ReleaseYear.HasValue)
+                {
+                    baseQuery = baseQuery.Where(lv => lv.Laptop.ReleaseYear == queryDto.ReleaseYear.Value);
                 }
 
                 // Apply sorting
@@ -108,8 +175,8 @@ namespace TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Handlers
                 if (!laptopVariants.Any())
                 {
                     return RequestResponse<PagedResult<RecommendedLaptopVariantViewModel>>.Fail(
-                        "No recommended laptop variants found",
-                        "لم يتم العثور على أنواع اللابتوب الموصى بها"
+                        "No laptop variants found matching the criteria",
+                        "لم يتم العثور على أنواع اللابتوب التي تطابق المعايير"
                     );
                 }
 
@@ -130,7 +197,7 @@ namespace TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Handlers
                     var (originalPrice, discountPercentage, discountAmount) =
                         CalculatePricing(lv, activeDiscount);
 
-                    return new RecommendedLaptopVariantViewModel
+                    var viewModel = new RecommendedLaptopVariantViewModel
                     {
                         Id = lv.Id,
                         Sku = lv.SKU,
@@ -180,7 +247,30 @@ namespace TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Handlers
                         DiscountPercentage = discountPercentage,
                         DiscountAmount = discountAmount
                     };
-                }).ToList();
+
+                    // Apply hasDiscount filter after mapping
+                    if (queryDto.HasDiscount.HasValue && queryDto.HasDiscount.Value)
+                    {
+                        return discountPercentage > 0 ? viewModel : null;
+                    }
+
+                    return viewModel;
+
+                }).Where(x => x != null).ToList();
+
+                // Apply minRating filter after mapping (since it depends on calculated average rating)
+                if (queryDto.MinRating.HasValue)
+                {
+                    items = items.Where(item => (decimal)item.AverageRating >= queryDto.MinRating.Value).ToList();
+                }
+
+                if (!items.Any())
+                {
+                    return RequestResponse<PagedResult<RecommendedLaptopVariantViewModel>>.Fail(
+                        "No laptop variants found matching the criteria",
+                        "لم يتم العثور على أنواع اللابتوب التي تطابق المعايير"
+                    );
+                }
 
                 var pagedResult = new PagedResult<RecommendedLaptopVariantViewModel>(
                     items,
@@ -191,16 +281,16 @@ namespace TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Handlers
 
                 return RequestResponse<PagedResult<RecommendedLaptopVariantViewModel>>.Success(
                     pagedResult,
-                    "Recommended laptop variants fetched successfully",
-                    "تم جلب أنواع اللابتوب الموصى بها بنجاح"
+                    "Laptop variants filtered successfully",
+                    "تم تصفية أنواع اللابتوب بنجاح"
                 );
             }
             catch (Exception ex)
             {
                 // Log exception here
                 return RequestResponse<PagedResult<RecommendedLaptopVariantViewModel>>.Fail(
-                    "An error occurred while fetching recommended laptop variants",
-                    "حدث خطأ أثناء جلب أنواع اللابتوب الموصى بها"
+                    "An error occurred while filtering laptop variants",
+                    "حدث خطأ أثناء تصفية أنواع اللابتوب"
                 );
             }
         }
@@ -227,11 +317,8 @@ namespace TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Handlers
                 // Calculate the original price based on discount type
                 if (activeDiscount.DiscountType == DiscountType.Percentage)
                 {
-                    // For percentage discount, calculate what the original price would be
-                    // currentPrice = originalPrice * (1 - discountPercentage/100)
-                    // So: originalPrice = currentPrice / (1 - discountPercentage/100)
                     var discountRate = activeDiscount.Value / 100m;
-                    if (discountRate < 1) // Avoid division by zero and invalid rates
+                    if (discountRate < 1)
                     {
                         originalPrice = variant.CurrentPrice / (1 - discountRate);
                         discountAmount = originalPrice - variant.CurrentPrice;
@@ -240,7 +327,6 @@ namespace TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Handlers
                 }
                 else // FixedAmount
                 {
-                    // For fixed amount discount: originalPrice = currentPrice + discountAmount
                     discountAmount = activeDiscount.Value;
                     originalPrice = variant.CurrentPrice + discountAmount;
                     if (originalPrice > 0)
@@ -249,7 +335,7 @@ namespace TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Handlers
                     }
                 }
 
-                // Apply max discount amount constraint if applicable
+                // Apply max discount amount constraint
                 if (activeDiscount.MaxDiscountAmount > 0 && discountAmount > activeDiscount.MaxDiscountAmount)
                 {
                     discountAmount = activeDiscount.MaxDiscountAmount;
@@ -262,7 +348,7 @@ namespace TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Handlers
             }
             else
             {
-                // No active discount, check price history for recent price changes
+                // Check price history for recent price changes
                 var lastPriceChange = variant.PriceHistories
                     .OrderByDescending(ph => ph.EffectiveFrom)
                     .FirstOrDefault();
