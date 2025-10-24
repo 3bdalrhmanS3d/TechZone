@@ -54,7 +54,6 @@
     <Folder Include="Features\Laptops\UpdateLaptop\" />
     <Folder Include="Features\Laptopvariant\GetPriceHistory\" />
     <Folder Include="Features\Laptopvariant\BulkUpdateStock\" />
-    <Folder Include="Features\Laptopvariant\UpdateStock\" />
   </ItemGroup>
 
 </Project>
