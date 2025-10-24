@@ -34,8 +34,6 @@ namespace TechZone.Infrastructure.Repositories
                 query = query.Include(include);
             }
 
-            // This assumes your entities have an "Id" property
-            // You might need to adjust this based on your actual primary key
             return await query.FirstOrDefaultAsync(e => Microsoft.EntityFrameworkCore.EF.Property<int>(e, "Id") == id);
         }
 
@@ -119,6 +117,7 @@ namespace TechZone.Infrastructure.Repositories
         {
             _dbSet.Update(entity);
         }
+
         public void SaveInclude(T entity, params string[] includedProperties)
         {
             var LocalEntity = _dbSet.Local.FirstOrDefault(e => e.Id == entity.Id);
@@ -126,7 +125,6 @@ namespace TechZone.Infrastructure.Repositories
 
             if (LocalEntity == null)
             {
-                //_dbSet.Attach(entity);
                 entry = _context.Entry(entity);
             }
             else
@@ -149,51 +147,38 @@ namespace TechZone.Infrastructure.Repositories
                         property.IsModified = false;
                     }
                 }
-
             }
-
         }
 
-        #region oldsaveInclude_withtracking
-        //public void SaveInclude(T entity, params string[] includedProperties)
-        //{
-        //    // شوف هل فيه كيان متتبع بنفس الـ Id
-        //    var localEntity = _dbSet.Local.FirstOrDefault(e => e.Id == entity.Id);
-        //    EntityEntry entry;
-
-        //    if (localEntity == null)
-        //    {
-        //        // لو مش متتبع، اربطه بالـ context
-        //        _dbSet.Attach(entity);
-        //        entry = _context.Entry(entity);
-        //    }
-        //    else
-        //    {
-        //        // لو فيه كيان متتبع بالفعل، اشتغل عليه
-        //        entry = _context.Entry(localEntity);
-
-        //        // وحدث القيم اللي جايه من الكيان الجديد
-        //        _context.Entry(localEntity).CurrentValues.SetValues(entity);
-        //    }
-
-        //    // حدد الخصائص اللي عايز تحدثها بس
-        //    foreach (var property in entry.Properties)
-        //    {
-        //        if (property.Metadata.IsPrimaryKey())
-        //            continue;
-
-        //        property.IsModified = includedProperties.Contains(property.Metadata.Name);
-        //    }
-        //}
-        #endregion
+        // Soft Delete - marks as deleted but keeps in database
         public void Delete(T entity)
+        {
+            _dbSet.Attach(entity);
+            entity.IsDeleted = true;
+            entity.DeletedAt = DateTime.UtcNow;
+
+            // Mark the entity as modified so EF will update it
+            _context.Entry(entity).State = EntityState.Modified;
+        }
+
+        // Hard Delete - physically removes from database
+        public void HardDelete(T entity)
         {
             _dbSet.Remove(entity);
         }
 
+        // New method to save changes from repository level
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return await _context.SaveChangesAsync(cancellationToken);
+        }
+
         public void DeleteRange(IEnumerable<T> entities)
         {
-            _dbSet.RemoveRange(entities);
+            foreach (var entity in entities)
+            {
+                Delete(entity); // Use soft delete for range as well
+            }
         }
 
         public async Task<int> CountAsync(Expression<Func<T, bool>>? criteria = null)
@@ -230,7 +215,7 @@ namespace TechZone.Infrastructure.Repositories
 
         public Task DeleteAsync(T entity)
         {
-            _dbSet.Remove(entity);
+            Delete(entity); // Use soft delete
             return Task.CompletedTask;
         }
 
@@ -248,8 +233,6 @@ namespace TechZone.Infrastructure.Repositories
         {
             return await _dbSet.FirstOrDefaultAsync(predicate);
         }
-
-
 
         // Extension methods to support LINQ operations
         public async Task<List<T>> ToListAsync()
@@ -368,6 +351,5 @@ namespace TechZone.Infrastructure.Repositories
         {
             return await _dbSet.AverageAsync(selector);
         }
-
     }
 }
