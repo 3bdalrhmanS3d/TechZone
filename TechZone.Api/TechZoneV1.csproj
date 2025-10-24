@@ -48,8 +48,6 @@
     <Folder Include="Features\Category\GetAll\" />
     <Folder Include="Features\Category\GetDetailedInfo\" />
     <Folder Include="Features\Category\Update\" />
-    <Folder Include="Features\Laptops\GetAllLaptops1\Commands\" />
-    <Folder Include="Features\Laptops\GetAllLaptops\" />
     <Folder Include="Features\Laptops\DeleteLaptop\" />
     <Folder Include="Features\Laptops\UpdateLaptop\" />
   </ItemGroup>

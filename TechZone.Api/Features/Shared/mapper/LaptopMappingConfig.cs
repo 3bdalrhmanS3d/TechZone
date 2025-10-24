@@ -8,11 +8,11 @@ namespace TechZoneV1.Features.Shared.mapper
     {
         public void Register(TypeAdapterConfig config)
         {
-            config.NewConfig<LaptopsDto, LaptopResponseViewModel>();
-            config.NewConfig<BrandDTO, LaptopResponseViewModel.BrandVM>();
-            config.NewConfig<CategoryDTO, LaptopResponseViewModel.CategoryVM>();
-            config.NewConfig<LaptopVariantDTO, LaptopResponseViewModel.LaptopVariantVM>();
-            config.NewConfig<LaptopImageDTO, LaptopResponseViewModel.LaptopImageVM>();
+            //config.NewConfig<LaptopsDto, LaptopResponseViewModel>();
+            //config.NewConfig<BrandDTO, LaptopResponseViewModel.BrandVM>();
+            //config.NewConfig<CategoryDTO, LaptopResponseViewModel.CategoryVM>();
+            //config.NewConfig<LaptopVariantDTO, LaptopResponseViewModel.LaptopVariantVM>();
+            //config.NewConfig<LaptopImageDTO, LaptopResponseViewModel.LaptopImageVM>();
         }
     }
 }

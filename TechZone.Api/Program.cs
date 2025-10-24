@@ -24,6 +24,7 @@ using TechZone.Shared.Data;
 using TechZone.Shared.Service.Implementations;
 using TechZoneV1.Features.Category.ChangeCategoryName.Endpoints;
 using TechZoneV1.Features.Laptops.GetAllLaptops.Endpoints;
+using TechZoneV1.Features.Laptops.GetLaptopDetails.Endpoints;
 using TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Endpoints;
 using TechZoneV1.Features.LaptopVariant.BulkUpdateStock.Endpoints;
 using TechZoneV1.Features.LaptopVariant.CreateVariant.Endpoints;
@@ -408,7 +409,6 @@ namespace TechZone
                 app.MapProfileEndpoint();
                 app.MapGetRecommendedLaptopVariantsEndpoint();
                 app.MapFilterLaptopVariantsEndpoint();
-                app.MapGetAllLaptopEndpoint();
                 app.MapChangeCategoryNameEndpoint();
                 app.MapGetLaptopVariantByIdEndpoint();
                 app.MapGetVariantsByLaptopIdEndpoint();
@@ -419,6 +419,8 @@ namespace TechZone
                 app.MapBulkUpdateStockEndpoint();
                 app.MapUpdateStockEndpoint(); 
                 app.MapGetPriceHistoryEndpoint();
+                app.MapGetAllLaptopsEndpoint();
+                app.MapGetLaptopDetailsEndpoint();
                 app.UseCors("AllowSpecificOrigins");
                 app.UseAuthentication();
                 app.UseAuthorization();
