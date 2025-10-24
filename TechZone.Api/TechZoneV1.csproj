@@ -52,8 +52,6 @@
     <Folder Include="Features\Laptops\GetAllLaptops\" />
     <Folder Include="Features\Laptops\DeleteLaptop\" />
     <Folder Include="Features\Laptops\UpdateLaptop\" />
-    <Folder Include="Features\Laptopvariant\GetPriceHistory\" />
-    <Folder Include="Features\Laptopvariant\BulkUpdateStock\" />
   </ItemGroup>
 
 </Project>
