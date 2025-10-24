@@ -27,6 +27,7 @@ using TechZoneV1.Features.Laptops.GetAllLaptops.Endpoints;
 using TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Endpoints;
 using TechZoneV1.Features.LaptopVariant.FilterVariants.Endpoints;
 using TechZoneV1.Features.LaptopVariant.GetVariantById.Endpoints;
+using TechZoneV1.Features.LaptopVariant.GetVariantsByLaptopId.Endpoints;
 using TechZoneV1.Features.Profile.EditUserProfile.Endpoints;
 using TechZoneV1.Features.Profile.GetUserProfile.Endpoints;
 
@@ -404,6 +405,7 @@ namespace TechZone
                 app.MapGetAllLaptopEndpoint();
                 app.MapChangeCategoryNameEndpoint();
                 app.MapGetLaptopVariantByIdEndpoint();
+                app.MapGetVariantsByLaptopIdEndpoint();
                 app.MapEditEndpoint();
                 app.UseCors("AllowSpecificOrigins");
                 app.UseAuthentication();
