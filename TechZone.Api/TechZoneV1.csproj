@@ -48,12 +48,6 @@
     <Folder Include="Features\Category\GetAll\" />
     <Folder Include="Features\Category\GetDetailedInfo\" />
     <Folder Include="Features\Category\Update\" />
-    <Folder Include="Features\Laptops\AddLaptop\" />
-    <Folder Include="Features\Laptops\DeleteLaptop\" />
-    <Folder Include="Features\Laptops\GetAllLaptops\Commands\" />
-    <Folder Include="Features\Laptops\GetDetailedLaptopInfo\" />
-    <Folder Include="Features\Laptops\UpdateLaptop\" />
-    <Folder Include="Features\Laptopvariant\" />
   </ItemGroup>
 
 </Project>

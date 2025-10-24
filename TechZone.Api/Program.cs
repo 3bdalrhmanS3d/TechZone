@@ -1,6 +1,8 @@
 ﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using dotenv.net;
+using Mapster;
+using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,15 +19,26 @@ using TechZone.Domain.Service.Interfaces;
 using TechZone.Infrastructure.Application;
 using TechZone.Infrastructure.Repositories;
 using TechZone.Infrastructure.UnitOfWork;
-using TechZone.Services.Interfaces;
 using TechZone.Shared.Data;
 using TechZone.Shared.Service.Implementations;
 using TechZoneV1.Features.Category.ChangeCategoryName.Endpoints;
+using TechZoneV1.Features.Laptops.CreateLaptop.Endpoints;
+using TechZoneV1.Features.Laptops.DeleteLaptop.Endpoints;
 using TechZoneV1.Features.Laptops.GetAllLaptops.Endpoints;
+using TechZoneV1.Features.Laptops.GetLaptopDetails.Endpoints;
+using TechZoneV1.Features.Laptops.UpdateLaptop.Endpoints;
+using TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Endpoints;
+using TechZoneV1.Features.LaptopVariant.BulkUpdateStock.Endpoints;
+using TechZoneV1.Features.LaptopVariant.CreateVariant.Endpoints;
+using TechZoneV1.Features.LaptopVariant.DeleteVariant.Endpoints;
+using TechZoneV1.Features.LaptopVariant.FilterVariants.Endpoints;
+using TechZoneV1.Features.LaptopVariant.GetPriceHistory.Endpoints;
+using TechZoneV1.Features.LaptopVariant.GetVariantById.Endpoints;
+using TechZoneV1.Features.LaptopVariant.GetVariantsByLaptopId.Endpoints;
+using TechZoneV1.Features.LaptopVariant.UpdateStock.Endpoints;
+using TechZoneV1.Features.LaptopVariant.UpdateVariant.Endpoints;
 using TechZoneV1.Features.Profile.EditUserProfile.Endpoints;
 using TechZoneV1.Features.Profile.GetUserProfile.Endpoints;
-using Mapster;
-using MapsterMapper;
 
 namespace TechZone
 {
@@ -86,7 +99,6 @@ namespace TechZone
                 builder.Services.AddScoped<IJwtService, JwtService>();
                 builder.Services.AddScoped<IEmailService, EmailService>();
                 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-                builder.Services.AddScoped<ILaptopService, LaptopService>();
                 builder.Services.AddScoped<ICategoryService, CategoryService>();
                 builder.Services.AddScoped<IBrandService, BrandService>();
 
@@ -94,9 +106,11 @@ namespace TechZone
                 builder.Services.AddHostedService<EmailBackgroundService>();
                 // 1️⃣ أنشئ config أساسي
                 var config = TypeAdapterConfig.GlobalSettings;
-                builder.Services.AddSingleton(config);
 
-                // 2️⃣ سجل المابر نفسه
+                // mapster configuration
+                TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
+                builder.Services.AddSingleton(config);
+                builder.Services.AddMapster();
                 builder.Services.AddScoped<IMapper, ServiceMapper>();
 
 
@@ -132,7 +146,7 @@ namespace TechZone
                 {
                     // Try to read DATABASE_URL from Railway
                     var dbUrl = null as string;
-                    dbUrl = "postgresql://postgres:GRgpDWQqsyUjfpcfZCYCvcmGiHCUTbGt@switchyard.proxy.rlwy.net:46456/railway";
+                    //dbUrl = "postgresql://postgres:GRgpDWQqsyUjfpcfZCYCvcmGiHCUTbGt@switchyard.proxy.rlwy.net:46456/railway";
                     string connectionString;
 
                 if (!string.IsNullOrEmpty(dbUrl))
@@ -394,9 +408,24 @@ namespace TechZone
                     await next();
                 });
                 app.MapProfileEndpoint();
-                app.MapGetAllLaptopEndpoint();
+                app.MapGetRecommendedLaptopVariantsEndpoint();
+                app.MapFilterLaptopVariantsEndpoint();
                 app.MapChangeCategoryNameEndpoint();
+                app.MapGetLaptopVariantByIdEndpoint();
+                app.MapGetVariantsByLaptopIdEndpoint();
                 app.MapEditEndpoint();
+                app.MapUpdateLaptopVariantEndpoint();
+                app.MapCreateLaptopVariantEndpoint();
+                app.MapDeleteLaptopVariantEndpoint();
+                app.MapBulkUpdateStockEndpoint();
+                app.MapUpdateStockEndpoint(); 
+                app.MapGetPriceHistoryEndpoint();
+
+                app.MapGetAllLaptopsEndpoint();
+                app.MapGetLaptopDetailsEndpoint();
+                app.MapCreateLaptopEndpoint();
+                app.MapUpdateLaptopEndpoint();
+                app.MapDeleteLaptopEndpoint();
                 app.UseCors("AllowSpecificOrigins");
                 app.UseAuthentication();
                 app.UseAuthorization();

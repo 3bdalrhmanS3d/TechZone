@@ -10,7 +10,6 @@ namespace TechZone.Domain.Interfaces
     public interface IUnitOfWork:IDisposable
     {
         // Repository Properties
-        ILaptopRepository Laptops { get; }
         IOrderRepository Orders { get; }
         IOrderItemRepository OrderItems { get; }
         // Transaction Methods

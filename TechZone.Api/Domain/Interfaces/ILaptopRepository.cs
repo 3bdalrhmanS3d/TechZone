@@ -1,25 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using TechZone.Domain.DTOs.Laptop;
-using TechZone.Domain.Entities;
-using TechZone.Domain.Entities;
-using TechZone.Domain.ENUMS.Laptop;
-using TechZone.Domain.PagedResult;
-using TechZone.Domain.ServiceResponse;
-using TechZone.DTOs.Laptop;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Linq.Expressions;
+//using System.Text;
+//using System.Threading.Tasks;
+//using TechZone.Domain.DTOs.Laptop;
+//using TechZone.Domain.Entities;
+//using TechZone.Domain.Entities;
+//using TechZone.Domain.ENUMS.Laptop;
+//using TechZone.Domain.PagedResult;
+//using TechZone.Domain.ServiceResponse;
+//using TechZone.DTOs.Laptop;
 
-namespace TechZone.Domain.Interfaces
-{
-    public interface ILaptopRepository : IBaseRepository<Laptop>
-    {
-        Task<IEnumerable<FullLaptopResponseDTO>> GetAllFullAsync();
-        Task<PagedResult<LaptopResponseDTO>> GetPagedAsync(PaginationParamsDto<LaptopSortBy> paginationParams);
-        Task<int> CountAsync();
-        Task<Laptop?> GetLaptopWithDetailsAsync(int labId);
-        Task<IEnumerable<Laptop>?> GetFeaturedLaptopsAsync(int count);
-    }
-}
+//namespace TechZone.Domain.Interfaces
+//{
+//    public interface ILaptopRepository : IBaseRepository<Laptop>
+//    {
+//        Task<IEnumerable<FullLaptopResponseDTO>> GetAllFullAsync();
+//        Task<PagedResult<LaptopResponseDTO>> GetPagedAsync(PaginationParamsDto<LaptopSortBy> paginationParams);
+//        Task<int> CountAsync();
+//        Task<Laptop?> GetLaptopWithDetailsAsync(int labId);
+//        Task<IEnumerable<Laptop>?> GetFeaturedLaptopsAsync(int count);
+//    }
+//}

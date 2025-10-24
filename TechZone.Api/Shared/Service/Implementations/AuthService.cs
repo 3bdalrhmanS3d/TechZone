@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;
 using TechZone.DTOs.Auth;
-using TechZone.Services.Interfaces;
 using TechZone.core.Service.Interfaces;
 using TechZone.Domain.Entities;
 using TechZone.Domain.Entities.User;

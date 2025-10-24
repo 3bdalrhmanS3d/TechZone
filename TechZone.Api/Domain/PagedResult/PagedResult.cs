@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TechZoneV1.Features.Laptops.GetAllLaptops.ViewModels;
 
 namespace TechZone.Domain.PagedResult
 {
@@ -55,6 +56,8 @@ namespace TechZone.Domain.PagedResult
     /// <typeparam name="T">Type of items in the collection</typeparam>
     public class PagedResult<T>
     {
+        private List<LaptopResponseViewModel> mappedItems;
+
         public IReadOnlyList<T> Items { get; }
         public int Page { get; }
         public int PageSize { get; }
@@ -76,6 +79,12 @@ namespace TechZone.Domain.PagedResult
             Page = page;
             PageSize = pageSize;
             TotalPages = totalCount > 0 ? (int)Math.Ceiling(totalCount / (double)pageSize) : 0;
+        }
+
+        public PagedResult(List<LaptopResponseViewModel> mappedItems, int totalCount)
+        {
+            this.mappedItems = mappedItems;
+            TotalCount = totalCount;
         }
 
         public static PagedResult<T> Create(IQueryable<T> source, int page, int pageSize)
