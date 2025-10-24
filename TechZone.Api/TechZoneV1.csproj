@@ -48,7 +48,6 @@
     <Folder Include="Features\Category\GetAll\" />
     <Folder Include="Features\Category\GetDetailedInfo\" />
     <Folder Include="Features\Category\Update\" />
-    <Folder Include="Features\Laptops\DeleteLaptop\" />
   </ItemGroup>
 
 </Project>

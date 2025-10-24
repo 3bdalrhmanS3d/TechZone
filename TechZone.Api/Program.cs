@@ -23,6 +23,7 @@ using TechZone.Shared.Data;
 using TechZone.Shared.Service.Implementations;
 using TechZoneV1.Features.Category.ChangeCategoryName.Endpoints;
 using TechZoneV1.Features.Laptops.CreateLaptop.Endpoints;
+using TechZoneV1.Features.Laptops.DeleteLaptop.Endpoints;
 using TechZoneV1.Features.Laptops.GetAllLaptops.Endpoints;
 using TechZoneV1.Features.Laptops.GetLaptopDetails.Endpoints;
 using TechZoneV1.Features.Laptops.UpdateLaptop.Endpoints;
@@ -424,6 +425,7 @@ namespace TechZone
                 app.MapGetLaptopDetailsEndpoint();
                 app.MapCreateLaptopEndpoint();
                 app.MapUpdateLaptopEndpoint();
+                app.MapDeleteLaptopEndpoint();
                 app.UseCors("AllowSpecificOrigins");
                 app.UseAuthentication();
                 app.UseAuthorization();
