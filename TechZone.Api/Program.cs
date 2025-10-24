@@ -19,13 +19,13 @@ using TechZone.Domain.Service.Interfaces;
 using TechZone.Infrastructure.Application;
 using TechZone.Infrastructure.Repositories;
 using TechZone.Infrastructure.UnitOfWork;
-using TechZone.Services.Interfaces;
 using TechZone.Shared.Data;
 using TechZone.Shared.Service.Implementations;
 using TechZoneV1.Features.Category.ChangeCategoryName.Endpoints;
 using TechZoneV1.Features.Laptops.CreateLaptop.Endpoints;
 using TechZoneV1.Features.Laptops.GetAllLaptops.Endpoints;
 using TechZoneV1.Features.Laptops.GetLaptopDetails.Endpoints;
+using TechZoneV1.Features.Laptops.UpdateLaptop.Endpoints;
 using TechZoneV1.Features.Laptopvariant.GetRecommendedVariants.Endpoints;
 using TechZoneV1.Features.LaptopVariant.BulkUpdateStock.Endpoints;
 using TechZoneV1.Features.LaptopVariant.CreateVariant.Endpoints;
@@ -98,7 +98,6 @@ namespace TechZone
                 builder.Services.AddScoped<IJwtService, JwtService>();
                 builder.Services.AddScoped<IEmailService, EmailService>();
                 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-                builder.Services.AddScoped<ILaptopService, LaptopService>();
                 builder.Services.AddScoped<ICategoryService, CategoryService>();
                 builder.Services.AddScoped<IBrandService, BrandService>();
 
@@ -424,6 +423,7 @@ namespace TechZone
                 app.MapGetAllLaptopsEndpoint();
                 app.MapGetLaptopDetailsEndpoint();
                 app.MapCreateLaptopEndpoint();
+                app.MapUpdateLaptopEndpoint();
                 app.UseCors("AllowSpecificOrigins");
                 app.UseAuthentication();
                 app.UseAuthorization();

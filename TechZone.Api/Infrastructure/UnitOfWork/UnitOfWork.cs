@@ -12,7 +12,6 @@ namespace TechZone.Infrastructure.UnitOfWork
         private readonly ApplicationDbContext _context;
 
         // Repository instances
-        public ILaptopRepository Laptops { get; }
         public IOrderRepository Orders { get; }
         public IOrderItemRepository OrderItems { get; }
 
@@ -20,10 +19,6 @@ namespace TechZone.Infrastructure.UnitOfWork
         {
             _context = context;
 
-            // Initialize repositories
-            Laptops = new LaptopRepository(_context);
-            Orders = new OrderRepository(_context);
-            OrderItems = new OrderItemRepository(_context);
         }
 
         // Transaction methods
