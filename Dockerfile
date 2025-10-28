@@ -1,4 +1,6 @@
-﻿# Use the official .NET SDK image for building
+﻿# =========================
+# Stage 1: Build
+# =========================
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
@@ -13,8 +15,15 @@ WORKDIR /app/TechZone.Api
 # Build and publish the app
 RUN dotnet publish -c Release -o out
 
-# Use the ASP.NET runtime image
+# =========================
+# Stage 2: Runtime
+# =========================
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
+
 COPY --from=build /app/TechZone.Api/out .
+
+# 👇 Tell ASP.NET Core to listen on Railway's assigned port
+ENV ASPNETCORE_URLS=http://+:${PORT}
+
 ENTRYPOINT ["dotnet", "TechZoneV1.dll"]
