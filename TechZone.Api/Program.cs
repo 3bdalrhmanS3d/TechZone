@@ -141,30 +141,30 @@ namespace TechZone
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-                // Database Configuration with reduced logging
                 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 {
-                    // Try to read DATABASE_URL from Railway
-                    var dbUrl = null as string;
-                    //dbUrl = "postgresql://postgres:GRgpDWQqsyUjfpcfZCYCvcmGiHCUTbGt@switchyard.proxy.rlwy.net:46456/railway";
+                    // 1️⃣ Try to read DATABASE_URL from environment variables (e.g. Railway, Render, etc.)
+                    var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
                     string connectionString;
 
-                if (!string.IsNullOrEmpty(dbUrl))
-                {
-                    // Convert postgres://... into Npgsql connection string
-                    var uri = new Uri(dbUrl);
-                    var userInfo = uri.UserInfo.Split(':');
+                    if (!string.IsNullOrEmpty(dbUrl))
+                    {
+                        // Convert postgres://... into Npgsql connection string
+                        var uri = new Uri(dbUrl);
+                        var userInfo = uri.UserInfo.Split(':');
 
-                    connectionString =
-                        $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};" +
-                        $"Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
-                }
-                else
-                {
-                    //Local fallback(from appsettings.json)
-                    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-                         }
+                        connectionString =
+                            $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};" +
+                            $"Username={userInfo[0]};Password={userInfo[1]};Ssl Mode=Require;Trust Server Certificate=true;";
+                    }
+                    else
+                    {
+                        // 2️⃣ Fallback to local connection string from appsettings.json
+                        connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                    }
 
+                    // 3️⃣ Configure EF Core with Npgsql
                     options.UseNpgsql(connectionString, npgsqlOptions =>
                     {
                         npgsqlOptions.EnableRetryOnFailure(
@@ -173,14 +173,17 @@ namespace TechZone
                             errorCodesToAdd: null
                         );
                         npgsqlOptions.CommandTimeout(30);
-                    }).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                    })
+                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 
+                    // 4️⃣ EF Core diagnostic settings
                     options.EnableSensitiveDataLogging(false);
                     options.EnableServiceProviderCaching();
                     options.EnableDetailedErrors(builder.Environment.IsDevelopment());
 
                     options.LogTo(message => Log.Debug("[EF] {Message}", message), LogLevel.Warning);
                 });
+
 
                 // mediator services for CQRS
                 builder.Services.AddMediatR(typeof(Program).Assembly);
