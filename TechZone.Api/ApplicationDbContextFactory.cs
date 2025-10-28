@@ -14,7 +14,7 @@ namespace TechZone
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
-            // 1️⃣ Try to read from DATABASE_URL environment variable
+            // 1️. Try to read from DATABASE_URL environment variable
             var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
             string connectionString;
