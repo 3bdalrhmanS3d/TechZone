@@ -5,7 +5,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy the main project file and restore dependencies
-COPY TechZone.Api/TechZoneV1/TechZoneV1.csproj TechZoneV1/
+COPY TechZoneV1/TechZoneV1.csproj TechZoneV1/
 RUN dotnet restore TechZoneV1/TechZoneV1.csproj
 
 # Copy the rest of the source code
