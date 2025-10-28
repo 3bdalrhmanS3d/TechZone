@@ -1,30 +1,20 @@
-﻿# =========================
-# Stage 1: Build
-# =========================
+﻿# Use the official .NET SDK image for building
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
-
-# Copy the main project file and restore dependencies
-COPY TechZone.Api/TechZoneV1/TechZoneV1.csproj TechZoneV1/
-RUN dotnet restore TechZoneV1/TechZoneV1.csproj
-
-# Copy the rest of the source code
-COPY . .
-RUN dotnet publish TechZoneV1/TechZoneV1.csproj -c Release -o /app/publish
-
-# =========================
-# Stage 2: Runtime
-# =========================
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
-COPY --from=build /app/publish .
+# Copy only the .csproj file first (for restore layer)
+COPY TechZone.Api/TechZoneV1.csproj ./TechZone.Api/
+RUN dotnet restore ./TechZone.Api/TechZoneV1.csproj
 
-# Railway automatically sets PORT
-ENV ASPNETCORE_URLS=http://+:${PORT}
+# Copy the rest of the project files
+COPY TechZone.Api/. ./TechZone.Api/
+WORKDIR /app/TechZone.Api
 
-# PostgreSQL connection string (for Npgsql)
-ENV ConnectionStrings__DefaultConnection="Host=${RAILWAY_TCP_HOST};Port=${RAILWAY_TCP_PORT};Database=mydb;Username=${RAILWAY_TCP_USER};Password=${RAILWAY_TCP_PASSWORD};SSL Mode=Prefer;Trust Server Certificate=True;"
+# Build and publish the app
+RUN dotnet publish -c Release -o out
 
+# Use the ASP.NET runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/TechZone.Api/out .
 ENTRYPOINT ["dotnet", "TechZoneV1.dll"]
-
