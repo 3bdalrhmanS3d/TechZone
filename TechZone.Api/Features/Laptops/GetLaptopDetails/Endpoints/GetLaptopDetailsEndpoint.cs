@@ -33,6 +33,7 @@ namespace TechZoneV1.Features.Laptops.GetLaptopDetails.Endpoints
                         result.Message,
                         result.MessageAr
                     ));
+                    //localize.get(result.Message)
                 }
 
                 return Results.Ok(EndpointResponse<LaptopDetailsResponseViewModel>.SuccessResponse(

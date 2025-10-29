@@ -9,6 +9,7 @@ namespace TechZoneV1.Features.Shared
         int StatusCode = 200,
         List<string>? Errors = null,
         DateTime? Timestamp = null
+
     )
     {
         public List<string> Errors { get; init; } = Errors ?? new();
