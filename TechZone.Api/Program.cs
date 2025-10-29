@@ -11,6 +11,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Filters;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using TechZone.core.Service.Interfaces;
 using TechZone.Domain.Entities;
 using TechZone.Domain.Entities.User;
@@ -21,6 +22,7 @@ using TechZone.Infrastructure.Repositories;
 using TechZone.Infrastructure.UnitOfWork;
 using TechZone.Shared.Data;
 using TechZone.Shared.Service.Implementations;
+using TechZoneV1.Features.Cart.AddToCart.Endpoints;
 using TechZoneV1.Features.Cart.GetCart.Endpoints;
 using TechZoneV1.Features.Category.ChangeCategoryName.Endpoints;
 using TechZoneV1.Features.Laptops.CreateLaptop.Endpoints;
@@ -40,6 +42,8 @@ using TechZoneV1.Features.LaptopVariant.UpdateStock.Endpoints;
 using TechZoneV1.Features.LaptopVariant.UpdateVariant.Endpoints;
 using TechZoneV1.Features.Profile.EditUserProfile.Endpoints;
 using TechZoneV1.Features.Profile.GetUserProfile.Endpoints;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Http.Json;
 
 namespace TechZone
 {
@@ -145,7 +149,7 @@ namespace TechZone
                 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 {
                     // 1️⃣ Try to read DATABASE_URL from environment variables (e.g. Railway, Render, etc.)
-                    var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+                    var dbUrl =Environment.GetEnvironmentVariable("DATABASE_URL");
 
                     string connectionString;
 
@@ -254,6 +258,19 @@ namespace TechZone
                 {
                     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
                     options.AddPolicy("UserOrAdmin", policy => policy.RequireRole("User", "Admin"));
+                });
+
+
+                
+                // Add this after builder.Services configuration
+                builder.Services.ConfigureHttpJsonOptions(options =>
+                {
+                    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
+
+                builder.Services.Configure<JsonOptions>(options =>
+                {
+                    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
 
                 // Controllers
@@ -432,6 +449,7 @@ namespace TechZone
                 app.MapDeleteLaptopEndpoint();
                 //Cart
                 app.MapGetCartEndpoint();
+                app.MapAddToCartEndpoint();
 
                 app.UseCors("AllowSpecificOrigins");
                 app.UseAuthentication();
