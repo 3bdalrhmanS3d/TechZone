@@ -21,6 +21,7 @@ using TechZone.Infrastructure.Repositories;
 using TechZone.Infrastructure.UnitOfWork;
 using TechZone.Shared.Data;
 using TechZone.Shared.Service.Implementations;
+using TechZoneV1.Features.Cart.GetCart.Endpoints;
 using TechZoneV1.Features.Category.ChangeCategoryName.Endpoints;
 using TechZoneV1.Features.Laptops.CreateLaptop.Endpoints;
 using TechZoneV1.Features.Laptops.DeleteLaptop.Endpoints;
@@ -429,6 +430,9 @@ namespace TechZone
                 app.MapCreateLaptopEndpoint();
                 app.MapUpdateLaptopEndpoint();
                 app.MapDeleteLaptopEndpoint();
+                //Cart
+                app.MapGetCartEndpoint();
+
                 app.UseCors("AllowSpecificOrigins");
                 app.UseAuthentication();
                 app.UseAuthorization();
