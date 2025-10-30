@@ -4,6 +4,7 @@ using dotenv.net;
 using Mapster;
 using MapsterMapper;
 using MediatR;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -11,6 +12,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Filters;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using System.Text.Json.Serialization;
 using TechZone.core.Service.Interfaces;
 using TechZone.Domain.Entities;
@@ -23,7 +25,12 @@ using TechZone.Infrastructure.UnitOfWork;
 using TechZone.Shared.Data;
 using TechZone.Shared.Service.Implementations;
 using TechZoneV1.Features.Cart.AddToCart.Endpoints;
+using TechZoneV1.Features.Cart.ApplyDiscountCode.Endpoints;
+using TechZoneV1.Features.Cart.ClearCart.Endpoints;
 using TechZoneV1.Features.Cart.GetCart.Endpoints;
+using TechZoneV1.Features.Cart.RemoveDiscountCode.Endpoints;
+using TechZoneV1.Features.Cart.RemoveFromCart.Endpoints;
+using TechZoneV1.Features.Cart.UpdateCartItem.Endpoints;
 using TechZoneV1.Features.Category.ChangeCategoryName.Endpoints;
 using TechZoneV1.Features.Laptops.CreateLaptop.Endpoints;
 using TechZoneV1.Features.Laptops.DeleteLaptop.Endpoints;
@@ -42,11 +49,6 @@ using TechZoneV1.Features.LaptopVariant.UpdateStock.Endpoints;
 using TechZoneV1.Features.LaptopVariant.UpdateVariant.Endpoints;
 using TechZoneV1.Features.Profile.EditUserProfile.Endpoints;
 using TechZoneV1.Features.Profile.GetUserProfile.Endpoints;
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Http.Json;
-using TechZoneV1.Features.Cart.UpdateCartItem.Endpoints;
-using TechZoneV1.Features.Cart.RemoveFromCart.Endpoints;
-using TechZoneV1.Features.Cart.ClearCart.Endpoints;
 
 namespace TechZone
 {
@@ -152,7 +154,7 @@ namespace TechZone
                 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 {
                     // 1️⃣ Try to read DATABASE_URL from environment variables (e.g. Railway, Render, etc.)
-                    var dbUrl =Environment.GetEnvironmentVariable("DATABASE_URL");
+                    var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
                     // "" ;
                     string connectionString;
 
@@ -456,6 +458,11 @@ namespace TechZone
                 app.MapUpdateCartItemEndpoint();
                 app.MapRemoveFromCartEndpoint();
                 app.MapClearCartEndpoint();
+                app.MapRemoveDiscountCodeEndpoint();
+
+                // Apply Discount Code
+                app.MapApplyDiscountCodeEndpoint();
+
 
                 app.UseCors("AllowSpecificOrigins");
                 app.UseAuthentication();
