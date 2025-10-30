@@ -8,7 +8,8 @@ using TechZoneV1.Features.Shared;
 
 namespace TechZoneV1.Features.Cart.AddToCart.Handlers
 {
-    public class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, RequestResponse<AddedCartItemDto>>
+    public class AddToCartCommandHandler
+        : IRequestHandler<AddToCartCommand, RequestResponse<AddedCartItemDto>>
     {
         private readonly IBaseRepository<CartItem> _cartItemRepository;
         private readonly IBaseRepository<TechZone.Domain.Entities.LaptopVariant> _laptopVariantRepository;
@@ -24,60 +25,68 @@ namespace TechZoneV1.Features.Cart.AddToCart.Handlers
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<RequestResponse<AddedCartItemDto>> Handle(
-            AddToCartCommand request,
-            CancellationToken cancellationToken)
+        public async Task<RequestResponse<AddedCartItemDto>> Handle(AddToCartCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                var requestDto = request.RequestDto;
+                var dto = request.RequestDto;
 
-                // Validate product exists and is available
-                var (validationResult, productName, unitPrice, availableStock) = await ValidateProduct(
-                    requestDto.ProductType,
-                    requestDto.ProductId,
-                    cancellationToken);
+                // ✅ Validate Product
+                var (validateResult, productName, unitPrice, availableStock) =
+                    await ValidateProduct(dto.ProductType, dto.ProductId, cancellationToken);
 
-                if (!validationResult.IsSuccess)
-                {
-                    return validationResult;
-                }
+                if (!validateResult.IsSuccess)
+                    return validateResult;
 
-                // Check stock availability
-                if (requestDto.Quantity > availableStock)
-                {
-                    return RequestResponse<AddedCartItemDto>.Fail(
-                        $"Not enough stock available. Only {availableStock} items in stock.",
-                        $"لا يوجد مخزون كافي. فقط {availableStock} عنصر متاح."
-                    );
-                }
-
-                // Check if item already exists in cart
+                // ✅ Check if product is already in cart
                 var existingCartItem = await _cartItemRepository.GetAll()
-                    .Where(ci => ci.UserId == request.UserId &&
-                                 ci.ProductType == requestDto.ProductType &&
-                                 ci.ProductId == requestDto.ProductId &&
-                                 !ci.IsDeleted)
-                    .FirstOrDefaultAsync(cancellationToken);
+                    .FirstOrDefaultAsync(ci =>
+                        ci.UserId == request.UserId &&
+                        ci.ProductType == dto.ProductType &&
+                        ci.ProductId == dto.ProductId &&
+                        !ci.IsDeleted,
+                        cancellationToken);
 
                 CartItem cartItem;
 
                 if (existingCartItem != null)
                 {
-                    // Update quantity if item already exists
-                    existingCartItem.Quantity += requestDto.Quantity;
+                    // ✅ Update quantity using SaveInclude for partial update
+                    var newQuantity = existingCartItem.Quantity + dto.Quantity;
+
+                    if (newQuantity > availableStock)
+                    {
+                        return RequestResponse<AddedCartItemDto>.Fail(
+                            $"Cannot add {dto.Quantity} more. Only {availableStock - existingCartItem.Quantity} items left.",
+                            $"لا يمكنك إضافة {dto.Quantity}. الكمية المتاحة فقط هي {availableStock - existingCartItem.Quantity}"
+                        );
+                    }
+
+                    // Update only specific properties using SaveInclude
+                    existingCartItem.Quantity = newQuantity;
                     existingCartItem.UpdatedAt = DateTime.UtcNow;
+
+                    // Use SaveInclude to update only Quantity and UpdatedAt properties
+                    _cartItemRepository.SaveInclude(existingCartItem, "Quantity", "UpdatedAt");
                     cartItem = existingCartItem;
                 }
                 else
                 {
-                    // Create new cart item
+                    // ✅ Add new item
+                    if (dto.Quantity > availableStock)
+                    {
+                        return RequestResponse<AddedCartItemDto>.Fail(
+                            $"Only {availableStock} in stock",
+                            $"المتاح فقط {availableStock}"
+                        );
+                    }
+
                     cartItem = new CartItem
                     {
                         UserId = request.UserId,
-                        ProductType = requestDto.ProductType,
-                        ProductId = requestDto.ProductId,
-                        Quantity = requestDto.Quantity,
+                        ProductType = dto.ProductType,
+                        ProductId = dto.ProductId,
+                        Quantity = dto.Quantity,
                         AddedAt = DateTime.UtcNow,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
@@ -88,35 +97,34 @@ namespace TechZoneV1.Features.Cart.AddToCart.Handlers
 
                 await _unitOfWork.SaveChangesAsync();
 
-                // Get updated cart summary
-                var cartSummary = await GetCartSummary(request.UserId, cancellationToken);
+                // ✅ Cart Summary
+                var summary = await GetCartSummary(request.UserId, cancellationToken);
 
-                // Return DTO
-                var addedCartItemDto = new AddedCartItemDto
+                var response = new AddedCartItemDto
                 {
                     Id = cartItem.Id,
-                    ProductType = cartItem.ProductType,
                     ProductId = cartItem.ProductId,
+                    ProductType = cartItem.ProductType,
                     ProductName = productName,
                     Quantity = cartItem.Quantity,
                     UnitPrice = unitPrice,
                     TotalPrice = unitPrice * cartItem.Quantity,
                     AddedAt = cartItem.AddedAt,
-                    CartSummary = cartSummary
+                    CartSummary = summary
                 };
 
                 return RequestResponse<AddedCartItemDto>.Success(
-                    addedCartItemDto,
-                    "Item added to cart successfully",
-                    "تم إضافة العنصر إلى السلة بنجاح"
+                    response,
+                    existingCartItem != null ? "Cart item quantity updated successfully" : "Item added to cart successfully",
+                    existingCartItem != null ? "تم تحديث كمية عنصر السلة بنجاح" : "تم إضافة العنصر إلى السلة بنجاح"
                 );
             }
             catch (Exception ex)
             {
                 // Log exception here
                 return RequestResponse<AddedCartItemDto>.Fail(
-                    "An error occurred while adding item to cart",
-                    "حدث خطأ أثناء إضافة العنصر إلى السلة"
+                    "An error occurred while updating cart",
+                    "حدث خطأ أثناء تحديث السلة"
                 );
             }
         }
@@ -155,10 +163,15 @@ namespace TechZoneV1.Features.Cart.AddToCart.Handlers
 
         private async Task<CartSummaryDto> GetCartSummary(string userId, CancellationToken cancellationToken)
         {
-            // Get cart items without the problematic Include
+            // Get cart items
             var cartItems = await _cartItemRepository.GetAll()
                 .Where(ci => ci.UserId == userId && !ci.IsDeleted)
                 .ToListAsync(cancellationToken);
+
+            if (!cartItems.Any())
+            {
+                return new CartSummaryDto { TotalItems = 0, Total = 0 };
+            }
 
             var totalItems = cartItems.Sum(ci => ci.Quantity);
             decimal total = 0;
@@ -190,7 +203,6 @@ namespace TechZoneV1.Features.Cart.AddToCart.Handlers
 
                     // Add pricing for other product types as needed
                     default:
-                        // Unknown product type - skip or handle accordingly
                         continue;
                 }
 

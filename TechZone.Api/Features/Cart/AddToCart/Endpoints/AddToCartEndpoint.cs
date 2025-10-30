@@ -14,25 +14,28 @@ namespace TechZoneV1.Features.Cart.AddToCart.Endpoints
         {
             app.MapPost("/api/cart/items", async (
                 IMediator mediator,
+                CancellationToken cancellationToken,
                 [FromBody] AddToCartRequestDto requestDto,
-                [FromServices] IHttpContextAccessor httpContextAccessor,
-                CancellationToken cancellationToken) =>
+                IHttpContextAccessor httpContextAccessor) =>
             {
                 // Validate the DTO
                 if (!TryValidateRequestDto(requestDto, out var validationErrors))
                 {
-                    return Results.BadRequest(EndpointResponse<AddedCartItemViewModel>.ValidationErrorResponse(
+                    return EndpointResponse<AddedCartItemViewModel>.ValidationErrorResponse(
                         validationErrors,
                         "Validation failed",
                         "فشل التحقق من الصحة"
-                    ));
+                    );
                 }
 
                 // Get current user ID
                 var userId = GetCurrentUserId(httpContextAccessor.HttpContext);
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Results.Unauthorized();
+                    return EndpointResponse<AddedCartItemViewModel>.UnauthorizedResponse(
+                        "Unauthorized access",
+                        "الوصول غير مصرح به"
+                    );
                 }
 
                 var command = new AddToCartCommand(userId, requestDto);
@@ -40,31 +43,25 @@ namespace TechZoneV1.Features.Cart.AddToCart.Endpoints
 
                 if (!result.IsSuccess)
                 {
-                    return Results.BadRequest(EndpointResponse<AddedCartItemViewModel>.ErrorResponse(
+                    return EndpointResponse<AddedCartItemViewModel>.ErrorResponse(
                         result.Message,
                         result.MessageAr,
                         400
-                    ));
+                    );
                 }
 
                 // Map DTO to ViewModel in the endpoint
                 var viewModel = MapToViewModel(result.Data!);
 
-                return Results.Created(
-                    $"/api/cart/items/{result.Data!.Id}",
-                    EndpointResponse<AddedCartItemViewModel>.SuccessResponse(
+                return EndpointResponse<AddedCartItemViewModel>.SuccessResponse(
                         data: viewModel,
                         message: result.Message,
                         messageAr: result.MessageAr,
                         statusCode: 201
-                    )
                 );
             })
             .WithName("AddToCart")
-            .WithTags("Cart")
-            .Produces<EndpointResponse<AddedCartItemViewModel>>(StatusCodes.Status201Created)
-            .Produces<EndpointResponse<AddedCartItemViewModel>>(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status401Unauthorized);
+            .WithTags("Cart");
         }
 
         private static bool TryValidateRequestDto(AddToCartRequestDto requestDto, out Dictionary<string, List<string>> errors)
@@ -128,7 +125,7 @@ namespace TechZoneV1.Features.Cart.AddToCart.Endpoints
         private static string GetCurrentUserId(HttpContext? httpContext)
         {
             // Implement your logic to get current user ID
-            return httpContext?.User?.FindFirst("uid")?.Value ?? "current-user-id";
+            return httpContext?.User?.FindFirst("uid")?.Value ?? "";
         }
     }
 }

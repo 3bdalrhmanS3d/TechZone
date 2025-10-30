@@ -149,8 +149,8 @@ namespace TechZone
                 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 {
                     // 1️⃣ Try to read DATABASE_URL from environment variables (e.g. Railway, Render, etc.)
-                    var dbUrl =Environment.GetEnvironmentVariable("DATABASE_URL");
-
+                    var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+                    // "" ;
                     string connectionString;
 
                     if (!string.IsNullOrEmpty(dbUrl))
