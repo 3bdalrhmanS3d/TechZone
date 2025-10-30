@@ -46,6 +46,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 using TechZoneV1.Features.Cart.UpdateCartItem.Endpoints;
 using TechZoneV1.Features.Cart.RemoveFromCart.Endpoints;
+using TechZoneV1.Features.Cart.ClearCart.Endpoints;
 
 namespace TechZone
 {
@@ -151,7 +152,7 @@ namespace TechZone
                 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 {
                     // 1️⃣ Try to read DATABASE_URL from environment variables (e.g. Railway, Render, etc.)
-                    var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+                    var dbUrl =Environment.GetEnvironmentVariable("DATABASE_URL");
                     // "" ;
                     string connectionString;
 
@@ -454,6 +455,7 @@ namespace TechZone
                 app.MapAddToCartEndpoint();
                 app.MapUpdateCartItemEndpoint();
                 app.MapRemoveFromCartEndpoint();
+                app.MapClearCartEndpoint();
 
                 app.UseCors("AllowSpecificOrigins");
                 app.UseAuthentication();

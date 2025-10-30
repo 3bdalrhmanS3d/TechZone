@@ -46,7 +46,7 @@ namespace TechZoneV1.Features.Cart.RemoveFromCart.Handlers
                 }
 
                 // Soft delete the cart item
-                _cartItemRepository.Delete(cartItem);
+                _cartItemRepository.HardDelete(cartItem);
                 await _unitOfWork.SaveChangesAsync();
 
                 // Get updated cart summary
