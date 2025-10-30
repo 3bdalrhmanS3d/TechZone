@@ -44,6 +44,7 @@ using TechZoneV1.Features.Profile.EditUserProfile.Endpoints;
 using TechZoneV1.Features.Profile.GetUserProfile.Endpoints;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
+using TechZoneV1.Features.Cart.UpdateCartItem.Endpoints;
 
 namespace TechZone
 {
@@ -450,6 +451,8 @@ namespace TechZone
                 //Cart
                 app.MapGetCartEndpoint();
                 app.MapAddToCartEndpoint();
+                app.MapUpdateCartItemEndpoint();
+
 
                 app.UseCors("AllowSpecificOrigins");
                 app.UseAuthentication();
