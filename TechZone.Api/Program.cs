@@ -45,6 +45,7 @@ using TechZoneV1.Features.Profile.GetUserProfile.Endpoints;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 using TechZoneV1.Features.Cart.UpdateCartItem.Endpoints;
+using TechZoneV1.Features.Cart.RemoveFromCart.Endpoints;
 
 namespace TechZone
 {
@@ -452,7 +453,7 @@ namespace TechZone
                 app.MapGetCartEndpoint();
                 app.MapAddToCartEndpoint();
                 app.MapUpdateCartItemEndpoint();
-
+                app.MapRemoveFromCartEndpoint();
 
                 app.UseCors("AllowSpecificOrigins");
                 app.UseAuthentication();
